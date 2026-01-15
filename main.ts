@@ -246,6 +246,7 @@ function crear_item(nombre: string, img_obj: Image, loc: tiles.Location, tipo: s
     }
     
     //  Items de misión
+    // hola
     nuevo_item = new ItemJuego(nombre, img_obj, tipo)
     items.push(nuevo_item)
     if (settings.readNumber("got_" + nombre) == 1) {

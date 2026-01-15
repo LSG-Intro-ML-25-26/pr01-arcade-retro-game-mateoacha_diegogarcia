@@ -268,6 +268,7 @@ def crear_item(nombre: str, img_obj: Image, loc: tiles.Location, tipo: str):
         return
 
     # Items de misión
+    #hola
     nuevo_item = ItemJuego(nombre, img_obj, tipo)
     items.append(nuevo_item)
     
