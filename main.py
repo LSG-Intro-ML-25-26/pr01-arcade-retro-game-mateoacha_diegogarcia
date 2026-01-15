@@ -1,5 +1,5 @@
 """
-👑 THE ALCHEMIST👑
+👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
 """
 
 # --- 1. CLASES ---
@@ -20,12 +20,14 @@ rey_npc: Sprite = None
 energia = 100.0
 juego_activo = False
 mision_iniciada = False
+nivel_actual = 1
 
 # Tipos de Sprite
 KIND_ITEM = SpriteKind.create()
 KIND_META = SpriteKind.create()
 KIND_ENEMIGO = SpriteKind.enemy
 KIND_NPC = SpriteKind.create()
+KIND_SALIDA_SECRETA = SpriteKind.create() # Nueva trampilla
 
 # --- 3. ARTE PIXEL ---
 
@@ -141,6 +143,20 @@ img_caldero = img("""
     . . d . . . . . . d . .
 """)
 
+img_trampilla = img("""
+    . . . b b b b b b . . .
+    . . b c c c c c c b . .
+    . b c 1 1 1 1 1 1 c b .
+    . b c 1 f f f f 1 c b .
+    . b c 1 f 1 1 f 1 c b .
+    . b c 1 f 1 1 f 1 c b .
+    . b c 1 f 1 1 f 1 c b .
+    . b c 1 f f f f 1 c b .
+    . b c 1 1 1 1 1 1 c b .
+    . . b c c c c c c b . .
+    . . . b b b b b b . . .
+""")
+
 img_suelo = img("""
     c c b c c c b c c c b c c c b c
     c c b c c c b c c c b c c c b c
@@ -182,69 +198,131 @@ img_pared = img("""
 # --- 4. MAPA Y ENTIDADES ---
 
 def generar_mundo():
-    scene.set_background_color(13)
-    # IMPORTANTE: Configurar mapa en el editor a 20x15
-    tiles.set_current_tilemap(tilemap("""level1"""))
+    global nivel_actual
     
-    # N = NPC, S = Start, P = Pocion
-    nivel = [
+    # LIMPIEZA TOTAL
+    for muro in tiles.get_tiles_by_type(img_pared):
+        tiles.set_tile_at(muro, img_suelo)
+        tiles.set_wall_at(muro, False)
+    
+    sprites.destroy_all_sprites_of_kind(KIND_ENEMIGO)
+    sprites.destroy_all_sprites_of_kind(KIND_META)
+    sprites.destroy_all_sprites_of_kind(KIND_NPC)
+    sprites.destroy_all_sprites_of_kind(KIND_SALIDA_SECRETA)
+    
+    for item in items:
+        if item.sprite_fisico:
+            item.sprite_fisico.destroy()
+
+    scene.set_background_color(13)
+    tiles.set_current_tilemap(tilemap("""level1"""))
+
+    # --- DISEÑO DE NIVELES CON MECÁNICA DE FASEO ---
+    # Los items (1, 2, 3) están rodeados de 'W'.
+    # Hay una 'T' (Trampilla) junto al item para poder salir.
+    # Los enemigos 'E' están fuera para empujarte dentro.
+
+    # NIVEL 1
+    mapa_1 = [
         "WWWWWWWWWWWWWWWWWWWW",
         "W.S..N.............W",
-        "W.WWWWWWW.WW.WWWWW.W",
+        "W.WWWWWWW.WW.WWW.W.W",
         "W.W.....W.WW.W...W.W",
-        "W.W.1...W.WW.W.2.W.W",
-        "W.WWWWWWW.WW.WWWWW.W",
-        "W.........E........W",
+        "W.W.E...W.WW.WWWWW.W",
+        "W.WWWWWWW.WW.W1TWW.W", # <--- SALA CERRADA
+        "W.........E..WWWWW.W",
         "WWWWWWWW.....WWWWWWW",
-        "W......E...........W",
+        "W..................W",
         "W.WWWWWWW...WWWWWW.W",
         "W.W.....W...W....W.W",
-        "W.W.3.......W..C.W.W",
+        "W.W.........W..C.W.W",
         "W.WWWWWWWW.WWWWWWW.W",
-        "W.........P........W",
+        "W..................W",
         "WWWWWWWWWWWWWWWWWWWW"
     ]
-    
-    filas = len(nivel)
-    cols = len(nivel[0])
+
+    # NIVEL 2
+    mapa_2 = [
+        "WWWWWWWWWWWWWWWWWWWW",
+        "WS.......W...E.....W",
+        "WWWWWW.W.W.WWWWWWW.W",
+        "W......W.W.......W.W",
+        "W.WWWWWW.WWWWWWW.W.W",
+        "W.W...E..........W.W",
+        "W.W.WWWWWWWWWWWW.W.W",
+        "W.W.W......P...W.W.W",
+        "W.W.W.WWWWWWWW.W.W.W",
+        "W.W.W.WWWWWWWW.W.W.W",
+        "W.W.W.WW2TWWWW.W.W.W", # <--- SALA CERRADA
+        "W.W.W.WWWWWWWW.W.W.W",
+        "W...W.....E....W.C.W",
+        "WWWWWWWWWWWWWWWWWWWW",
+        "WWWWWWWWWWWWWWWWWWWW"
+    ]
+
+    # NIVEL 3
+    mapa_3 = [
+        "WWWWWWWWWWWWWWWWWWWW",
+        "WS..W...E..W.....E.W",
+        "WWW.W.WWWW.W.WWWWW.W",
+        "W...W.W..W.W.W...W.W",
+        "W.WWW.W..W.W.W.W.W.W",
+        "W.....W..W...W.W.W.W",
+        "WWWWWWW.WWWWWW.W.W.W",
+        "W...E........W.W.W.W",
+        "W.WWWWWWWWWW.W.W.W.W",
+        "W.W........W.W.W.W.W",
+        "W.W.WWWWWW.W.W.W.W.W",
+        "W.W.WW3TWW.W...W.C.W", # <--- SALA CERRADA
+        "W.W.WWWWWWWWWWWWWW.W",
+        "W.P...E............W",
+        "WWWWWWWWWWWWWWWWWWWW"
+    ]
+
+    mapa_elegido = mapa_1
+    if nivel_actual == 2: mapa_elegido = mapa_2
+    elif nivel_actual == 3: mapa_elegido = mapa_3
+
+    filas = len(mapa_elegido)
+    cols = len(mapa_elegido[0])
     
     for r in range(filas):
-        fila = nivel[r]
+        fila = mapa_elegido[r]
         for c in range(cols):
             char = fila[c]
             loc = tiles.get_tile_location(c, r)
             
-            # 1. Suelo
             tiles.set_tile_at(loc, img_suelo)
             
-            # 2. Elementos
             if char == "W":
                 tiles.set_tile_at(loc, img_pared)
                 tiles.set_wall_at(loc, True)
-            
             elif char == "C":
                 caldero = sprites.create(img_caldero, KIND_META)
                 tiles.place_on_tile(caldero, loc)
                 caldero.start_effect(effects.fountain, 50000)
-            
             elif char == "S":
-                tiles.place_on_tile(jugador, loc)
-            
+                if jugador: tiles.place_on_tile(jugador, loc)
             elif char == "N":
-                crear_rey(loc)
-
+                if nivel_actual == 1: crear_rey(loc)
             elif char == "E":
                 crear_enemigo(loc)
-                
+            elif char == "T":
+                # La Salida Secreta
+                trampilla = sprites.create(img_trampilla, KIND_SALIDA_SECRETA)
+                tiles.place_on_tile(trampilla, loc)
             elif char == "P":
                 crear_item("Pocion Salud", img_salud, loc, "curacion")
             
-            elif char == "1":
+            # Objetos de misión
+            elif char == "1" and nivel_actual == 1:
                 crear_item("Gema Magica", img_gema, loc, "mision")
-            elif char == "2":
+            elif char == "2" and nivel_actual == 2:
                 crear_item("Hierba Santa", img_planta, loc, "mision")
-            elif char == "3":
+            elif char == "3" and nivel_actual == 3:
                 crear_item("Libro Antiguo", img_libro, loc, "mision")
+
+    game.splash("NIVEL " + str(nivel_actual))
 
 def crear_rey(loc: tiles.Location):
     global rey_npc
@@ -255,10 +333,11 @@ def crear_rey(loc: tiles.Location):
 def crear_enemigo(loc: tiles.Location):
     ene = sprites.create(img_fantasma, KIND_ENEMIGO)
     tiles.place_on_tile(ene, loc)
-    ene.follow(jugador, 25)
+    ene.follow(jugador, 35)
+    # MECÁNICA CLAVE: El fantasma atraviesa paredes para poder empujarte
+    ene.set_flag(SpriteFlag.GHOST_THROUGH_WALLS, True)
 
 def crear_item(nombre: str, img_obj: Image, loc: tiles.Location, tipo: str):
-    # Items de curación no se guardan
     if tipo == "curacion":
         spr = sprites.create(img_obj, KIND_ITEM)
         tiles.place_on_tile(spr, loc)
@@ -267,8 +346,6 @@ def crear_item(nombre: str, img_obj: Image, loc: tiles.Location, tipo: str):
         items.append(nuevo_item)
         return
 
-    # Items de misión
-    #hola
     nuevo_item = ItemJuego(nombre, img_obj, tipo)
     items.append(nuevo_item)
     
@@ -282,6 +359,10 @@ def crear_item(nombre: str, img_obj: Image, loc: tiles.Location, tipo: str):
 
 def setup_hero():
     global jugador
+    # Corrección para evitar duplicados
+    if jugador:
+        jugador.destroy()
+
     jugador = sprites.create(img_hero, SpriteKind.player)
     controller.move_sprite(jugador, 80, 80)
     scene.camera_follow_sprite(jugador)
@@ -297,7 +378,6 @@ def bucle_principal():
     velocidad = 80
     gasto = 0.05
 
-    # SPRINT (Correr)
     if controller.A.is_pressed():
         velocidad = 120
         gasto = 0.2
@@ -305,11 +385,9 @@ def bucle_principal():
     
     controller.move_sprite(jugador, velocidad, velocidad)
 
-    # Gasto de energía
     if controller.left.is_pressed() or controller.right.is_pressed() or controller.up.is_pressed() or controller.down.is_pressed():
         energia -= gasto
 
-    # HUD (Sin cambiar color para evitar errores)
     info.set_score(int(energia))
     
     if energia <= 0:
@@ -321,8 +399,8 @@ game.on_update(bucle_principal)
 def on_npc_overlap(player, npc):
     global mision_iniciada
     if not mision_iniciada:
-        game.show_long_text("REY: ¡Alquimista!\nUna plaga destruye mi reino.\nEncuentra los 3 objetos sagrados y llevalos al caldero.", DialogLayout.BOTTOM)
-        game.show_long_text("REY: Ten cuidado con los fantasmas.\n¡Ve y salvanos!", DialogLayout.BOTTOM)
+        game.show_long_text("REY: ¡Alquimista!\nLos objetos estan ocultos tras los muros.", DialogLayout.BOTTOM)
+        game.show_long_text("REY: Deja que los espectros te golpeen para traspasar la pared.\nUsa las trampillas para salir.", DialogLayout.BOTTOM)
         mision_iniciada = True
         player.y += 16
 
@@ -333,13 +411,11 @@ def on_item_overlap(player, other):
     global energia
     for it in items:
         if it.sprite_fisico == other:
-            
             if it.tipo == "curacion":
                 energia = min(100, energia + 30)
                 other.destroy(effects.hearts, 500)
                 music.power_up.play()
                 player.say("Recuperado!", 500)
-                # No usamos remove, solo lo marcamos como recogido
                 it.recogido = True
                 break
 
@@ -354,37 +430,64 @@ def on_item_overlap(player, other):
 
 sprites.on_overlap(SpriteKind.player, KIND_ITEM, on_item_overlap)
 
-# INTERACCIÓN ENEMIGOS
+# INTERACCIÓN ENEMIGOS (MECÁNICA DE FASEO)
 def on_enemy_overlap(player, enemy):
     global energia
     energia -= 5
     scene.camera_shake(4, 200)
     music.zapped.play()
     
+    # EMPUJE (FASEO): Esto permite atravesar muros si estás pegado a ellos
     if player.x < enemy.x:
         player.x -= 16
     else:
         player.x += 16
     
-    player.say("¡Ay!", 500)
+    player.say("¡Pasando!", 200)
 
 sprites.on_overlap(SpriteKind.player, KIND_ENEMIGO, on_enemy_overlap)
 
-# INTERACCIÓN META
+# INTERACCIÓN CALDERO (CAMBIO DE NIVEL)
 def on_meta_overlap(player, meta):
-    faltan = False
-    for i in items:
-        if i.tipo == "mision" and not i.recogido:
-            faltan = True
+    global nivel_actual
     
-    if not faltan:
+    item_necesario = ""
+    if nivel_actual == 1: item_necesario = "Gema Magica"
+    elif nivel_actual == 2: item_necesario = "Hierba Santa"
+    elif nivel_actual == 3: item_necesario = "Libro Antiguo"
+    
+    tiene_item = False
+    for i in items:
+        if i.nombre == item_necesario and i.recogido:
+            tiene_item = True
+            break
+            
+    if tiene_item:
         music.ba_ding.play()
-        game.over(True, effects.star_field)
+        if nivel_actual < 3:
+            game.show_long_text("El caldero te transporta...", DialogLayout.BOTTOM)
+            nivel_actual += 1
+            player.start_effect(effects.halo, 1000)
+            pause(1000)
+            generar_mundo()
+        else:
+            game.over(True, effects.star_field)
     else:
-        player.say("Necesito los 3 objetos!", 1000)
-        player.y -= 10
+        player.y += 10
+        scene.camera_shake(2, 200)
+        player.say("Necesito: " + item_necesario, 2000)
 
 sprites.on_overlap(SpriteKind.player, KIND_META, on_meta_overlap)
+
+# INTERACCIÓN SALIDA SECRETA (TRAMPILLA)
+def on_salida_overlap(player, salida):
+    music.jump_up.play()
+    player.start_effect(effects.spray, 500)
+    player.say("¡Escape!", 500)
+    # Teletransportar a lugar seguro (ej. 32, 32)
+    player.set_position(32, 32)
+
+sprites.on_overlap(SpriteKind.player, KIND_SALIDA_SECRETA, on_salida_overlap)
 
 # --- 6. MENÚS Y ARRANQUE ---
 
@@ -397,8 +500,8 @@ def mostrar_inventari():
     game.show_long_text(texto, DialogLayout.FULL)
 
 def inicio():
-    global juego_activo, energia
-    game.splash("THE ALCHEMIST", "Platinum Edition")
+    global juego_activo, energia, nivel_actual, items
+    game.splash("THE ALCHEMIST", "Ghost Edition")
     
     opcion = game.ask_for_number("1. Jugar\n2. Borrar Progreso", 1)
     
@@ -409,14 +512,15 @@ def inicio():
         game.splash("Memoria borrada")
 
     setup_hero()
-    # Botón B activa inventario
     controller.B.on_event(ControllerButtonEvent.PRESSED, mostrar_inventari)
     
-    generar_mundo()
-    energia = 100.0
-    juego_activo = True
+    items = []
+    nivel_actual = 1
+    energia = 999.0
     
-    game.show_long_text("CONTROLES:\nA = Correr\nB = Inventario\n\nHabla con el REY para empezar.", DialogLayout.FULL)
+    generar_mundo()
+    
+    juego_activo = True
+    game.show_long_text("CONTROLES:\nA = Correr\nB = Inventario", DialogLayout.FULL)
 
-# ¡ARRANCAR MOTOR!
 inicio()

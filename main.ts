@@ -1,4 +1,4 @@
-/** 👑 THE ALCHEMIST👑 */
+/** 👑 THE ALCHEMIST: GHOST PHASE EDITION 👑 */
 //  --- 1. CLASES ---
 class ItemJuego {
     nombre: string
@@ -25,11 +25,14 @@ let rey_npc : Sprite = null
 let energia = 100.0
 let juego_activo = false
 let mision_iniciada = false
+let nivel_actual = 1
 //  Tipos de Sprite
 let KIND_ITEM = SpriteKind.create()
 let KIND_META = SpriteKind.create()
 let KIND_ENEMIGO = SpriteKind.Enemy
 let KIND_NPC = SpriteKind.create()
+let KIND_SALIDA_SECRETA = SpriteKind.create()
+//  Nueva trampilla
 //  --- 3. ARTE PIXEL ---
 let img_hero = img`
     . . . . 2 2 2 2 . . . .
@@ -135,6 +138,19 @@ let img_caldero = img`
     . . . d . . . . d . . .
     . . d . . . . . . d . .
 `
+let img_trampilla = img`
+    . . . b b b b b b . . .
+    . . b c c c c c c b . .
+    . b c 1 1 1 1 1 1 c b .
+    . b c 1 f f f f 1 c b .
+    . b c 1 f 1 1 f 1 c b .
+    . b c 1 f 1 1 f 1 c b .
+    . b c 1 f 1 1 f 1 c b .
+    . b c 1 f f f f 1 c b .
+    . b c 1 1 1 1 1 1 c b .
+    . . b c c c c c c b . .
+    . . . b b b b b b . . .
+`
 let img_suelo = img`
     c c b c c c b c c c b c c c b c
     c c b c c c b c c c b c c c b c
@@ -177,21 +193,53 @@ function generar_mundo() {
     let char: string;
     let loc: tiles.Location;
     let caldero: Sprite;
+    let trampilla: Sprite;
+    
+    //  LIMPIEZA TOTAL
+    for (let muro of tiles.getTilesByType(img_pared)) {
+        tiles.setTileAt(muro, img_suelo)
+        tiles.setWallAt(muro, false)
+    }
+    sprites.destroyAllSpritesOfKind(KIND_ENEMIGO)
+    sprites.destroyAllSpritesOfKind(KIND_META)
+    sprites.destroyAllSpritesOfKind(KIND_NPC)
+    sprites.destroyAllSpritesOfKind(KIND_SALIDA_SECRETA)
+    for (let item of items) {
+        if (item.sprite_fisico) {
+            item.sprite_fisico.destroy()
+        }
+        
+    }
     scene.setBackgroundColor(13)
-    //  IMPORTANTE: Configurar mapa en el editor a 20x15
     tiles.setCurrentTilemap(tilemap`level1`)
-    //  N = NPC, S = Start, P = Pocion
-    let nivel = ["WWWWWWWWWWWWWWWWWWWW", "W.S..N.............W", "W.WWWWWWW.WW.WWWWW.W", "W.W.....W.WW.W...W.W", "W.W.1...W.WW.W.2.W.W", "W.WWWWWWW.WW.WWWWW.W", "W.........E........W", "WWWWWWWW.....WWWWWWW", "W......E...........W", "W.WWWWWWW...WWWWWW.W", "W.W.....W...W....W.W", "W.W.3.......W..C.W.W", "W.WWWWWWWW.WWWWWWW.W", "W.........P........W", "WWWWWWWWWWWWWWWWWWWW"]
-    let filas = nivel.length
-    let cols = nivel[0].length
+    //  --- DISEÑO DE NIVELES CON MECÁNICA DE FASEO ---
+    //  Los items (1, 2, 3) están rodeados de 'W'.
+    //  Hay una 'T' (Trampilla) junto al item para poder salir.
+    //  Los enemigos 'E' están fuera para empujarte dentro.
+    //  NIVEL 1
+    let mapa_1 = ["WWWWWWWWWWWWWWWWWWWW", "W.S..N.............W", "W.WWWWWWW.WW.WWW.W.W", "W.W.....W.WW.W...W.W", "W.W.E...W.WW.WWWWW.W", "W.WWWWWWW.WW.W1TWW.W", "W.........E..WWWWW.W", "WWWWWWWW.....WWWWWWW", "W..................W", "W.WWWWWWW...WWWWWW.W", "W.W.....W...W....W.W", "W.W.........W..C.W.W", "W.WWWWWWWW.WWWWWWW.W", "W..................W", "WWWWWWWWWWWWWWWWWWWW"]
+    //  <--- SALA CERRADA
+    //  NIVEL 2
+    let mapa_2 = ["WWWWWWWWWWWWWWWWWWWW", "WS.......W...E.....W", "WWWWWW.W.W.WWWWWWW.W", "W......W.W.......W.W", "W.WWWWWW.WWWWWWW.W.W", "W.W...E..........W.W", "W.W.WWWWWWWWWWWW.W.W", "W.W.W......P...W.W.W", "W.W.W.WWWWWWWW.W.W.W", "W.W.W.WWWWWWWW.W.W.W", "W.W.W.WW2TWWWW.W.W.W", "W.W.W.WWWWWWWW.W.W.W", "W...W.....E....W.C.W", "WWWWWWWWWWWWWWWWWWWW", "WWWWWWWWWWWWWWWWWWWW"]
+    //  <--- SALA CERRADA
+    //  NIVEL 3
+    let mapa_3 = ["WWWWWWWWWWWWWWWWWWWW", "WS..W...E..W.....E.W", "WWW.W.WWWW.W.WWWWW.W", "W...W.W..W.W.W...W.W", "W.WWW.W..W.W.W.W.W.W", "W.....W..W...W.W.W.W", "WWWWWWW.WWWWWW.W.W.W", "W...E........W.W.W.W", "W.WWWWWWWWWW.W.W.W.W", "W.W........W.W.W.W.W", "W.W.WWWWWW.W.W.W.W.W", "W.W.WW3TWW.W...W.C.W", "W.W.WWWWWWWWWWWWWW.W", "W.P...E............W", "WWWWWWWWWWWWWWWWWWWW"]
+    //  <--- SALA CERRADA
+    let mapa_elegido = mapa_1
+    if (nivel_actual == 2) {
+        mapa_elegido = mapa_2
+    } else if (nivel_actual == 3) {
+        mapa_elegido = mapa_3
+    }
+    
+    let filas = mapa_elegido.length
+    let cols = mapa_elegido[0].length
     for (let r = 0; r < filas; r++) {
-        fila = nivel[r]
+        fila = mapa_elegido[r]
         for (let c = 0; c < cols; c++) {
             char = fila[c]
             loc = tiles.getTileLocation(c, r)
-            //  1. Suelo
             tiles.setTileAt(loc, img_suelo)
-            //  2. Elementos
             if (char == "W") {
                 tiles.setTileAt(loc, img_pared)
                 tiles.setWallAt(loc, true)
@@ -200,23 +248,35 @@ function generar_mundo() {
                 tiles.placeOnTile(caldero, loc)
                 caldero.startEffect(effects.fountain, 50000)
             } else if (char == "S") {
-                tiles.placeOnTile(jugador, loc)
+                if (jugador) {
+                    tiles.placeOnTile(jugador, loc)
+                }
+                
             } else if (char == "N") {
-                crear_rey(loc)
+                if (nivel_actual == 1) {
+                    crear_rey(loc)
+                }
+                
             } else if (char == "E") {
                 crear_enemigo(loc)
+            } else if (char == "T") {
+                //  La Salida Secreta
+                trampilla = sprites.create(img_trampilla, KIND_SALIDA_SECRETA)
+                tiles.placeOnTile(trampilla, loc)
             } else if (char == "P") {
                 crear_item("Pocion Salud", img_salud, loc, "curacion")
-            } else if (char == "1") {
+            } else if (char == "1" && nivel_actual == 1) {
+                //  Objetos de misión
                 crear_item("Gema Magica", img_gema, loc, "mision")
-            } else if (char == "2") {
+            } else if (char == "2" && nivel_actual == 2) {
                 crear_item("Hierba Santa", img_planta, loc, "mision")
-            } else if (char == "3") {
+            } else if (char == "3" && nivel_actual == 3) {
                 crear_item("Libro Antiguo", img_libro, loc, "mision")
             }
             
         }
     }
+    game.splash("NIVEL " + ("" + nivel_actual))
 }
 
 function crear_rey(loc: tiles.Location) {
@@ -229,13 +289,14 @@ function crear_rey(loc: tiles.Location) {
 function crear_enemigo(loc: tiles.Location) {
     let ene = sprites.create(img_fantasma, KIND_ENEMIGO)
     tiles.placeOnTile(ene, loc)
-    ene.follow(jugador, 25)
+    ene.follow(jugador, 35)
+    //  MECÁNICA CLAVE: El fantasma atraviesa paredes para poder empujarte
+    ene.setFlag(SpriteFlag.GhostThroughWalls, true)
 }
 
 function crear_item(nombre: string, img_obj: Image, loc: tiles.Location, tipo: string) {
     let spr: Sprite;
     let nuevo_item: ItemJuego;
-    //  Items de curación no se guardan
     if (tipo == "curacion") {
         spr = sprites.create(img_obj, KIND_ITEM)
         tiles.placeOnTile(spr, loc)
@@ -245,8 +306,6 @@ function crear_item(nombre: string, img_obj: Image, loc: tiles.Location, tipo: s
         return
     }
     
-    //  Items de misión
-    // hola
     nuevo_item = new ItemJuego(nombre, img_obj, tipo)
     items.push(nuevo_item)
     if (settings.readNumber("got_" + nombre) == 1) {
@@ -261,6 +320,11 @@ function crear_item(nombre: string, img_obj: Image, loc: tiles.Location, tipo: s
 }
 
 function setup_hero() {
+    
+    //  Corrección para evitar duplicados
+    if (jugador) {
+        jugador.destroy()
+    }
     
     jugador = sprites.create(img_hero, SpriteKind.Player)
     controller.moveSprite(jugador, 80, 80)
@@ -277,7 +341,6 @@ game.onUpdate(function bucle_principal() {
     
     let velocidad = 80
     let gasto = 0.05
-    //  SPRINT (Correr)
     if (controller.A.isPressed()) {
         velocidad = 120
         gasto = 0.2
@@ -285,12 +348,10 @@ game.onUpdate(function bucle_principal() {
     }
     
     controller.moveSprite(jugador, velocidad, velocidad)
-    //  Gasto de energía
     if (controller.left.isPressed() || controller.right.isPressed() || controller.up.isPressed() || controller.down.isPressed()) {
         energia -= gasto
     }
     
-    //  HUD (Sin cambiar color para evitar errores)
     info.setScore(Math.trunc(energia))
     if (energia <= 0) {
         game.over(false, effects.melt)
@@ -302,10 +363,9 @@ sprites.onOverlap(SpriteKind.Player, KIND_NPC, function on_npc_overlap(player: S
     
     if (!mision_iniciada) {
         game.showLongText(`REY: ¡Alquimista!
-Una plaga destruye mi reino.
-Encuentra los 3 objetos sagrados y llevalos al caldero.`, DialogLayout.Bottom)
-        game.showLongText(`REY: Ten cuidado con los fantasmas.
-¡Ve y salvanos!`, DialogLayout.Bottom)
+Los objetos estan ocultos tras los muros.`, DialogLayout.Bottom)
+        game.showLongText(`REY: Deja que los espectros te golpeen para traspasar la pared.
+Usa las trampillas para salir.`, DialogLayout.Bottom)
         mision_iniciada = true
         player.y += 16
     }
@@ -321,7 +381,6 @@ sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player:
                 other.destroy(effects.hearts, 500)
                 music.powerUp.play()
                 player.say("Recuperado!", 500)
-                //  No usamos remove, solo lo marcamos como recogido
                 it.recogido = true
                 break
             }
@@ -340,42 +399,72 @@ sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player:
         
     }
 })
-//  INTERACCIÓN ENEMIGOS
+//  INTERACCIÓN ENEMIGOS (MECÁNICA DE FASEO)
 sprites.onOverlap(SpriteKind.Player, KIND_ENEMIGO, function on_enemy_overlap(player: Sprite, enemy: Sprite) {
     
     energia -= 5
     scene.cameraShake(4, 200)
     music.zapped.play()
+    //  EMPUJE (FASEO): Esto permite atravesar muros si estás pegado a ellos
     if (player.x < enemy.x) {
         player.x -= 16
     } else {
         player.x += 16
     }
     
-    player.say("¡Ay!", 500)
+    player.say("¡Pasando!", 200)
 })
-//  INTERACCIÓN META
+//  INTERACCIÓN CALDERO (CAMBIO DE NIVEL)
 sprites.onOverlap(SpriteKind.Player, KIND_META, function on_meta_overlap(player: Sprite, meta: Sprite) {
-    let faltan = false
+    
+    let item_necesario = ""
+    if (nivel_actual == 1) {
+        item_necesario = "Gema Magica"
+    } else if (nivel_actual == 2) {
+        item_necesario = "Hierba Santa"
+    } else if (nivel_actual == 3) {
+        item_necesario = "Libro Antiguo"
+    }
+    
+    let tiene_item = false
     for (let i of items) {
-        if (i.tipo == "mision" && !i.recogido) {
-            faltan = true
+        if (i.nombre == item_necesario && i.recogido) {
+            tiene_item = true
+            break
         }
         
     }
-    if (!faltan) {
+    if (tiene_item) {
         music.baDing.play()
-        game.over(true, effects.starField)
+        if (nivel_actual < 3) {
+            game.showLongText("El caldero te transporta...", DialogLayout.Bottom)
+            nivel_actual += 1
+            player.startEffect(effects.halo, 1000)
+            pause(1000)
+            generar_mundo()
+        } else {
+            game.over(true, effects.starField)
+        }
+        
     } else {
-        player.say("Necesito los 3 objetos!", 1000)
-        player.y -= 10
+        player.y += 10
+        scene.cameraShake(2, 200)
+        player.say("Necesito: " + item_necesario, 2000)
     }
     
+})
+//  INTERACCIÓN SALIDA SECRETA (TRAMPILLA)
+sprites.onOverlap(SpriteKind.Player, KIND_SALIDA_SECRETA, function on_salida_overlap(player: Sprite, salida: Sprite) {
+    music.jumpUp.play()
+    player.startEffect(effects.spray, 500)
+    player.say("¡Escape!", 500)
+    //  Teletransportar a lugar seguro (ej. 32, 32)
+    player.setPosition(32, 32)
 })
 //  --- 6. MENÚS Y ARRANQUE ---
 function inicio() {
     
-    game.splash("THE ALCHEMIST", "Platinum Edition")
+    game.splash("THE ALCHEMIST", "Ghost Edition")
     let opcion = game.askForNumber(`1. Jugar
 2. Borrar Progreso`, 1)
     if (opcion == 2) {
@@ -386,7 +475,6 @@ function inicio() {
     }
     
     setup_hero()
-    //  Botón B activa inventario
     controller.B.onEvent(ControllerButtonEvent.Pressed, function mostrar_inventari() {
         let estado: any;
         let texto = "MOCHILA:\n"
@@ -399,15 +487,14 @@ function inicio() {
         }
         game.showLongText(texto, DialogLayout.Full)
     })
+    items = []
+    nivel_actual = 1
+    energia = 999.0
     generar_mundo()
-    energia = 100.0
     juego_activo = true
     game.showLongText(`CONTROLES:
 A = Correr
-B = Inventario
-
-Habla con el REY para empezar.`, DialogLayout.Full)
+B = Inventario`, DialogLayout.Full)
 }
 
-//  ¡ARRANCAR MOTOR!
 inicio()
