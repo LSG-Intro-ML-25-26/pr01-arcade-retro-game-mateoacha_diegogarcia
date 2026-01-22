@@ -1,6 +1,6 @@
 """
 👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
-(Héroe Animado + Objetos Texto + Respawn en cada nivel)
+(Sin empujes: Atraviesa fantasmas pero recibe daño)
 """
 
 # --- 1. CLASES ---
@@ -18,7 +18,7 @@ enemigos: List[Sprite] = []
 jugador: Sprite = None
 rey_npc: Sprite = None
 
-energia = 999.0
+energia = 100.0
 juego_activo = False
 mision_iniciada = False
 nivel_actual = 1
@@ -160,15 +160,14 @@ img_suelo_limpio = img("""
 def generar_mundo():
     global nivel_actual, items
     
-    # [CAMBIO 1] REINICIAMOS LOS OBJETOS EN CADA NIVEL
-    # Así, si en el nivel 1 cogiste una gema, en el nivel 2 la gema vuelve a aparecer
+    # REINICIAMOS LOS OBJETOS EN CADA NIVEL
     items = []
 
     # 1. LIMPIEZA
     sprites.destroy_all_sprites_of_kind(KIND_ENEMIGO)
     sprites.destroy_all_sprites_of_kind(KIND_META)
     sprites.destroy_all_sprites_of_kind(KIND_NPC)
-    sprites.destroy_all_sprites_of_kind(KIND_ITEM) # Limpieza extra por seguridad
+    sprites.destroy_all_sprites_of_kind(KIND_ITEM)
     
     scene.set_background_color(13)
 
@@ -251,10 +250,6 @@ def crear_enemigo(loc: tiles.Location):
     ene.set_flag(SpriteFlag.GHOST_THROUGH_WALLS, True)
 
 def crear_item(nombre: str, img_obj: Image, loc: tiles.Location, tipo: str):
-    # [CAMBIO 2] ELIMINADO EL BLOQUEO DE DUPLICADOS
-    # Ahora siempre crea el item, aunque lo hayas cogido antes.
-    # Como vaciamos la lista 'items' en generar_mundo, esto funciona perfecto.
-
     if tipo == "curacion":
         spr = sprites.create(img_obj, KIND_ITEM)
         tiles.place_on_tile(spr, loc)
@@ -373,19 +368,19 @@ def on_item_overlap(player, other):
 
 sprites.on_overlap(SpriteKind.player, KIND_ITEM, on_item_overlap)
 
-# INTERACCIÓN ENEMIGOS
+# INTERACCIÓN ENEMIGOS (CAMBIADO: YA NO EMPUJAN)
 def on_enemy_overlap(player, enemy):
     global energia
+    # Solo quitamos vida y efecto
     energia -= 5
     scene.camera_shake(4, 200)
     music.zapped.play()
     
-    if player.x < enemy.x:
-        player.x -= 16
-    else:
-        player.x += 16
+    # [BORRADO EL EMPUJE]
+    # Ya no hay player.x += ...
     
-    player.say("¡Pasando!", 200)
+    # Pequeña pausa para no morir instantáneamente al tocarlo
+    pause(200)
 
 sprites.on_overlap(SpriteKind.player, KIND_ENEMIGO, on_enemy_overlap)
 
@@ -461,7 +456,7 @@ def inicio():
     # Inicialización limpia
     items = []
     nivel_actual = 1
-    energia = 999.0
+    energia = 100.0
     
     generar_mundo()
     

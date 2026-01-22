@@ -1,6 +1,6 @@
 /** 
 👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
-(Héroe Animado + Objetos Texto + Respawn en cada nivel)
+(Sin empujes: Atraviesa fantasmas pero recibe daño)
 
  */
 //  --- 1. CLASES ---
@@ -26,7 +26,7 @@ let items : ItemJuego[] = []
 let enemigos : Sprite[] = []
 let jugador : Sprite = null
 let rey_npc : Sprite = null
-let energia = 999.0
+let energia = 100.0
 let juego_activo = false
 let mision_iniciada = false
 let nivel_actual = 1
@@ -156,15 +156,13 @@ function generar_mundo() {
     let loc: tiles.Location;
     let caldero: Sprite;
     
-    //  [CAMBIO 1] REINICIAMOS LOS OBJETOS EN CADA NIVEL
-    //  Así, si en el nivel 1 cogiste una gema, en el nivel 2 la gema vuelve a aparecer
+    //  REINICIAMOS LOS OBJETOS EN CADA NIVEL
     items = []
     //  1. LIMPIEZA
     sprites.destroyAllSpritesOfKind(KIND_ENEMIGO)
     sprites.destroyAllSpritesOfKind(KIND_META)
     sprites.destroyAllSpritesOfKind(KIND_NPC)
     sprites.destroyAllSpritesOfKind(KIND_ITEM)
-    //  Limpieza extra por seguridad
     scene.setBackgroundColor(13)
     //  2. CARGAR TILEMAP VISUAL
     if (nivel_actual == 1) {
@@ -250,9 +248,6 @@ function crear_enemigo(loc: tiles.Location) {
 function crear_item(nombre: string, img_obj: Image, loc: tiles.Location, tipo: string) {
     let spr: Sprite;
     let nuevo_item: ItemJuego;
-    //  [CAMBIO 2] ELIMINADO EL BLOQUEO DE DUPLICADOS
-    //  Ahora siempre crea el item, aunque lo hayas cogido antes.
-    //  Como vaciamos la lista 'items' en generar_mundo, esto funciona perfecto.
     if (tipo == "curacion") {
         spr = sprites.create(img_obj, KIND_ITEM)
         tiles.placeOnTile(spr, loc)
@@ -379,19 +374,17 @@ sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player:
         
     }
 })
-//  INTERACCIÓN ENEMIGOS
+//  INTERACCIÓN ENEMIGOS (CAMBIADO: YA NO EMPUJAN)
 sprites.onOverlap(SpriteKind.Player, KIND_ENEMIGO, function on_enemy_overlap(player: Sprite, enemy: Sprite) {
     
+    //  Solo quitamos vida y efecto
     energia -= 5
     scene.cameraShake(4, 200)
     music.zapped.play()
-    if (player.x < enemy.x) {
-        player.x -= 16
-    } else {
-        player.x += 16
-    }
-    
-    player.say("¡Pasando!", 200)
+    //  [BORRADO EL EMPUJE]
+    //  Ya no hay player.x += ...
+    //  Pequeña pausa para no morir instantáneamente al tocarlo
+    pause(200)
 })
 //  INTERACCIÓN CALDERO (META)
 sprites.onOverlap(SpriteKind.Player, KIND_META, function on_meta_overlap(player: Sprite, meta: Sprite) {
@@ -473,7 +466,7 @@ perderas TODOS los objetos.`, DialogLayout.Full)
     //  Inicialización limpia
     items = []
     nivel_actual = 1
-    energia = 999.0
+    energia = 100.0
     generar_mundo()
     juego_activo = true
 }
