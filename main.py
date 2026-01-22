@@ -1,6 +1,6 @@
 """
 👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
-(Sin empujes: Atraviesa fantasmas pero recibe daño)
+(Sin Confeti + Sin Empujes + Héroe Animado)
 """
 
 # --- 1. CLASES ---
@@ -360,7 +360,11 @@ def on_item_overlap(player, other):
 
             if it.tipo == "mision":
                 it.recogido = True
-                other.destroy(effects.confetti, 500)
+                
+                # [CAMBIO: ELIMINADO effects.confetti]
+                # Simplemente destruimos el objeto (desaparece)
+                other.destroy()
+                
                 music.magic_wand.play()
                 energia = min(100, energia + 10)
                 game.show_long_text("¡Conseguido!\n" + it.nombre, DialogLayout.BOTTOM)
@@ -368,18 +372,14 @@ def on_item_overlap(player, other):
 
 sprites.on_overlap(SpriteKind.player, KIND_ITEM, on_item_overlap)
 
-# INTERACCIÓN ENEMIGOS (CAMBIADO: YA NO EMPUJAN)
+# INTERACCIÓN ENEMIGOS
 def on_enemy_overlap(player, enemy):
     global energia
-    # Solo quitamos vida y efecto
     energia -= 5
     scene.camera_shake(4, 200)
     music.zapped.play()
     
-    # [BORRADO EL EMPUJE]
-    # Ya no hay player.x += ...
-    
-    # Pequeña pausa para no morir instantáneamente al tocarlo
+    # Pausa para evitar muerte instantánea al atravesar
     pause(200)
 
 sprites.on_overlap(SpriteKind.player, KIND_ENEMIGO, on_enemy_overlap)
@@ -456,7 +456,7 @@ def inicio():
     # Inicialización limpia
     items = []
     nivel_actual = 1
-    energia = 999.0
+    energia = 100.0
     
     generar_mundo()
     

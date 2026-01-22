@@ -1,6 +1,6 @@
 /** 
 👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
-(Sin empujes: Atraviesa fantasmas pero recibe daño)
+(Sin Confeti + Sin Empujes + Héroe Animado)
 
  */
 //  --- 1. CLASES ---
@@ -363,7 +363,9 @@ sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player:
             
             if (it.tipo == "mision") {
                 it.recogido = true
-                other.destroy(effects.confetti, 500)
+                //  [CAMBIO: ELIMINADO effects.confetti]
+                //  Simplemente destruimos el objeto (desaparece)
+                other.destroy()
                 music.magicWand.play()
                 energia = Math.min(100, energia + 10)
                 game.showLongText("¡Conseguido!\n" + it.nombre, DialogLayout.Bottom)
@@ -374,16 +376,13 @@ sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player:
         
     }
 })
-//  INTERACCIÓN ENEMIGOS (CAMBIADO: YA NO EMPUJAN)
+//  INTERACCIÓN ENEMIGOS
 sprites.onOverlap(SpriteKind.Player, KIND_ENEMIGO, function on_enemy_overlap(player: Sprite, enemy: Sprite) {
     
-    //  Solo quitamos vida y efecto
     energia -= 5
     scene.cameraShake(4, 200)
     music.zapped.play()
-    //  [BORRADO EL EMPUJE]
-    //  Ya no hay player.x += ...
-    //  Pequeña pausa para no morir instantáneamente al tocarlo
+    //  Pausa para evitar muerte instantánea al atravesar
     pause(200)
 })
 //  INTERACCIÓN CALDERO (META)
@@ -466,7 +465,7 @@ perderas TODOS los objetos.`, DialogLayout.Full)
     //  Inicialización limpia
     items = []
     nivel_actual = 1
-    energia = 999.0
+    energia = 100.0
     generar_mundo()
     juego_activo = true
 }
