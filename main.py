@@ -1,6 +1,6 @@
 """
 👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
-(Sin Confeti + Sin Empujes + Héroe Animado)
+(Sin Confeti + Sin Empujes + Héroe Animado + VIDA EXTRA)
 """
 
 # --- 1. CLASES ---
@@ -18,7 +18,7 @@ enemigos: List[Sprite] = []
 jugador: Sprite = None
 rey_npc: Sprite = None
 
-energia = 999.0
+energia = 999.0  # <-- CAMBIADO AQUÍ TAMBIÉN POR SI ACASO
 juego_activo = False
 mision_iniciada = False
 nivel_actual = 1
@@ -351,7 +351,7 @@ def on_item_overlap(player, other):
     for it in items:
         if it.sprite_fisico == other:
             if it.tipo == "curacion":
-                energia = min(100, energia + 30)
+                energia = min(999, energia + 30) # Aumentado el tope de curación
                 other.destroy(effects.hearts, 500)
                 music.power_up.play()
                 player.say("Recuperado!", 500)
@@ -366,7 +366,7 @@ def on_item_overlap(player, other):
                 other.destroy()
                 
                 music.magic_wand.play()
-                energia = min(100, energia + 10)
+                energia = min(999, energia + 10) # Aumentado el tope de energía
                 game.show_long_text("¡Conseguido!\n" + it.nombre, DialogLayout.BOTTOM)
                 break
 
@@ -456,7 +456,9 @@ def inicio():
     # Inicialización limpia
     items = []
     nivel_actual = 1
-    energia = 100.0
+    
+    # [CAMBIO: VIDA INICIAL 999]
+    energia = 999.0
     
     generar_mundo()
     

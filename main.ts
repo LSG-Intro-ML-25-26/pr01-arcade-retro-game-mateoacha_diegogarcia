@@ -1,6 +1,6 @@
 /** 
 👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
-(Sin Confeti + Sin Empujes + Héroe Animado)
+(Sin Confeti + Sin Empujes + Héroe Animado + VIDA EXTRA)
 
  */
 //  --- 1. CLASES ---
@@ -27,6 +27,7 @@ let enemigos : Sprite[] = []
 let jugador : Sprite = null
 let rey_npc : Sprite = null
 let energia = 999.0
+//  <-- CAMBIADO AQUÍ TAMBIÉN POR SI ACASO
 let juego_activo = false
 let mision_iniciada = false
 let nivel_actual = 1
@@ -353,7 +354,8 @@ sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player:
     for (let it of items) {
         if (it.sprite_fisico == other) {
             if (it.tipo == "curacion") {
-                energia = Math.min(100, energia + 30)
+                energia = Math.min(999, energia + 30)
+                //  Aumentado el tope de curación
                 other.destroy(effects.hearts, 500)
                 music.powerUp.play()
                 player.say("Recuperado!", 500)
@@ -367,7 +369,8 @@ sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player:
                 //  Simplemente destruimos el objeto (desaparece)
                 other.destroy()
                 music.magicWand.play()
-                energia = Math.min(100, energia + 10)
+                energia = Math.min(999, energia + 10)
+                //  Aumentado el tope de energía
                 game.showLongText("¡Conseguido!\n" + it.nombre, DialogLayout.Bottom)
                 break
             }
@@ -465,7 +468,8 @@ perderas TODOS los objetos.`, DialogLayout.Full)
     //  Inicialización limpia
     items = []
     nivel_actual = 1
-    energia = 100.0
+    //  [CAMBIO: VIDA INICIAL 999]
+    energia = 999.0
     generar_mundo()
     juego_activo = true
 }
