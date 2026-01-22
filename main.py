@@ -1,6 +1,6 @@
 """
 👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
-(3 Objetos Únicos - Progresión Acumulativa)
+(Héroe 100% Personalizable + Resto Clásico)
 """
 
 # --- 1. CLASES ---
@@ -23,6 +23,9 @@ juego_activo = False
 mision_iniciada = False
 nivel_actual = 1
 
+# Variable para controlar la animación
+ultimo_estado_hero = "parado"
+
 # Tipos de Sprite
 KIND_ITEM = SpriteKind.create()
 KIND_META = SpriteKind.create()
@@ -31,23 +34,11 @@ KIND_NPC = SpriteKind.create()
 
 # --- 3. ARTE PIXEL ---
 
-img_hero = img("""
-    . . . . 2 2 2 2 . . . .
-    . . . 2 2 2 2 2 2 . . .
-    . . 2 2 2 2 2 2 2 2 . .
-    . . 2 2 8 8 8 8 2 2 . .
-    . . 2 8 8 8 8 8 8 2 . .
-    . . 8 8 f f f f 8 8 . .
-    . . 8 f f 2 2 f f 8 . .
-    . . 8 f f f f f f 8 . .
-    . . 8 8 8 8 8 8 8 8 . .
-    . . f 8 8 8 8 8 8 f . .
-    . . f 8 5 5 5 5 8 f . .
-    . . . 8 5 5 5 5 8 . . .
-    . . . f f . . f f . . .
-    . . . . . . . . . . . .
-""")
+# [ESTO ES LO QUE PEDISTE]
+# El héroe usa Assets. Haz clic en el paréntesis para elegir tu dibujo "Quieto"
+img_hero = assets.image("""hero_quieto""")
 
+# [EL RESTO SIGUE SIENDO CÓDIGO DE TEXTO]
 img_rey = img("""
     . . . . 5 5 5 5 . . . .
     . . . 5 5 4 4 5 5 . . .
@@ -144,7 +135,7 @@ img_caldero = img("""
     . . d . . . . . . d . .
 """)
 
-# Tile de limpieza (usado para borrar marcadores)
+# Tile de limpieza
 img_suelo_limpio = img("""
     c c b c c c b c c c b c c c b c
     c c b c c c b c c c b c c c b c
@@ -191,10 +182,6 @@ def generar_mundo():
         game.over(True)
 
     # 3. COLOCAR OBJETOS BASADO EN MARCADORES
-    # NOTA: Asegúrate de dibujar los marcadores correspondientes en cada nivel.
-    # Nivel 1: Dibuja marcador_gema
-    # Nivel 2: Dibuja marcador_gema Y marcador_planta
-    # Nivel 3: Dibuja marcador_gema, marcador_planta Y marcador_libro
 
     # --- A. JUGADOR ---
     lista_jugador = tiles.get_tiles_by_type(assets.tile("""marcador_jugador"""))
@@ -227,21 +214,21 @@ def generar_mundo():
     
     # --- F. ITEMS (OBJETOS) ---
     
-    # 1. GEMA MAGICA (Aparece si pones el tile "marcador_item1")
+    # 1. GEMA MAGICA
     lista_gema = tiles.get_tiles_by_type(assets.tile("""marcador_item1"""))
     for i in range(len(lista_gema)):
         loc = lista_gema[i]
         crear_item("Gema Magica", img_gema, loc, "mision")
         tiles.set_tile_at(loc, img_suelo_limpio)
 
-    # 2. HIERBA SANTA (Aparece si pones el tile "marcador_item2")
+    # 2. HIERBA SANTA
     lista_planta = tiles.get_tiles_by_type(assets.tile("""marcador_item2"""))
     for i in range(len(lista_planta)):
         loc = lista_planta[i]
         crear_item("Hierba Santa", img_planta, loc, "mision")
         tiles.set_tile_at(loc, img_suelo_limpio)
         
-    # 3. LIBRO ANTIGUO (Aparece si pones el tile "marcador_item3")
+    # 3. LIBRO ANTIGUO
     lista_libro = tiles.get_tiles_by_type(assets.tile("""marcador_item3"""))
     for i in range(len(lista_libro)):
         loc = lista_libro[i]
@@ -264,7 +251,6 @@ def crear_enemigo(loc: tiles.Location):
     ene.set_flag(SpriteFlag.GHOST_THROUGH_WALLS, True)
 
 def crear_item(nombre: str, img_obj: Image, loc: tiles.Location, tipo: str):
-    # Evitar duplicados si ya lo recogimos (aunque al morir se borra todo)
     for i in items:
         if i.nombre == nombre and i.recogido:
             return
@@ -290,6 +276,7 @@ def setup_hero():
     if jugador:
         jugador.destroy()
 
+    # Se crea el héroe usando la imagen de Assets que definiste arriba
     jugador = sprites.create(img_hero, SpriteKind.player)
     controller.move_sprite(jugador, 80, 80)
     scene.camera_follow_sprite(jugador)
@@ -298,7 +285,7 @@ def setup_hero():
 # --- 5. LÓGICA DEL JUEGO ---
 
 def bucle_principal():
-    global energia, juego_activo
+    global energia, juego_activo, ultimo_estado_hero
     
     if not juego_activo: return
 
@@ -312,8 +299,41 @@ def bucle_principal():
     
     controller.move_sprite(jugador, velocidad, velocidad)
 
-    if controller.left.is_pressed() or controller.right.is_pressed() or controller.up.is_pressed() or controller.down.is_pressed():
+    # --- LÓGICA DE ANIMACIÓN DEL HÉROE ---
+    estado_actual = "parado"
+
+    if controller.left.is_pressed():
+        estado_actual = "izquierda"
         energia -= gasto
+    elif controller.right.is_pressed():
+        estado_actual = "derecha"
+        energia -= gasto
+    elif controller.up.is_pressed():
+        estado_actual = "arriba"
+        energia -= gasto
+    elif controller.down.is_pressed():
+        estado_actual = "abajo"
+        energia -= gasto
+    
+    # Solo cambiamos la animación si el estado es diferente al anterior
+    if estado_actual != ultimo_estado_hero:
+        # Esto para cualquier animación que esté corriendo
+        animation.stop_animation(animation.AnimationTypes.ALL, jugador)
+        
+        # IMPORTANTE: Selecciona aquí tus animaciones
+        if estado_actual == "izquierda":
+            animation.run_image_animation(jugador, assets.animation("""anim_hero_izquierda"""), 100, True)
+        elif estado_actual == "derecha":
+            animation.run_image_animation(jugador, assets.animation("""anim_hero_derecha"""), 100, True)
+        elif estado_actual == "arriba":
+            animation.run_image_animation(jugador, assets.animation("""anim_hero_arriba"""), 100, True)
+        elif estado_actual == "abajo":
+            animation.run_image_animation(jugador, assets.animation("""anim_hero_abajo"""), 100, True)
+        elif estado_actual == "parado":
+            # Aquí es donde le decimos: Si se para, ponte la imagen de "img_hero"
+            jugador.set_image(img_hero)
+
+        ultimo_estado_hero = estado_actual
 
     info.set_score(int(energia))
     
@@ -378,7 +398,6 @@ def on_meta_overlap(player, meta):
     
     objetivos: List[str] = []
     
-    # CONFIGURACIÓN DE OBJETIVOS POR NIVEL
     if nivel_actual == 1:
         objetivos = ["Gema Magica"]
     elif nivel_actual == 2:

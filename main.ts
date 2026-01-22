@@ -1,6 +1,6 @@
 /** 
 👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
-(3 Objetos Únicos - Progresión Acumulativa)
+(Héroe 100% Personalizable + Resto Clásico)
 
  */
 //  --- 1. CLASES ---
@@ -30,28 +30,18 @@ let energia = 100.0
 let juego_activo = false
 let mision_iniciada = false
 let nivel_actual = 1
+//  Variable para controlar la animación
+let ultimo_estado_hero = "parado"
 //  Tipos de Sprite
 let KIND_ITEM = SpriteKind.create()
 let KIND_META = SpriteKind.create()
 let KIND_ENEMIGO = SpriteKind.Enemy
 let KIND_NPC = SpriteKind.create()
 //  --- 3. ARTE PIXEL ---
-let img_hero = img`
-    . . . . 2 2 2 2 . . . .
-    . . . 2 2 2 2 2 2 . . .
-    . . 2 2 2 2 2 2 2 2 . .
-    . . 2 2 8 8 8 8 2 2 . .
-    . . 2 8 8 8 8 8 8 2 . .
-    . . 8 8 f f f f 8 8 . .
-    . . 8 f f 2 2 f f 8 . .
-    . . 8 f f f f f f 8 . .
-    . . 8 8 8 8 8 8 8 8 . .
-    . . f 8 8 8 8 8 8 f . .
-    . . f 8 5 5 5 5 8 f . .
-    . . . 8 5 5 5 5 8 . . .
-    . . . f f . . f f . . .
-    . . . . . . . . . . . .
-`
+//  [ESTO ES LO QUE PEDISTE]
+//  El héroe usa Assets. Haz clic en el paréntesis para elegir tu dibujo "Quieto"
+let img_hero = assets.image`hero_quieto`
+//  [EL RESTO SIGUE SIENDO CÓDIGO DE TEXTO]
 let img_rey = img`
     . . . . 5 5 5 5 . . . .
     . . . 5 5 4 4 5 5 . . .
@@ -141,7 +131,7 @@ let img_caldero = img`
     . . . d . . . . d . . .
     . . d . . . . . . d . .
 `
-//  Tile de limpieza (usado para borrar marcadores)
+//  Tile de limpieza
 let img_suelo_limpio = img`
     c c b c c c b c c c b c c c b c
     c c b c c c b c c c b c c c b c
@@ -189,10 +179,6 @@ function generar_mundo() {
     }
     
     //  3. COLOCAR OBJETOS BASADO EN MARCADORES
-    //  NOTA: Asegúrate de dibujar los marcadores correspondientes en cada nivel.
-    //  Nivel 1: Dibuja marcador_gema
-    //  Nivel 2: Dibuja marcador_gema Y marcador_planta
-    //  Nivel 3: Dibuja marcador_gema, marcador_planta Y marcador_libro
     //  --- A. JUGADOR ---
     let lista_jugador = tiles.getTilesByType(assets.tile`marcador_jugador`)
     if (lista_jugador.length > 0) {
@@ -224,21 +210,21 @@ function generar_mundo() {
         tiles.setTileAt(loc, img_suelo_limpio)
     }
     //  --- F. ITEMS (OBJETOS) ---
-    //  1. GEMA MAGICA (Aparece si pones el tile "marcador_item1")
+    //  1. GEMA MAGICA
     let lista_gema = tiles.getTilesByType(assets.tile`marcador_item1`)
     for (i = 0; i < lista_gema.length; i++) {
         loc = lista_gema[i]
         crear_item("Gema Magica", img_gema, loc, "mision")
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-    //  2. HIERBA SANTA (Aparece si pones el tile "marcador_item2")
+    //  2. HIERBA SANTA
     let lista_planta = tiles.getTilesByType(assets.tile`marcador_item2`)
     for (i = 0; i < lista_planta.length; i++) {
         loc = lista_planta[i]
         crear_item("Hierba Santa", img_planta, loc, "mision")
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-    //  3. LIBRO ANTIGUO (Aparece si pones el tile "marcador_item3")
+    //  3. LIBRO ANTIGUO
     let lista_libro = tiles.getTilesByType(assets.tile`marcador_item3`)
     for (i = 0; i < lista_libro.length; i++) {
         loc = lista_libro[i]
@@ -266,7 +252,6 @@ function crear_enemigo(loc: tiles.Location) {
 function crear_item(nombre: string, img_obj: Image, loc: tiles.Location, tipo: string) {
     let spr: Sprite;
     let nuevo_item: ItemJuego;
-    //  Evitar duplicados si ya lo recogimos (aunque al morir se borra todo)
     for (let i of items) {
         if (i.nombre == nombre && i.recogido) {
             return
@@ -296,6 +281,7 @@ function setup_hero() {
         jugador.destroy()
     }
     
+    //  Se crea el héroe usando la imagen de Assets que definiste arriba
     jugador = sprites.create(img_hero, SpriteKind.Player)
     controller.moveSprite(jugador, 80, 80)
     scene.cameraFollowSprite(jugador)
@@ -318,8 +304,41 @@ game.onUpdate(function bucle_principal() {
     }
     
     controller.moveSprite(jugador, velocidad, velocidad)
-    if (controller.left.isPressed() || controller.right.isPressed() || controller.up.isPressed() || controller.down.isPressed()) {
+    //  --- LÓGICA DE ANIMACIÓN DEL HÉROE ---
+    let estado_actual = "parado"
+    if (controller.left.isPressed()) {
+        estado_actual = "izquierda"
         energia -= gasto
+    } else if (controller.right.isPressed()) {
+        estado_actual = "derecha"
+        energia -= gasto
+    } else if (controller.up.isPressed()) {
+        estado_actual = "arriba"
+        energia -= gasto
+    } else if (controller.down.isPressed()) {
+        estado_actual = "abajo"
+        energia -= gasto
+    }
+    
+    //  Solo cambiamos la animación si el estado es diferente al anterior
+    if (estado_actual != ultimo_estado_hero) {
+        //  Esto para cualquier animación que esté corriendo
+        animation.stopAnimation(animation.AnimationTypes.All, jugador)
+        //  IMPORTANTE: Selecciona aquí tus animaciones
+        if (estado_actual == "izquierda") {
+            animation.runImageAnimation(jugador, assets.animation`anim_hero_izquierda`, 100, true)
+        } else if (estado_actual == "derecha") {
+            animation.runImageAnimation(jugador, assets.animation`anim_hero_derecha`, 100, true)
+        } else if (estado_actual == "arriba") {
+            animation.runImageAnimation(jugador, assets.animation`anim_hero_arriba`, 100, true)
+        } else if (estado_actual == "abajo") {
+            animation.runImageAnimation(jugador, assets.animation`anim_hero_abajo`, 100, true)
+        } else if (estado_actual == "parado") {
+            //  Aquí es donde le decimos: Si se para, ponte la imagen de "img_hero"
+            jugador.setImage(img_hero)
+        }
+        
+        ultimo_estado_hero = estado_actual
     }
     
     info.setScore(Math.trunc(energia))
@@ -388,7 +407,6 @@ sprites.onOverlap(SpriteKind.Player, KIND_META, function on_meta_overlap(player:
     let texto_falta: string;
     
     let objetivos : string[] = []
-    //  CONFIGURACIÓN DE OBJETIVOS POR NIVEL
     if (nivel_actual == 1) {
         objetivos = ["Gema Magica"]
     } else if (nivel_actual == 2) {
