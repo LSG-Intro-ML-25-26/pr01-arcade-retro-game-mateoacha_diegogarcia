@@ -1,6 +1,6 @@
 /** 
 👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
-(Héroe 100% Personalizable + Resto Clásico)
+(Héroe Animado + Objetos Texto + Respawn en cada nivel)
 
  */
 //  --- 1. CLASES ---
@@ -38,10 +38,10 @@ let KIND_META = SpriteKind.create()
 let KIND_ENEMIGO = SpriteKind.Enemy
 let KIND_NPC = SpriteKind.create()
 //  --- 3. ARTE PIXEL ---
-//  [ESTO ES LO QUE PEDISTE]
-//  El héroe usa Assets. Haz clic en el paréntesis para elegir tu dibujo "Quieto"
+//  [HÉROE ANIMADO]
+//  Haz clic aquí para elegir tu dibujo del héroe quieto
 let img_hero = assets.image`hero_quieto`
-//  [EL RESTO SIGUE SIENDO CÓDIGO DE TEXTO]
+//  [RESTO DE OBJETOS - TEXTO]
 let img_rey = img`
     . . . . 5 5 5 5 . . . .
     . . . 5 5 4 4 5 5 . . .
@@ -156,16 +156,15 @@ function generar_mundo() {
     let loc: tiles.Location;
     let caldero: Sprite;
     
+    //  [CAMBIO 1] REINICIAMOS LOS OBJETOS EN CADA NIVEL
+    //  Así, si en el nivel 1 cogiste una gema, en el nivel 2 la gema vuelve a aparecer
+    items = []
     //  1. LIMPIEZA
     sprites.destroyAllSpritesOfKind(KIND_ENEMIGO)
     sprites.destroyAllSpritesOfKind(KIND_META)
     sprites.destroyAllSpritesOfKind(KIND_NPC)
-    for (let item of items) {
-        if (item.sprite_fisico) {
-            item.sprite_fisico.destroy()
-        }
-        
-    }
+    sprites.destroyAllSpritesOfKind(KIND_ITEM)
+    //  Limpieza extra por seguridad
     scene.setBackgroundColor(13)
     //  2. CARGAR TILEMAP VISUAL
     if (nivel_actual == 1) {
@@ -244,7 +243,6 @@ function crear_rey(loc: tiles.Location) {
 function crear_enemigo(loc: tiles.Location) {
     let ene = sprites.create(img_fantasma, KIND_ENEMIGO)
     tiles.placeOnTile(ene, loc)
-    //  VELOCIDAD LENTA (20)
     ene.follow(jugador, 20)
     ene.setFlag(SpriteFlag.GhostThroughWalls, true)
 }
@@ -252,12 +250,9 @@ function crear_enemigo(loc: tiles.Location) {
 function crear_item(nombre: string, img_obj: Image, loc: tiles.Location, tipo: string) {
     let spr: Sprite;
     let nuevo_item: ItemJuego;
-    for (let i of items) {
-        if (i.nombre == nombre && i.recogido) {
-            return
-        }
-        
-    }
+    //  [CAMBIO 2] ELIMINADO EL BLOQUEO DE DUPLICADOS
+    //  Ahora siempre crea el item, aunque lo hayas cogido antes.
+    //  Como vaciamos la lista 'items' en generar_mundo, esto funciona perfecto.
     if (tipo == "curacion") {
         spr = sprites.create(img_obj, KIND_ITEM)
         tiles.placeOnTile(spr, loc)
@@ -320,9 +315,7 @@ game.onUpdate(function bucle_principal() {
         energia -= gasto
     }
     
-    //  Solo cambiamos la animación si el estado es diferente al anterior
     if (estado_actual != ultimo_estado_hero) {
-        //  Esto para cualquier animación que esté corriendo
         animation.stopAnimation(animation.AnimationTypes.All, jugador)
         //  IMPORTANTE: Selecciona aquí tus animaciones
         if (estado_actual == "izquierda") {
@@ -334,7 +327,6 @@ game.onUpdate(function bucle_principal() {
         } else if (estado_actual == "abajo") {
             animation.runImageAnimation(jugador, assets.animation`anim_hero_abajo`, 100, true)
         } else if (estado_actual == "parado") {
-            //  Aquí es donde le decimos: Si se para, ponte la imagen de "img_hero"
             jugador.setImage(img_hero)
         }
         
@@ -407,6 +399,7 @@ sprites.onOverlap(SpriteKind.Player, KIND_META, function on_meta_overlap(player:
     let texto_falta: string;
     
     let objetivos : string[] = []
+    //  REQUERIMIENTOS POR NIVEL
     if (nivel_actual == 1) {
         objetivos = ["Gema Magica"]
     } else if (nivel_actual == 2) {
@@ -477,9 +470,10 @@ perderas TODOS los objetos.`, DialogLayout.Full)
         
         game.showLongText(texto, DialogLayout.Full)
     })
+    //  Inicialización limpia
     items = []
     nivel_actual = 1
-    energia = 100.0
+    energia = 999.0
     generar_mundo()
     juego_activo = true
 }

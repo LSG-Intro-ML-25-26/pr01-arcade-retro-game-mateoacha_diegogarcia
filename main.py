@@ -1,6 +1,6 @@
 """
 👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
-(Héroe 100% Personalizable + Resto Clásico)
+(Héroe Animado + Objetos Texto + Respawn en cada nivel)
 """
 
 # --- 1. CLASES ---
@@ -34,11 +34,11 @@ KIND_NPC = SpriteKind.create()
 
 # --- 3. ARTE PIXEL ---
 
-# [ESTO ES LO QUE PEDISTE]
-# El héroe usa Assets. Haz clic en el paréntesis para elegir tu dibujo "Quieto"
+# [HÉROE ANIMADO]
+# Haz clic aquí para elegir tu dibujo del héroe quieto
 img_hero = assets.image("""hero_quieto""")
 
-# [EL RESTO SIGUE SIENDO CÓDIGO DE TEXTO]
+# [RESTO DE OBJETOS - TEXTO]
 img_rey = img("""
     . . . . 5 5 5 5 . . . .
     . . . 5 5 4 4 5 5 . . .
@@ -160,15 +160,16 @@ img_suelo_limpio = img("""
 def generar_mundo():
     global nivel_actual, items
     
+    # [CAMBIO 1] REINICIAMOS LOS OBJETOS EN CADA NIVEL
+    # Así, si en el nivel 1 cogiste una gema, en el nivel 2 la gema vuelve a aparecer
+    items = []
+
     # 1. LIMPIEZA
     sprites.destroy_all_sprites_of_kind(KIND_ENEMIGO)
     sprites.destroy_all_sprites_of_kind(KIND_META)
     sprites.destroy_all_sprites_of_kind(KIND_NPC)
+    sprites.destroy_all_sprites_of_kind(KIND_ITEM) # Limpieza extra por seguridad
     
-    for item in items:
-        if item.sprite_fisico:
-            item.sprite_fisico.destroy()
-
     scene.set_background_color(13)
 
     # 2. CARGAR TILEMAP VISUAL
@@ -246,14 +247,13 @@ def crear_rey(loc: tiles.Location):
 def crear_enemigo(loc: tiles.Location):
     ene = sprites.create(img_fantasma, KIND_ENEMIGO)
     tiles.place_on_tile(ene, loc)
-    # VELOCIDAD LENTA (20)
     ene.follow(jugador, 20)
     ene.set_flag(SpriteFlag.GHOST_THROUGH_WALLS, True)
 
 def crear_item(nombre: str, img_obj: Image, loc: tiles.Location, tipo: str):
-    for i in items:
-        if i.nombre == nombre and i.recogido:
-            return
+    # [CAMBIO 2] ELIMINADO EL BLOQUEO DE DUPLICADOS
+    # Ahora siempre crea el item, aunque lo hayas cogido antes.
+    # Como vaciamos la lista 'items' en generar_mundo, esto funciona perfecto.
 
     if tipo == "curacion":
         spr = sprites.create(img_obj, KIND_ITEM)
@@ -315,9 +315,7 @@ def bucle_principal():
         estado_actual = "abajo"
         energia -= gasto
     
-    # Solo cambiamos la animación si el estado es diferente al anterior
     if estado_actual != ultimo_estado_hero:
-        # Esto para cualquier animación que esté corriendo
         animation.stop_animation(animation.AnimationTypes.ALL, jugador)
         
         # IMPORTANTE: Selecciona aquí tus animaciones
@@ -330,7 +328,6 @@ def bucle_principal():
         elif estado_actual == "abajo":
             animation.run_image_animation(jugador, assets.animation("""anim_hero_abajo"""), 100, True)
         elif estado_actual == "parado":
-            # Aquí es donde le decimos: Si se para, ponte la imagen de "img_hero"
             jugador.set_image(img_hero)
 
         ultimo_estado_hero = estado_actual
@@ -398,6 +395,7 @@ def on_meta_overlap(player, meta):
     
     objetivos: List[str] = []
     
+    # REQUERIMIENTOS POR NIVEL
     if nivel_actual == 1:
         objetivos = ["Gema Magica"]
     elif nivel_actual == 2:
@@ -460,9 +458,10 @@ def inicio():
     setup_hero()
     controller.B.on_event(ControllerButtonEvent.PRESSED, mostrar_inventari)
     
+    # Inicialización limpia
     items = []
     nivel_actual = 1
-    energia = 100.0
+    energia = 999.0
     
     generar_mundo()
     
