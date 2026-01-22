@@ -18,7 +18,7 @@ enemigos: List[Sprite] = []
 jugador: Sprite = None
 rey_npc: Sprite = None
 
-energia = 100.0
+energia = 999.0
 juego_activo = False
 mision_iniciada = False
 nivel_actual = 1
