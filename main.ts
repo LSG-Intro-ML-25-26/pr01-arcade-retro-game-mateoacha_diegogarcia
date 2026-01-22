@@ -26,7 +26,7 @@ let items : ItemJuego[] = []
 let enemigos : Sprite[] = []
 let jugador : Sprite = null
 let rey_npc : Sprite = null
-let energia = 100.0
+let energia = 999.0
 let juego_activo = false
 let mision_iniciada = false
 let nivel_actual = 1
@@ -466,7 +466,7 @@ perderas TODOS los objetos.`, DialogLayout.Full)
     //  Inicialización limpia
     items = []
     nivel_actual = 1
-    energia = 100.0
+    energia = 999.0
     generar_mundo()
     juego_activo = true
 }
