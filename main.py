@@ -1,5 +1,6 @@
 """
 👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
+(3 Objetos Únicos - Progresión Acumulativa)
 """
 
 # --- 1. CLASES ---
@@ -27,7 +28,6 @@ KIND_ITEM = SpriteKind.create()
 KIND_META = SpriteKind.create()
 KIND_ENEMIGO = SpriteKind.enemy
 KIND_NPC = SpriteKind.create()
-KIND_SALIDA_SECRETA = SpriteKind.create() # Nueva trampilla
 
 # --- 3. ARTE PIXEL ---
 
@@ -79,6 +79,7 @@ img_fantasma = img("""
     . . . . . . . . . . . .
 """)
 
+# --- LOS 3 OBJETOS ÚNICOS ---
 img_gema = img("""
     . . . . . . . . . . . .
     . . . . . 2 2 . . . . .
@@ -143,21 +144,8 @@ img_caldero = img("""
     . . d . . . . . . d . .
 """)
 
-img_trampilla = img("""
-    . . . b b b b b b . . .
-    . . b c c c c c c b . .
-    . b c 1 1 1 1 1 1 c b .
-    . b c 1 f f f f 1 c b .
-    . b c 1 f 1 1 f 1 c b .
-    . b c 1 f 1 1 f 1 c b .
-    . b c 1 f 1 1 f 1 c b .
-    . b c 1 f f f f 1 c b .
-    . b c 1 1 1 1 1 1 c b .
-    . . b c c c c c c b . .
-    . . . b b b b b b . . .
-""")
-
-img_suelo = img("""
+# Tile de limpieza (usado para borrar marcadores)
+img_suelo_limpio = img("""
     c c b c c c b c c c b c c c b c
     c c b c c c b c c c b c c c b c
     b b b b b b b b b b b b b b b b
@@ -174,153 +162,91 @@ img_suelo = img("""
     c b c c c b c c c b c c c b c c
     b b b b b b b b b b b b b b b b
     c c c b c c c b c c c b c c c b
-""")
-
-img_pared = img("""
-    b b b b b b b b b b b b b b b b
-    b d d d d d d d d d d d d d d b
-    b d c c c c c c c c c c c c d b
-    b d c b b b c b b b c b b b c b
-    b d c b b b c b b b c b b b c b
-    b d c c c c c c c c c c c c c b
-    b d c b b b c b b b c b b b c b
-    b d c c c c c c c c c c c c c b
-    b d c c c c c c c c c c c c c b
-    b d c b b b c b b b c b b b c b
-    b d c b b b c b b b c b b b c b
-    b d c c c c c c c c c c c c c b
-    b d c b b b c b b b c b b b c b
-    b d c b b b c b b b c b b b c b
-    b d d d d d d d d d d d d d d b
-    b b b b b b b b b b b b b b b b
 """)
 
 # --- 4. MAPA Y ENTIDADES ---
 
 def generar_mundo():
-    global nivel_actual
+    global nivel_actual, items
     
-    # LIMPIEZA TOTAL
-    for muro in tiles.get_tiles_by_type(img_pared):
-        tiles.set_tile_at(muro, img_suelo)
-        tiles.set_wall_at(muro, False)
-    
+    # 1. LIMPIEZA
     sprites.destroy_all_sprites_of_kind(KIND_ENEMIGO)
     sprites.destroy_all_sprites_of_kind(KIND_META)
     sprites.destroy_all_sprites_of_kind(KIND_NPC)
-    sprites.destroy_all_sprites_of_kind(KIND_SALIDA_SECRETA)
     
     for item in items:
         if item.sprite_fisico:
             item.sprite_fisico.destroy()
 
     scene.set_background_color(13)
-    tiles.set_current_tilemap(tilemap("""level1"""))
 
-    # --- DISEÑO DE NIVELES CON MECÁNICA DE FASEO ---
-    # Los items (1, 2, 3) están rodeados de 'W'.
-    # Hay una 'T' (Trampilla) junto al item para poder salir.
-    # Los enemigos 'E' están fuera para empujarte dentro.
+    # 2. CARGAR TILEMAP VISUAL
+    if nivel_actual == 1:
+        tiles.set_current_tilemap(tilemap("""level1"""))
+    elif nivel_actual == 2:
+        tiles.set_current_tilemap(tilemap("""level2"""))
+    elif nivel_actual == 3:
+        tiles.set_current_tilemap(tilemap("""level3"""))
+    else:
+        game.over(True)
 
-    # NIVEL 1
-    mapa_1 = [
-        "WWWWWWWWWWWWWWWWWWWW",
-        "W.S..N.............W",
-        "W.WWWWWWW.WW.WWW.W.W",
-        "W.W.....W.WW.W...W.W",
-        "W.W.E...W.WW.WWWWW.W",
-        "W.WWWWWWW.WW.W1TWW.W", # <--- SALA CERRADA
-        "W.........E..WWWWW.W",
-        "WWWWWWWW.....WWWWWWW",
-        "W..................W",
-        "W.WWWWWWW...WWWWWW.W",
-        "W.W.....W...W....W.W",
-        "W.W.........W..C.W.W",
-        "W.WWWWWWWW.WWWWWWW.W",
-        "W..................W",
-        "WWWWWWWWWWWWWWWWWWWW"
-    ]
+    # 3. COLOCAR OBJETOS BASADO EN MARCADORES
+    # NOTA: Asegúrate de dibujar los marcadores correspondientes en cada nivel.
+    # Nivel 1: Dibuja marcador_gema
+    # Nivel 2: Dibuja marcador_gema Y marcador_planta
+    # Nivel 3: Dibuja marcador_gema, marcador_planta Y marcador_libro
 
-    # NIVEL 2
-    mapa_2 = [
-        "WWWWWWWWWWWWWWWWWWWW",
-        "WS.......W...E.....W",
-        "WWWWWW.W.W.WWWWWWW.W",
-        "W......W.W.......W.W",
-        "W.WWWWWW.WWWWWWW.W.W",
-        "W.W...E..........W.W",
-        "W.W.WWWWWWWWWWWW.W.W",
-        "W.W.W......P...W.W.W",
-        "W.W.W.WWWWWWWW.W.W.W",
-        "W.W.W.WWWWWWWW.W.W.W",
-        "W.W.W.WW2TWWWW.W.W.W", # <--- SALA CERRADA
-        "W.W.W.WWWWWWWW.W.W.W",
-        "W...W.....E....W.C.W",
-        "WWWWWWWWWWWWWWWWWWWW",
-        "WWWWWWWWWWWWWWWWWWWW"
-    ]
+    # --- A. JUGADOR ---
+    lista_jugador = tiles.get_tiles_by_type(assets.tile("""marcador_jugador"""))
+    if len(lista_jugador) > 0:
+        tiles.place_on_tile(jugador, lista_jugador[0])
+        tiles.set_tile_at(lista_jugador[0], img_suelo_limpio)
 
-    # NIVEL 3
-    mapa_3 = [
-        "WWWWWWWWWWWWWWWWWWWW",
-        "WS..W...E..W.....E.W",
-        "WWW.W.WWWW.W.WWWWW.W",
-        "W...W.W..W.W.W...W.W",
-        "W.WWW.W..W.W.W.W.W.W",
-        "W.....W..W...W.W.W.W",
-        "WWWWWWW.WWWWWW.W.W.W",
-        "W...E........W.W.W.W",
-        "W.WWWWWWWWWW.W.W.W.W",
-        "W.W........W.W.W.W.W",
-        "W.W.WWWWWW.W.W.W.W.W",
-        "W.W.WW3TWW.W...W.C.W", # <--- SALA CERRADA
-        "W.W.WWWWWWWWWWWWWW.W",
-        "W.P...E............W",
-        "WWWWWWWWWWWWWWWWWWWW"
-    ]
+    # --- B. EL REY ---
+    lista_rey = tiles.get_tiles_by_type(assets.tile("""marcador_rey"""))
+    for i in range(len(lista_rey)):
+        loc = lista_rey[i]
+        crear_rey(loc)
+        tiles.set_tile_at(loc, img_suelo_limpio)
 
-    mapa_elegido = mapa_1
-    if nivel_actual == 2: mapa_elegido = mapa_2
-    elif nivel_actual == 3: mapa_elegido = mapa_3
+    # --- C. ENEMIGOS ---
+    lista_enemigos = tiles.get_tiles_by_type(assets.tile("""marcador_enemigo"""))
+    for i in range(len(lista_enemigos)):
+        loc = lista_enemigos[i]
+        crear_enemigo(loc)
+        tiles.set_tile_at(loc, img_suelo_limpio)
 
-    filas = len(mapa_elegido)
-    cols = len(mapa_elegido[0])
+    # --- D. CALDERO ---
+    lista_caldero = tiles.get_tiles_by_type(assets.tile("""marcador_caldero"""))
+    for i in range(len(lista_caldero)):
+        loc = lista_caldero[i]
+        caldero = sprites.create(img_caldero, KIND_META)
+        tiles.place_on_tile(caldero, loc)
+        caldero.start_effect(effects.fountain, 50000)
+        tiles.set_tile_at(loc, img_suelo_limpio)
     
-    for r in range(filas):
-        fila = mapa_elegido[r]
-        for c in range(cols):
-            char = fila[c]
-            loc = tiles.get_tile_location(c, r)
-            
-            tiles.set_tile_at(loc, img_suelo)
-            
-            if char == "W":
-                tiles.set_tile_at(loc, img_pared)
-                tiles.set_wall_at(loc, True)
-            elif char == "C":
-                caldero = sprites.create(img_caldero, KIND_META)
-                tiles.place_on_tile(caldero, loc)
-                caldero.start_effect(effects.fountain, 50000)
-            elif char == "S":
-                if jugador: tiles.place_on_tile(jugador, loc)
-            elif char == "N":
-                if nivel_actual == 1: crear_rey(loc)
-            elif char == "E":
-                crear_enemigo(loc)
-            elif char == "T":
-                # La Salida Secreta
-                trampilla = sprites.create(img_trampilla, KIND_SALIDA_SECRETA)
-                tiles.place_on_tile(trampilla, loc)
-            elif char == "P":
-                crear_item("Pocion Salud", img_salud, loc, "curacion")
-            
-            # Objetos de misión
-            elif char == "1" and nivel_actual == 1:
-                crear_item("Gema Magica", img_gema, loc, "mision")
-            elif char == "2" and nivel_actual == 2:
-                crear_item("Hierba Santa", img_planta, loc, "mision")
-            elif char == "3" and nivel_actual == 3:
-                crear_item("Libro Antiguo", img_libro, loc, "mision")
+    # --- F. ITEMS (OBJETOS) ---
+    
+    # 1. GEMA MAGICA (Aparece si pones el tile "marcador_item1")
+    lista_gema = tiles.get_tiles_by_type(assets.tile("""marcador_item1"""))
+    for i in range(len(lista_gema)):
+        loc = lista_gema[i]
+        crear_item("Gema Magica", img_gema, loc, "mision")
+        tiles.set_tile_at(loc, img_suelo_limpio)
+
+    # 2. HIERBA SANTA (Aparece si pones el tile "marcador_item2")
+    lista_planta = tiles.get_tiles_by_type(assets.tile("""marcador_item2"""))
+    for i in range(len(lista_planta)):
+        loc = lista_planta[i]
+        crear_item("Hierba Santa", img_planta, loc, "mision")
+        tiles.set_tile_at(loc, img_suelo_limpio)
+        
+    # 3. LIBRO ANTIGUO (Aparece si pones el tile "marcador_item3")
+    lista_libro = tiles.get_tiles_by_type(assets.tile("""marcador_item3"""))
+    for i in range(len(lista_libro)):
+        loc = lista_libro[i]
+        crear_item("Libro Antiguo", img_libro, loc, "mision")
+        tiles.set_tile_at(loc, img_suelo_limpio)
 
     game.splash("NIVEL " + str(nivel_actual))
 
@@ -333,11 +259,16 @@ def crear_rey(loc: tiles.Location):
 def crear_enemigo(loc: tiles.Location):
     ene = sprites.create(img_fantasma, KIND_ENEMIGO)
     tiles.place_on_tile(ene, loc)
-    ene.follow(jugador, 35)
-    # MECÁNICA CLAVE: El fantasma atraviesa paredes para poder empujarte
+    # VELOCIDAD LENTA (20)
+    ene.follow(jugador, 20)
     ene.set_flag(SpriteFlag.GHOST_THROUGH_WALLS, True)
 
 def crear_item(nombre: str, img_obj: Image, loc: tiles.Location, tipo: str):
+    # Evitar duplicados si ya lo recogimos (aunque al morir se borra todo)
+    for i in items:
+        if i.nombre == nombre and i.recogido:
+            return
+
     if tipo == "curacion":
         spr = sprites.create(img_obj, KIND_ITEM)
         tiles.place_on_tile(spr, loc)
@@ -349,17 +280,13 @@ def crear_item(nombre: str, img_obj: Image, loc: tiles.Location, tipo: str):
     nuevo_item = ItemJuego(nombre, img_obj, tipo)
     items.append(nuevo_item)
     
-    if settings.read_number("got_" + nombre) == 1:
-        nuevo_item.recogido = True
-    else:
-        spr = sprites.create(img_obj, KIND_ITEM)
-        tiles.place_on_tile(spr, loc)
-        spr.start_effect(effects.halo, 50000)
-        nuevo_item.sprite_fisico = spr
+    spr = sprites.create(img_obj, KIND_ITEM)
+    tiles.place_on_tile(spr, loc)
+    spr.start_effect(effects.halo, 50000)
+    nuevo_item.sprite_fisico = spr
 
 def setup_hero():
     global jugador
-    # Corrección para evitar duplicados
     if jugador:
         jugador.destroy()
 
@@ -399,8 +326,8 @@ game.on_update(bucle_principal)
 def on_npc_overlap(player, npc):
     global mision_iniciada
     if not mision_iniciada:
-        game.show_long_text("REY: ¡Alquimista!\nLos objetos estan ocultos tras los muros.", DialogLayout.BOTTOM)
-        game.show_long_text("REY: Deja que los espectros te golpeen para traspasar la pared.\nUsa las trampillas para salir.", DialogLayout.BOTTOM)
+        game.show_long_text("REY: ¡Traeme los ingredientes!", DialogLayout.BOTTOM)
+        game.show_long_text("Nivel 1: Gema\nNivel 2: Gema + Hierba\nNivel 3: Gema + Hierba + Libro", DialogLayout.BOTTOM)
         mision_iniciada = True
         player.y += 16
 
@@ -425,19 +352,17 @@ def on_item_overlap(player, other):
                 music.magic_wand.play()
                 energia = min(100, energia + 10)
                 game.show_long_text("¡Conseguido!\n" + it.nombre, DialogLayout.BOTTOM)
-                settings.write_number("got_" + it.nombre, 1)
                 break
 
 sprites.on_overlap(SpriteKind.player, KIND_ITEM, on_item_overlap)
 
-# INTERACCIÓN ENEMIGOS (MECÁNICA DE FASEO)
+# INTERACCIÓN ENEMIGOS
 def on_enemy_overlap(player, enemy):
     global energia
     energia -= 5
     scene.camera_shake(4, 200)
     music.zapped.play()
     
-    # EMPUJE (FASEO): Esto permite atravesar muros si estás pegado a ellos
     if player.x < enemy.x:
         player.x -= 16
     else:
@@ -447,25 +372,35 @@ def on_enemy_overlap(player, enemy):
 
 sprites.on_overlap(SpriteKind.player, KIND_ENEMIGO, on_enemy_overlap)
 
-# INTERACCIÓN CALDERO (CAMBIO DE NIVEL)
+# INTERACCIÓN CALDERO (META)
 def on_meta_overlap(player, meta):
     global nivel_actual
     
-    item_necesario = ""
-    if nivel_actual == 1: item_necesario = "Gema Magica"
-    elif nivel_actual == 2: item_necesario = "Hierba Santa"
-    elif nivel_actual == 3: item_necesario = "Libro Antiguo"
+    objetivos: List[str] = []
     
-    tiene_item = False
-    for i in items:
-        if i.nombre == item_necesario and i.recogido:
-            tiene_item = True
-            break
+    # CONFIGURACIÓN DE OBJETIVOS POR NIVEL
+    if nivel_actual == 1:
+        objetivos = ["Gema Magica"]
+    elif nivel_actual == 2:
+        objetivos = ["Gema Magica", "Hierba Santa"]
+    elif nivel_actual == 3:
+        objetivos = ["Gema Magica", "Hierba Santa", "Libro Antiguo"]
+    
+    faltan: List[str] = []
+    
+    for obj_nombre in objetivos:
+        tenemos_este = False
+        for it in items:
+            if it.nombre == obj_nombre and it.recogido:
+                tenemos_este = True
+                break
+        if not tenemos_este:
+            faltan.append(obj_nombre)
             
-    if tiene_item:
+    if len(faltan) == 0:
         music.ba_ding.play()
         if nivel_actual < 3:
-            game.show_long_text("El caldero te transporta...", DialogLayout.BOTTOM)
+            game.show_long_text("¡Caldero activado!\nViajando...", DialogLayout.BOTTOM)
             nivel_actual += 1
             player.start_effect(effects.halo, 1000)
             pause(1000)
@@ -475,52 +410,43 @@ def on_meta_overlap(player, meta):
     else:
         player.y += 10
         scene.camera_shake(2, 200)
-        player.say("Necesito: " + item_necesario, 2000)
+        texto_falta = "Falta:\n"
+        for f in faltan:
+            texto_falta += "- " + f + "\n"
+        game.show_long_text(texto_falta, DialogLayout.BOTTOM)
 
 sprites.on_overlap(SpriteKind.player, KIND_META, on_meta_overlap)
-
-# INTERACCIÓN SALIDA SECRETA (TRAMPILLA)
-def on_salida_overlap(player, salida):
-    music.jump_up.play()
-    player.start_effect(effects.spray, 500)
-    player.say("¡Escape!", 500)
-    # Teletransportar a lugar seguro (ej. 32, 32)
-    player.set_position(32, 32)
-
-sprites.on_overlap(SpriteKind.player, KIND_SALIDA_SECRETA, on_salida_overlap)
 
 # --- 6. MENÚS Y ARRANQUE ---
 
 def mostrar_inventari():
     texto = "MOCHILA:\n"
+    encontrados = 0
     for i in items:
-        if i.tipo == "mision":
-            estado = "[X] " if i.recogido else "[ ] "
-            texto += estado + i.nombre + "\n"
+        if i.tipo == "mision" and i.recogido:
+            texto += "[X] " + i.nombre + "\n"
+            encontrados += 1
+    
+    if encontrados == 0:
+        texto += "(Vacia)"
+        
     game.show_long_text(texto, DialogLayout.FULL)
 
 def inicio():
     global juego_activo, energia, nivel_actual, items
     game.splash("THE ALCHEMIST", "Ghost Edition")
     
-    opcion = game.ask_for_number("1. Jugar\n2. Borrar Progreso", 1)
-    
-    if opcion == 2:
-        settings.write_number("got_Gema Magica", 0)
-        settings.write_number("got_Hierba Santa", 0)
-        settings.write_number("got_Libro Antiguo", 0)
-        game.splash("Memoria borrada")
+    game.show_long_text("Si tu energia llega a 0,\nperderas TODOS los objetos.", DialogLayout.FULL)
 
     setup_hero()
     controller.B.on_event(ControllerButtonEvent.PRESSED, mostrar_inventari)
     
     items = []
     nivel_actual = 1
-    energia = 999.0
+    energia = 100.0
     
     generar_mundo()
     
     juego_activo = True
-    game.show_long_text("CONTROLES:\nA = Correr\nB = Inventario", DialogLayout.FULL)
 
 inicio()
