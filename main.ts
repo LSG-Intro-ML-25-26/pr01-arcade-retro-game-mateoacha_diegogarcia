@@ -1,3 +1,10 @@
+controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
+    animation.runImageAnimation(
+    nena,
+    assets.animation`nena-animation-down`,
+    500,
+    false
+    )
 /** 👑 THE ALCHEMIST: GHOST PHASE EDITION 👑 */
 //  --- 1. CLASES ---
 class ItemJuego {
@@ -358,6 +365,13 @@ game.onUpdate(function bucle_principal() {
     }
     
 })
+controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
+    animation.runImageAnimation(
+    nena,
+    assets.animation`nena-animation-right`,
+    500,
+    false
+    )
 //  INTERACCIÓN NPC
 sprites.onOverlap(SpriteKind.Player, KIND_NPC, function on_npc_overlap(player: Sprite, npc: Sprite) {
     
@@ -371,6 +385,13 @@ Usa las trampillas para salir.`, DialogLayout.Bottom)
     }
     
 })
+controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
+    animation.runImageAnimation(
+    nena,
+    assets.animation`nena-animation-left`,
+    500,
+    false
+    )
 //  INTERACCIÓN ITEMS
 sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player: Sprite, other: Sprite) {
     
@@ -399,6 +420,13 @@ sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player:
         
     }
 })
+controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
+    animation.runImageAnimation(
+    nena,
+    assets.animation`nena-animation-up`,
+    500,
+    false
+    )
 //  INTERACCIÓN ENEMIGOS (MECÁNICA DE FASEO)
 sprites.onOverlap(SpriteKind.Player, KIND_ENEMIGO, function on_enemy_overlap(player: Sprite, enemy: Sprite) {
     
