@@ -1,6 +1,6 @@
 """
 👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
-(Sin Confeti + Sin Empujes + Héroe Animado + VIDA EXTRA)
+(Sin Rey + Sin Confeti + Sin Empujes + Héroe Animado + Vida 999)
 """
 
 # --- 1. CLASES ---
@@ -16,11 +16,9 @@ class ItemJuego:
 items: List[ItemJuego] = []
 enemigos: List[Sprite] = []
 jugador: Sprite = None
-rey_npc: Sprite = None
 
-energia = 999.0  # <-- CAMBIADO AQUÍ TAMBIÉN POR SI ACASO
+energia = 999.0
 juego_activo = False
-mision_iniciada = False
 nivel_actual = 1
 
 # Variable para controlar la animación
@@ -30,7 +28,6 @@ ultimo_estado_hero = "parado"
 KIND_ITEM = SpriteKind.create()
 KIND_META = SpriteKind.create()
 KIND_ENEMIGO = SpriteKind.enemy
-KIND_NPC = SpriteKind.create()
 
 # --- 3. ARTE PIXEL ---
 
@@ -39,23 +36,6 @@ KIND_NPC = SpriteKind.create()
 img_hero = assets.image("""hero_quieto""")
 
 # [RESTO DE OBJETOS - TEXTO]
-img_rey = img("""
-    . . . . 5 5 5 5 . . . .
-    . . . 5 5 4 4 5 5 . . .
-    . . 5 5 4 5 5 4 5 5 . .
-    . . 5 5 4 4 4 4 5 5 . .
-    . . . f f f f f f . . .
-    . . . f f 2 2 f f . . .
-    . . . f f f f f f . . .
-    . . . 5 5 5 5 5 5 . . .
-    . . . 5 4 5 5 4 5 . . .
-    . . . 5 5 5 5 5 5 . . .
-    . . . 5 5 5 5 5 5 . . .
-    . . . 5 5 . . 5 5 . . .
-    . . . . . . . . . . . .
-    . . . . . . . . . . . .
-""")
-
 img_fantasma = img("""
     . . . . . . . . . . . .
     . . . . 1 1 1 1 . . . .
@@ -166,18 +146,17 @@ def generar_mundo():
     # 1. LIMPIEZA
     sprites.destroy_all_sprites_of_kind(KIND_ENEMIGO)
     sprites.destroy_all_sprites_of_kind(KIND_META)
-    sprites.destroy_all_sprites_of_kind(KIND_NPC)
     sprites.destroy_all_sprites_of_kind(KIND_ITEM)
     
     scene.set_background_color(13)
 
     # 2. CARGAR TILEMAP VISUAL
     if nivel_actual == 1:
-        tiles.set_current_tilemap(tilemap("""level01"""))
+        tiles.set_current_tilemap(tilemap("""level1"""))
     elif nivel_actual == 2:
-        tiles.set_current_tilemap(tilemap("""level02"""))
+        tiles.set_current_tilemap(tilemap("""level2"""))
     elif nivel_actual == 3:
-        tiles.set_current_tilemap(tilemap("""level03"""))
+        tiles.set_current_tilemap(tilemap("""level3"""))
     else:
         game.over(True)
 
@@ -189,21 +168,14 @@ def generar_mundo():
         tiles.place_on_tile(jugador, lista_jugador[0])
         tiles.set_tile_at(lista_jugador[0], img_suelo_limpio)
 
-    # --- B. EL REY ---
-    lista_rey = tiles.get_tiles_by_type(assets.tile("""marcador_rey"""))
-    for i in range(len(lista_rey)):
-        loc = lista_rey[i]
-        crear_rey(loc)
-        tiles.set_tile_at(loc, img_suelo_limpio)
-
-    # --- C. ENEMIGOS ---
+    # --- B. ENEMIGOS ---
     lista_enemigos = tiles.get_tiles_by_type(assets.tile("""marcador_enemigo"""))
     for i in range(len(lista_enemigos)):
         loc = lista_enemigos[i]
         crear_enemigo(loc)
         tiles.set_tile_at(loc, img_suelo_limpio)
 
-    # --- D. CALDERO ---
+    # --- C. CALDERO ---
     lista_caldero = tiles.get_tiles_by_type(assets.tile("""marcador_caldero"""))
     for i in range(len(lista_caldero)):
         loc = lista_caldero[i]
@@ -212,7 +184,7 @@ def generar_mundo():
         caldero.start_effect(effects.fountain, 50000)
         tiles.set_tile_at(loc, img_suelo_limpio)
     
-    # --- F. ITEMS (OBJETOS) ---
+    # --- D. ITEMS (OBJETOS) ---
     
     # 1. GEMA MAGICA
     lista_gema = tiles.get_tiles_by_type(assets.tile("""marcador_item1"""))
@@ -236,12 +208,6 @@ def generar_mundo():
         tiles.set_tile_at(loc, img_suelo_limpio)
 
     game.splash("NIVEL " + str(nivel_actual))
-
-def crear_rey(loc: tiles.Location):
-    global rey_npc
-    rey_npc = sprites.create(img_rey, KIND_NPC)
-    tiles.place_on_tile(rey_npc, loc)
-    rey_npc.start_effect(effects.smiles, 50000)
 
 def crear_enemigo(loc: tiles.Location):
     ene = sprites.create(img_fantasma, KIND_ENEMIGO)
@@ -334,17 +300,6 @@ def bucle_principal():
 
 game.on_update(bucle_principal)
 
-# INTERACCIÓN NPC
-def on_npc_overlap(player, npc):
-    global mision_iniciada
-    if not mision_iniciada:
-        game.show_long_text("REY: ¡Traeme los ingredientes!", DialogLayout.BOTTOM)
-        game.show_long_text("Nivel 1: Gema\nNivel 2: Gema + Hierba\nNivel 3: Gema + Hierba + Libro", DialogLayout.BOTTOM)
-        mision_iniciada = True
-        player.y += 16
-
-sprites.on_overlap(SpriteKind.player, KIND_NPC, on_npc_overlap)
-
 # INTERACCIÓN ITEMS
 def on_item_overlap(player, other):
     global energia
@@ -361,8 +316,7 @@ def on_item_overlap(player, other):
             if it.tipo == "mision":
                 it.recogido = True
                 
-                # [CAMBIO: ELIMINADO effects.confetti]
-                # Simplemente destruimos el objeto (desaparece)
+                # Simplemente destruimos el objeto (desaparece sin confeti)
                 other.destroy()
                 
                 music.magic_wand.play()
@@ -457,7 +411,7 @@ def inicio():
     items = []
     nivel_actual = 1
     
-    # [CAMBIO: VIDA INICIAL 999]
+    # VIDA INICIAL 999
     energia = 999.0
     
     generar_mundo()

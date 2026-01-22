@@ -1,6 +1,6 @@
 /** 
 👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
-(Sin Confeti + Sin Empujes + Héroe Animado + VIDA EXTRA)
+(Sin Rey + Sin Confeti + Sin Empujes + Héroe Animado + Vida 999)
 
  */
 //  --- 1. CLASES ---
@@ -25,11 +25,8 @@ class ItemJuego {
 let items : ItemJuego[] = []
 let enemigos : Sprite[] = []
 let jugador : Sprite = null
-let rey_npc : Sprite = null
 let energia = 999.0
-//  <-- CAMBIADO AQUÍ TAMBIÉN POR SI ACASO
 let juego_activo = false
-let mision_iniciada = false
 let nivel_actual = 1
 //  Variable para controlar la animación
 let ultimo_estado_hero = "parado"
@@ -37,28 +34,11 @@ let ultimo_estado_hero = "parado"
 let KIND_ITEM = SpriteKind.create()
 let KIND_META = SpriteKind.create()
 let KIND_ENEMIGO = SpriteKind.Enemy
-let KIND_NPC = SpriteKind.create()
 //  --- 3. ARTE PIXEL ---
 //  [HÉROE ANIMADO]
 //  Haz clic aquí para elegir tu dibujo del héroe quieto
 let img_hero = assets.image`hero_quieto`
 //  [RESTO DE OBJETOS - TEXTO]
-let img_rey = img`
-    . . . . 5 5 5 5 . . . .
-    . . . 5 5 4 4 5 5 . . .
-    . . 5 5 4 5 5 4 5 5 . .
-    . . 5 5 4 4 4 4 5 5 . .
-    . . . f f f f f f . . .
-    . . . f f 2 2 f f . . .
-    . . . f f f f f f . . .
-    . . . 5 5 5 5 5 5 . . .
-    . . . 5 4 5 5 4 5 . . .
-    . . . 5 5 5 5 5 5 . . .
-    . . . 5 5 5 5 5 5 . . .
-    . . . 5 5 . . 5 5 . . .
-    . . . . . . . . . . . .
-    . . . . . . . . . . . .
-`
 let img_fantasma = img`
     . . . . . . . . . . . .
     . . . . 1 1 1 1 . . . .
@@ -162,16 +142,15 @@ function generar_mundo() {
     //  1. LIMPIEZA
     sprites.destroyAllSpritesOfKind(KIND_ENEMIGO)
     sprites.destroyAllSpritesOfKind(KIND_META)
-    sprites.destroyAllSpritesOfKind(KIND_NPC)
     sprites.destroyAllSpritesOfKind(KIND_ITEM)
     scene.setBackgroundColor(13)
     //  2. CARGAR TILEMAP VISUAL
     if (nivel_actual == 1) {
-        tiles.setCurrentTilemap(tilemap`level01`)
+        tiles.setCurrentTilemap(tilemap`level1`)
     } else if (nivel_actual == 2) {
-        tiles.setCurrentTilemap(tilemap`level02`)
+        tiles.setCurrentTilemap(tilemap`level2`)
     } else if (nivel_actual == 3) {
-        tiles.setCurrentTilemap(tilemap`level03`)
+        tiles.setCurrentTilemap(tilemap`level3`)
     } else {
         game.over(true)
     }
@@ -184,21 +163,14 @@ function generar_mundo() {
         tiles.setTileAt(lista_jugador[0], img_suelo_limpio)
     }
     
-    //  --- B. EL REY ---
-    let lista_rey = tiles.getTilesByType(assets.tile`marcador_rey`)
-    for (i = 0; i < lista_rey.length; i++) {
-        loc = lista_rey[i]
-        crear_rey(loc)
-        tiles.setTileAt(loc, img_suelo_limpio)
-    }
-    //  --- C. ENEMIGOS ---
+    //  --- B. ENEMIGOS ---
     let lista_enemigos = tiles.getTilesByType(assets.tile`marcador_enemigo`)
     for (i = 0; i < lista_enemigos.length; i++) {
         loc = lista_enemigos[i]
         crear_enemigo(loc)
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-    //  --- D. CALDERO ---
+    //  --- C. CALDERO ---
     let lista_caldero = tiles.getTilesByType(assets.tile`marcador_caldero`)
     for (i = 0; i < lista_caldero.length; i++) {
         loc = lista_caldero[i]
@@ -207,7 +179,7 @@ function generar_mundo() {
         caldero.startEffect(effects.fountain, 50000)
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-    //  --- F. ITEMS (OBJETOS) ---
+    //  --- D. ITEMS (OBJETOS) ---
     //  1. GEMA MAGICA
     let lista_gema = tiles.getTilesByType(assets.tile`marcador_item1`)
     for (i = 0; i < lista_gema.length; i++) {
@@ -230,13 +202,6 @@ function generar_mundo() {
         tiles.setTileAt(loc, img_suelo_limpio)
     }
     game.splash("NIVEL " + ("" + nivel_actual))
-}
-
-function crear_rey(loc: tiles.Location) {
-    
-    rey_npc = sprites.create(img_rey, KIND_NPC)
-    tiles.placeOnTile(rey_npc, loc)
-    rey_npc.startEffect(effects.smiles, 50000)
 }
 
 function crear_enemigo(loc: tiles.Location) {
@@ -335,19 +300,6 @@ game.onUpdate(function bucle_principal() {
     }
     
 })
-//  INTERACCIÓN NPC
-sprites.onOverlap(SpriteKind.Player, KIND_NPC, function on_npc_overlap(player: Sprite, npc: Sprite) {
-    
-    if (!mision_iniciada) {
-        game.showLongText("REY: ¡Traeme los ingredientes!", DialogLayout.Bottom)
-        game.showLongText(`Nivel 1: Gema
-Nivel 2: Gema + Hierba
-Nivel 3: Gema + Hierba + Libro`, DialogLayout.Bottom)
-        mision_iniciada = true
-        player.y += 16
-    }
-    
-})
 //  INTERACCIÓN ITEMS
 sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player: Sprite, other: Sprite) {
     
@@ -365,8 +317,7 @@ sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player:
             
             if (it.tipo == "mision") {
                 it.recogido = true
-                //  [CAMBIO: ELIMINADO effects.confetti]
-                //  Simplemente destruimos el objeto (desaparece)
+                //  Simplemente destruimos el objeto (desaparece sin confeti)
                 other.destroy()
                 music.magicWand.play()
                 energia = Math.min(999, energia + 10)
@@ -468,7 +419,7 @@ perderas TODOS los objetos.`, DialogLayout.Full)
     //  Inicialización limpia
     items = []
     nivel_actual = 1
-    //  [CAMBIO: VIDA INICIAL 999]
+    //  VIDA INICIAL 999
     energia = 999.0
     generar_mundo()
     juego_activo = true
