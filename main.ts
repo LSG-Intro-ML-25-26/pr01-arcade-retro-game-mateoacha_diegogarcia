@@ -146,11 +146,11 @@ function generar_mundo() {
     scene.setBackgroundColor(13)
     //  2. CARGAR TILEMAP VISUAL
     if (nivel_actual == 1) {
-        tiles.setCurrentTilemap(tilemap`level1`)
+        tiles.setCurrentTilemap(tilemap`level01`)
     } else if (nivel_actual == 2) {
-        tiles.setCurrentTilemap(tilemap`level2`)
+        tiles.setCurrentTilemap(tilemap`level02`)
     } else if (nivel_actual == 3) {
-        tiles.setCurrentTilemap(tilemap`level3`)
+        tiles.setCurrentTilemap(tilemap`level03`)
     } else {
         game.over(true)
     }

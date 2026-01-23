@@ -152,11 +152,11 @@ def generar_mundo():
 
     # 2. CARGAR TILEMAP VISUAL
     if nivel_actual == 1:
-        tiles.set_current_tilemap(tilemap("""level1"""))
+        tiles.set_current_tilemap(tilemap("""level01"""))
     elif nivel_actual == 2:
-        tiles.set_current_tilemap(tilemap("""level2"""))
+        tiles.set_current_tilemap(tilemap("""level02"""))
     elif nivel_actual == 3:
-        tiles.set_current_tilemap(tilemap("""level3"""))
+        tiles.set_current_tilemap(tilemap("""level03"""))
     else:
         game.over(True)
 
