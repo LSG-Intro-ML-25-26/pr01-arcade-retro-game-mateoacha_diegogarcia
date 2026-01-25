@@ -1,9 +1,10 @@
+
 // INTERACCIÓN CALDERO (META)
 sprites.onOverlap(SpriteKind.Player, KIND_META, function (player2, meta) {
     let faltan: string[] = []
     let tenemos_este: boolean;
-let texto_falta: string;
-// REQUERIMIENTOS POR NIVEL
+    let texto_falta: string;
+    // REQUERIMIENTOS POR NIVEL
     if (nivel_actual == 1) {
         objetivos = ["Gema Magica"]
     } else if (nivel_actual == 2) {
@@ -39,7 +40,7 @@ Viajando...`, DialogLayout.Bottom)
         player2.x += 10
         scene.cameraShake(2, 200)
         texto_falta = "Falta:\n"
-for (let f of faltan) {
+        for (let f of faltan) {
             texto_falta = "" + texto_falta + "- " + f + "\n"
         }
         game.showLongText(texto_falta, DialogLayout.Bottom)
@@ -53,7 +54,7 @@ sprites.onOverlap(SpriteKind.Player, KIND_ENEMIGO, function (player2, enemy) {
     // Pausa para evitar muerte instantánea al atravesar
     pause(200)
 })
-function setup_hero () {
+function setup_hero() {
     if (jugador) {
         jugador.destroy()
     }
@@ -64,11 +65,11 @@ function setup_hero () {
     jugador.setStayInScreen(true)
 }
 // --- 4. MAPA Y ENTIDADES ---
-function generar_mundo () {
+function generar_mundo() {
     let i: number;
-let loc: tiles.Location;
-let caldero: Sprite;
-// REINICIAMOS LOS OBJETOS EN CADA NIVEL
+    let loc: tiles.Location;
+    let caldero: Sprite;
+    // REINICIAMOS LOS OBJETOS EN CADA NIVEL
     items = []
     // 1. LIMPIEZA
     sprites.destroyAllSpritesOfKind(KIND_ENEMIGO)
@@ -99,7 +100,7 @@ let caldero: Sprite;
         crear_enemigo(loc)
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-// --- C. CALDERO ---
+    // --- C. CALDERO ---
     lista_caldero = tiles.getTilesByType(assets.tile`marcador_caldero`)
     for (i = 0; i < lista_caldero.length; i++) {
         loc = lista_caldero[i]
@@ -108,7 +109,7 @@ let caldero: Sprite;
         caldero.startEffect(effects.fountain, 50000)
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-// --- D. ITEMS (OBJETOS) ---
+    // --- D. ITEMS (OBJETOS) ---
     // 1. GEMA MAGICA
     lista_gema = tiles.getTilesByType(assets.tile`marcador_item1`)
     for (i = 0; i < lista_gema.length; i++) {
@@ -116,24 +117,24 @@ let caldero: Sprite;
         crear_item("Gema Magica", img_gema, loc, "mision")
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-// 2. HIERBA SANTA
+    // 2. HIERBA SANTA
     lista_planta = tiles.getTilesByType(assets.tile`marcador_item2`)
     for (i = 0; i < lista_planta.length; i++) {
         loc = lista_planta[i]
         crear_item("Hierba Santa", img_planta, loc, "mision")
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-// 3. LIBRO ANTIGUO
+    // 3. LIBRO ANTIGUO
     lista_libro = tiles.getTilesByType(assets.tile`marcador_item3`)
     for (i = 0; i < lista_libro.length; i++) {
         loc = lista_libro[i]
         crear_item("Libro Antiguo", img_libro, loc, "mision")
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-game.splash("NIVEL " + ("" + nivel_actual))
+    game.splash("NIVEL " + ("" + nivel_actual))
 }
 // --- 6. MENÚS Y ARRANQUE ---
-function inicio () {
+function inicio() {
     game.splash("THE ALCHEMIST", "Ghost Edition")
     game.showLongText(`Si tu energia llega a 0,
 perderas TODOS los objetos.`, DialogLayout.Full)
@@ -146,15 +147,15 @@ perderas TODOS los objetos.`, DialogLayout.Full)
                 texto += "[X] " + j.nombre + "\n"
                 encontrados += 1
             }
-            
+
         }
         if (encontrados == 0) {
             texto += "(Vacia)"
         }
-        
+
         game.showLongText(texto, DialogLayout.Full)
     })
-// Inicialización limpia
+    // Inicialización limpia
     items = []
     nivel_actual = 1
     // VIDA INICIAL 999
@@ -162,7 +163,7 @@ perderas TODOS los objetos.`, DialogLayout.Full)
     generar_mundo()
     juego_activo = true
 }
-function crear_enemigo (loc: tiles.Location) {
+function crear_enemigo(loc: tiles.Location) {
     ene = sprites.create(img_fantasma, KIND_ENEMIGO)
     tiles.placeOnTile(ene, loc)
     ene.follow(jugador, 20)
@@ -179,11 +180,11 @@ sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function (player2, other) {
                 music.powerUp.play()
                 player2.say("Recuperado!", 500)
                 it.recogido = true
-break;
+                break;
             }
             if (it.tipo == "mision") {
                 it.recogido = true
-// Simplemente destruimos el objeto (desaparece sin confeti)
+                // Simplemente destruimos el objeto (desaparece sin confeti)
                 other.destroy()
                 music.magicWand.play()
                 energia = Math.min(999, energia + 10)
@@ -194,19 +195,19 @@ break;
         }
     }
 })
-function crear_item (nombre: string, img_obj: Image, loc: tiles.Location, tipo: string) {
+function crear_item(nombre: string, img_obj: Image, loc: tiles.Location, tipo: string) {
     let spr: Sprite;
-let nuevo_item: ItemJuego;
-if (tipo == "curacion") {
+    let nuevo_item: ItemJuego;
+    if (tipo == "curacion") {
         spr = sprites.create(img_obj, KIND_ITEM)
         tiles.placeOnTile(spr, loc)
         nuevo_item = new ItemJuego(nombre, img_obj, tipo)
-nuevo_item.sprite_fisico = spr
-items.push(nuevo_item)
+        nuevo_item.sprite_fisico = spr
+        items.push(nuevo_item)
         return
     }
     nuevo_item = new ItemJuego(nombre, img_obj, tipo)
-items.push(nuevo_item)
+    items.push(nuevo_item)
     spr = sprites.create(img_obj, KIND_ITEM)
     tiles.placeOnTile(spr, loc)
     spr.startEffect(effects.halo, 50000)
@@ -233,7 +234,7 @@ let nivel_actual = 0
 let energia = 0
 let enemigos: number[] = []
 // --- 2. CONFIGURACIÓN ---
-let items : ItemJuego[] = []
+let items: ItemJuego[] = []
 class ItemJuego {
     nombre: string
     imagen: Image
@@ -248,7 +249,7 @@ class ItemJuego {
         this.recogido = false
         this.sprite_fisico = null
     }
-    
+
 }
 energia = 999
 nivel_actual = 1
@@ -388,31 +389,31 @@ game.onUpdate(function () {
         // IMPORTANTE: Selecciona aquí tus animaciones
         if (estado_actual == "izquierda") {
             animation.runImageAnimation(
-            jugador,
-            assets.animation`anim_hero_izquierda`,
-            100,
-            true
+                jugador,
+                assets.animation`anim_hero_izquierda`,
+                100,
+                true
             )
         } else if (estado_actual == "derecha") {
             animation.runImageAnimation(
-            jugador,
-            assets.animation`anim_hero_derecha`,
-            100,
-            true
+                jugador,
+                assets.animation`anim_hero_derecha`,
+                100,
+                true
             )
         } else if (estado_actual == "arriba") {
             animation.runImageAnimation(
-            jugador,
-            assets.animation`anim_hero_arriba`,
-            100,
-            true
+                jugador,
+                assets.animation`anim_hero_arriba`,
+                100,
+                true
             )
         } else if (estado_actual == "abajo") {
             animation.runImageAnimation(
-            jugador,
-            assets.animation`anim_hero_abajo`,
-            100,
-            true
+                jugador,
+                assets.animation`anim_hero_abajo`,
+                100,
+                true
             )
         } else if (estado_actual == "parado") {
             jugador.setImage(img_hero)
