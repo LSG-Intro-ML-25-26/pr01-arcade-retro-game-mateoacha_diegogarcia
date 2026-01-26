@@ -46,6 +46,24 @@
         "tilemapTile": true,
         "displayName": "marcador_item1"
     },
+    "tile1": {
+        "data": "hwQQABAAAAD//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////w==",
+        "mimeType": "image/x-mkcd-f4",
+        "tilemapTile": true,
+        "displayName": "marcador_torre_a"
+    },
+    "tile2": {
+        "data": "hwQQABAAAACqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqg==",
+        "mimeType": "image/x-mkcd-f4",
+        "tilemapTile": true,
+        "displayName": "marcador_torre_b"
+    },
+    "tile10": {
+        "data": "hwQQABAAAADMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzA==",
+        "mimeType": "image/x-mkcd-f4",
+        "tilemapTile": true,
+        "displayName": "marcador_torre_c"
+    },
     "level2": {
         "id": "level2",
         "mimeType": "application/mkcd-tilemap",
@@ -107,6 +125,24 @@
             "sprites.dungeon.floorLight1"
         ],
         "displayName": "level01"
+    },
+    "mapa_general1": {
+        "id": "mapa_general1",
+        "mimeType": "application/mkcd-tilemap",
+        "data": "MTAxOTAwMTkwMDAyMDEwMzAxMDEwMTAxMDEwMzAzMDMwMzAxMDIwMTAxMDEwMTAxMDEwMTAxMDEwMTAyMDEwMTAxMDMwMzAzMDMwMzAxMDEwMzAzMDEwMTAxMDEwMTAxMDEwMTAxMDEwMjAyMDIwMTAxMDIwMTA2MDYwNjA2MDYwNjA2MDYwNjA2MDYwNjA2MDYwNjAxMDIwMTAxMDEwMTAxMDEwMTA0MDYwMTA2MDYwNjA2MDYwNjA2MDYwNjA2MDEwMjA2MDYwNjAyMDEwMTAxMDEwMTAxMDQwNjA2MDYwNjA2MDYwMzAzMDIwMjAyMDYwNjA2MDYwMTA2MDYwMTAxMDEwMTAyMDIwNDA2MDYwNjA2MDMwMjAyMDEwMzAzMDEwMjAyMDEwNjA2MDEwNjA2MDEwMTAxMDEwMTA2MDYwNjA2MDMwMjAxMDEwMTA5MDMwMjAyMDIwMTAyMDYwNjAxMDYwMjAyMDEwMjA0MDYwNjA2MDIwMjAzMDMwMjAyMDMwMzAxMDIwMjAxMDIwMjA2MDYwNjAyMDIwMTAyMDQwNjA2MDIwMjAyMDIwMTAzMDEwMTAxMDEwMjAyMDIwMjAzMDMwNjA2MDYwMTAyMDIwNDA2MDYwMTAyMDIwMjAxMDEwMTAyMDIwMTAxMDEwMjAyMDIwMzA2MDMwNjAxMDIwMjA0MDYwNjAyMDIwMTAxMDEwMTAyMDIwMjAyMDEwMTAyMDIwMjAyMDYwNjA2MDEwMjAyMDYwNjAyMDIwMjAyMDIwMTAxMDIwMjAyMDIwMTAxMDEwMTAxMDEwMjA2MDYwMTAyMDIwNjA2MDEwMTAxMDIwMTAxMDEwMTAxMDEwMjAxMDIwMjAyMDIwMTAxMDYwNjAxMDIwMjA2MDYwMTAyMDEwMTAxMDEwMTAzMDMwMTAyMDIwMjAyMDIwMjAyMDEwNjA2MDEwMjAyMDYwNjA2MDEwMTA4MDEwMjAyMDMwMzAxMDEwMTAyMDcwMjAyMDEwMTA2MDYwMTAyMDIwNjA2MDYwMjAyMDIwMjAyMDIwMzAzMDIwMjAxMDMwMjAyMDIwMTA2MDYwMjAxMDIwMjA0MDYwNjAxMDIwMjAyMDEwMTAzMDMwMjAyMDEwMzAyMDIwMjAxMDYwNjAxMDEwMjAyMDEwNDA2MDYwMTAyMDEwMzAxMDEwMzAyMDIwMTAxMDIwMjAxMDMwNjA2MDEwMjAyMDEwMzAyMDQwNjA2MDIwMjAyMDIwMTAyMDIwMTAxMDEwMjAyMDEwNjA2MDIwMTAyMDIwMTAxMDEwNDA0MDYwNjAxMDIwMTAxMDMwMTAxMDIwMTAxMDEwNjA2MDYwMjAxMDIwMjAyMDEwMzAxMDQwNDA2MDYwMTAxMDEwMTAxMDIwMjAyMDEwNjA2MDYwMzAxMDEwMjAyMDIwMTAxMDEwMTA0MDQwNjA2MDYwNjA2MDYwMjAyMDYwNjA2MDYwMzAxMDEwMjAyMDEwMjAyMDEwMTAxMDEwMTA1MDUwNTA1MDUwNjA2MDYwNjA1MDUwMzAzMDEwMTAyMDIwMjAyMDIwMTAxMDEwMTAzMDMwMzAxMDEwMTAxMDEwMTAzMDMwMTAzMDMwMzAxMDIwMjAyMDIwMjAyMDIwMjAyMDIwMjAyMDIwMjAyMDIwMjAyMDEwMTAxMDIwMTAxMDEwMjAyMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA=",
+        "tileset": [
+            "myTiles.transparency16",
+            "sprites.castle.tileGrass2",
+            "sprites.castle.tileGrass1",
+            "sprites.castle.tileGrass3",
+            "sprites.castle.tilePath4",
+            "sprites.castle.tilePath8",
+            "sprites.castle.tilePath6",
+            "myTiles.tile1",
+            "myTiles.tile2",
+            "myTiles.tile10"
+        ],
+        "displayName": "mapa_general"
     },
     "*": {
         "mimeType": "image/x-mkcd-f4",

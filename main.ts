@@ -1,6 +1,6 @@
 /** 
 👑 BLACKOUT: ESPAÑA EDITION 👑
-(Historia corregida: Texto legible y bien colocado)
+(Mapa Abierto + Torres Blancas + Lore + Sin Errores)
 
  */
 //  --- 1. CLASES ---
@@ -27,7 +27,9 @@ let enemigos : Sprite[] = []
 let jugador : Sprite = null
 let energia = 999.0
 let juego_activo = false
-let nivel_actual = 1
+let nivel_actual = 0
+//  0 = MAPA, 1,2,3 = NIVELES
+let niveles_desbloqueados = 1
 //  Variable para controlar la animación
 let ultimo_estado_hero = "parado"
 //  Tipos de Sprite
@@ -35,9 +37,72 @@ let KIND_ITEM = SpriteKind.create()
 let KIND_META = SpriteKind.create()
 let KIND_ENEMIGO = SpriteKind.Enemy
 let KIND_NPC = SpriteKind.create()
+let KIND_TORRE = SpriteKind.create()
+//  Nuevo tipo para las torres
 //  --- 3. ARTE PIXEL ---
-//  [HÉROE ANIMADO]
+//  [HÉROE ANIMADO] - Haz clic para elegir tu dibujo
 let img_hero = assets.image`hero_quieto`
+//  [TORRES DEL MAPA - YA INCLUIDAS EN EL CÓDIGO]
+//  TORRE A (PEQUEÑA)
+let img_torre_a = img`
+    . . . . . . . . . . . . . . . .
+    . . . . 1 1 1 1 1 1 1 1 . . . .
+    . . . . 1 c b b b b c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 d c c c c d 1 . . . .
+    . . . . 1 1 1 1 1 1 1 1 . . . .
+    . . . . 1 1 1 d d 1 1 1 . . . .
+    . . . . 1 1 1 d d 1 1 1 . . . .
+    . . . . 1 1 1 1 1 1 1 1 . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+`
+//  TORRE B (MEDIANA)
+let img_torre_b = img`
+    . . . . . . . . . . . . . . . .
+    . . . . . . 1 1 1 1 . . . . . .
+    . . . . . 1 c b b c 1 . . . . .
+    . . . . . 1 c 1 1 c 1 . . . . .
+    . . 1 1 1 1 c 1 1 c 1 1 1 1 . .
+    . . 1 c b b b b b b b b c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 d c c c c c c c c d 1 . .
+    . . 1 1 1 1 1 1 1 1 1 1 1 1 . .
+    . . 1 1 1 1 1 d d 1 1 1 1 1 . .
+    . . 1 1 1 1 1 d d 1 1 1 1 1 . .
+    . . 1 1 1 1 1 1 1 1 1 1 1 1 . .
+`
+//  TORRE C (GRANDE)
+let img_torre_c = img`
+    . . . . . . . 1 1 . . . . . . .
+    . . . . . . 1 c c 1 . . . . . .
+    . . . . . 1 c b b c 1 . . . . .
+    . . . . . 1 c 1 1 c 1 . . . . .
+    . . 1 1 1 1 c 1 1 c 1 1 1 1 . .
+    . . 1 c b b b b b b b b c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    1 1 1 c 1 1 1 1 1 1 1 1 c 1 1 1
+    1 c b b b b b b b b b b b b c 1
+    1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+    1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+    1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+    1 d c c c c c c c c c c c c d 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 d d 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 d d 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+`
 //  [RESTO DE OBJETOS]
 let img_fantasma = img`
     . . . . . . . . . . . .
@@ -131,37 +196,88 @@ let img_suelo_limpio = img`
 `
 //  --- 4. MAPA Y ENTIDADES ---
 function generar_mundo() {
+    let lista_jugador: tiles.Location[];
+    let lista_torre_a: tiles.Location[];
     let i: number;
     let loc: tiles.Location;
+    let t: Sprite;
+    let lista_torre_b: tiles.Location[];
+    let lista_torre_c: tiles.Location[];
     let caldero: Sprite;
     
+    //  Limpieza
     items = []
     sprites.destroyAllSpritesOfKind(KIND_ENEMIGO)
     sprites.destroyAllSpritesOfKind(KIND_META)
     sprites.destroyAllSpritesOfKind(KIND_ITEM)
+    sprites.destroyAllSpritesOfKind(KIND_TORRE)
     scene.setBackgroundColor(13)
-    if (nivel_actual == 1) {
-        tiles.setCurrentTilemap(tilemap`level1`)
-    } else if (nivel_actual == 2) {
-        tiles.setCurrentTilemap(tilemap`level2`)
-    } else if (nivel_actual == 3) {
-        tiles.setCurrentTilemap(tilemap`level3`)
-    } else {
-        game.over(true)
+    //  --- CASO 0: MAPA GENERAL ---
+    if (nivel_actual == 0) {
+        tiles.setCurrentTilemap(tilemap`mapa_general`)
+        game.splash("MAPA DE ESPAÑA", "Busca la Torre A")
+        //  Colocar Jugador
+        lista_jugador = tiles.getTilesByType(assets.tile`marcador_jugador`)
+        if (lista_jugador.length > 0) {
+            tiles.placeOnTile(jugador, lista_jugador[0])
+            tiles.setTileAt(lista_jugador[0], img_suelo_limpio)
+        }
+        
+        //  COLOCAR TORRES
+        //  Torre A
+        lista_torre_a = tiles.getTilesByType(assets.tile`marcador_torre_a`)
+        for (i = 0; i < lista_torre_a.length; i++) {
+            loc = lista_torre_a[i]
+            t = sprites.create(img_torre_a, KIND_TORRE)
+            tiles.placeOnTile(t, loc)
+            tiles.setTileAt(loc, img_suelo_limpio)
+        }
+        //  Torre B
+        lista_torre_b = tiles.getTilesByType(assets.tile`marcador_torre_b`)
+        for (i = 0; i < lista_torre_b.length; i++) {
+            loc = lista_torre_b[i]
+            t = sprites.create(img_torre_b, KIND_TORRE)
+            tiles.placeOnTile(t, loc)
+            tiles.setTileAt(loc, img_suelo_limpio)
+        }
+        //  Torre C
+        lista_torre_c = tiles.getTilesByType(assets.tile`marcador_torre_c`)
+        for (i = 0; i < lista_torre_c.length; i++) {
+            loc = lista_torre_c[i]
+            t = sprites.create(img_torre_c, KIND_TORRE)
+            tiles.placeOnTile(t, loc)
+            tiles.setTileAt(loc, img_suelo_limpio)
+        }
+        return
     }
     
-    let lista_jugador = tiles.getTilesByType(assets.tile`marcador_jugador`)
+    //  --- CASO NIVELES (1, 2, 3) ---
+    if (nivel_actual == 1) {
+        tiles.setCurrentTilemap(tilemap`level1`)
+        game.splash("TORRE A", "Objetivo: 1 Panel")
+    } else if (nivel_actual == 2) {
+        tiles.setCurrentTilemap(tilemap`level2`)
+        game.splash("TORRE B", "Objetivo: 2 Paneles")
+    } else if (nivel_actual == 3) {
+        tiles.setCurrentTilemap(tilemap`level3`)
+        game.splash("TORRE C", "Objetivo: 3 Paneles")
+    }
+    
+    //  Colocar Jugador
+    lista_jugador = tiles.getTilesByType(assets.tile`marcador_jugador`)
     if (lista_jugador.length > 0) {
         tiles.placeOnTile(jugador, lista_jugador[0])
         tiles.setTileAt(lista_jugador[0], img_suelo_limpio)
     }
     
+    //  Colocar Enemigos
     let lista_enemigos = tiles.getTilesByType(assets.tile`marcador_enemigo`)
     for (i = 0; i < lista_enemigos.length; i++) {
         loc = lista_enemigos[i]
         crear_enemigo(loc)
         tiles.setTileAt(loc, img_suelo_limpio)
     }
+    //  Colocar Meta (Caldero/Centro Control)
     let lista_caldero = tiles.getTilesByType(assets.tile`marcador_caldero`)
     for (i = 0; i < lista_caldero.length; i++) {
         loc = lista_caldero[i]
@@ -170,6 +286,7 @@ function generar_mundo() {
         caldero.startEffect(effects.fountain, 50000)
         tiles.setTileAt(loc, img_suelo_limpio)
     }
+    //  Colocar Items
     let lista_gema = tiles.getTilesByType(assets.tile`marcador_item1`)
     for (i = 0; i < lista_gema.length; i++) {
         loc = lista_gema[i]
@@ -188,7 +305,6 @@ function generar_mundo() {
         crear_item("Panel Torre C", img_libro, loc, "mision")
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-    game.splash("NIVEL " + ("" + nivel_actual))
 }
 
 function crear_enemigo(loc: tiles.Location) {
@@ -264,7 +380,6 @@ game.onUpdate(function bucle_principal() {
     
     if (estado_actual != ultimo_estado_hero) {
         animation.stopAnimation(animation.AnimationTypes.All, jugador)
-        //  IMPORTANTE: Selecciona tus animaciones aquí
         if (estado_actual == "izquierda") {
             animation.runImageAnimation(jugador, assets.animation`anim_hero_izquierda`, 100, true)
         } else if (estado_actual == "derecha") {
@@ -321,7 +436,34 @@ sprites.onOverlap(SpriteKind.Player, KIND_ENEMIGO, function on_enemy_overlap(pla
     music.zapped.play()
     pause(200)
 })
-//  INTERACCIÓN META
+//  INTERACCIÓN CON LAS TORRES (ENTRADA A NIVELES)
+sprites.onOverlap(SpriteKind.Player, KIND_TORRE, function on_torre_overlap(player: Sprite, torre: Sprite) {
+    
+    if (torre.image == img_torre_a) {
+        nivel_actual = 1
+        generar_mundo()
+    } else if (torre.image == img_torre_b) {
+        if (niveles_desbloqueados >= 2) {
+            nivel_actual = 2
+            generar_mundo()
+        } else {
+            player.say("¡Bloqueada! Termina la Torre A", 1000)
+            player.y += 16
+        }
+        
+    } else if (torre.image == img_torre_c) {
+        if (niveles_desbloqueados >= 3) {
+            nivel_actual = 3
+            generar_mundo()
+        } else {
+            player.say("¡Bloqueada! Termina la Torre B", 1000)
+            player.y += 16
+        }
+        
+    }
+    
+})
+//  INTERACCIÓN CALDERO (COMPLETAR NIVEL)
 sprites.onOverlap(SpriteKind.Player, KIND_META, function on_meta_overlap(player: Sprite, meta: Sprite) {
     let tenemos_este: boolean;
     let texto_falta: string;
@@ -352,21 +494,29 @@ sprites.onOverlap(SpriteKind.Player, KIND_META, function on_meta_overlap(player:
     }
     if (faltan.length == 0) {
         music.baDing.play()
-        if (nivel_actual < 3) {
-            game.showLongText(`¡Sistema restablecido!
-Avanzando...`, DialogLayout.Bottom)
-            nivel_actual += 1
-            player.startEffect(effects.halo, 1000)
-            pause(1000)
+        if (nivel_actual == 1) {
+            game.showLongText(`Torre A reactivada.
+Volviendo al mapa...`, DialogLayout.Bottom)
+            niveles_desbloqueados = 2
+            nivel_actual = 0
+            //  Volver al mapa
             generar_mundo()
-        } else {
+        } else if (nivel_actual == 2) {
+            game.showLongText(`Torre B reactivada.
+Volviendo al mapa...`, DialogLayout.Bottom)
+            niveles_desbloqueados = 3
+            nivel_actual = 0
+            //  Volver al mapa
+            generar_mundo()
+        } else if (nivel_actual == 3) {
             game.over(true, effects.starField)
         }
         
     } else {
+        //  FIN DEL JUEGO
         player.y += 10
         scene.cameraShake(2, 200)
-        texto_falta = "Faltan Paneles:\n"
+        texto_falta = "Faltan:\n"
         for (let f of faltan) {
             texto_falta += "- " + f + "\n"
         }
@@ -375,11 +525,8 @@ Avanzando...`, DialogLayout.Bottom)
     
 })
 //  --- 6. HISTORIA Y MENÚS ---
-//  [NUEVA HISTORIA CORREGIDA: TEXTO LIMPIO]
 function introduccion_historia() {
-    //  Fondo negro para máxima legibilidad
     scene.setBackgroundColor(15)
-    //  Usamos FULL para que sea como una pantalla de cine muda
     game.showLongText(`ESPAÑA SE APAGO
 EN UNA SOLA NOCHE.`, DialogLayout.Full)
     game.showLongText(`Las ciudades quedaron
@@ -427,7 +574,8 @@ function inicio() {
         game.showLongText(texto, DialogLayout.Full)
     })
     items = []
-    nivel_actual = 1
+    //  EMPEZAMOS EN EL MAPA (Nivel 0)
+    nivel_actual = 0
     energia = 999.0
     generar_mundo()
     juego_activo = true

@@ -1,6 +1,6 @@
 """
 👑 BLACKOUT: ESPAÑA EDITION 👑
-(Historia corregida: Texto legible y bien colocado)
+(Mapa Abierto + Torres Blancas + Lore + Sin Errores)
 """
 
 # --- 1. CLASES ---
@@ -19,7 +19,8 @@ jugador: Sprite = None
 
 energia = 999.0
 juego_activo = False
-nivel_actual = 1
+nivel_actual = 0 # 0 = MAPA, 1,2,3 = NIVELES
+niveles_desbloqueados = 1
 
 # Variable para controlar la animación
 ultimo_estado_hero = "parado"
@@ -29,11 +30,77 @@ KIND_ITEM = SpriteKind.create()
 KIND_META = SpriteKind.create()
 KIND_ENEMIGO = SpriteKind.enemy
 KIND_NPC = SpriteKind.create()
+KIND_TORRE = SpriteKind.create() # Nuevo tipo para las torres
 
 # --- 3. ARTE PIXEL ---
 
-# [HÉROE ANIMADO]
+# [HÉROE ANIMADO] - Haz clic para elegir tu dibujo
 img_hero = assets.image("""hero_quieto""")
+
+# [TORRES DEL MAPA - YA INCLUIDAS EN EL CÓDIGO]
+
+# TORRE A (PEQUEÑA)
+img_torre_a = img("""
+    . . . . . . . . . . . . . . . .
+    . . . . 1 1 1 1 1 1 1 1 . . . .
+    . . . . 1 c b b b b c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 d c c c c d 1 . . . .
+    . . . . 1 1 1 1 1 1 1 1 . . . .
+    . . . . 1 1 1 d d 1 1 1 . . . .
+    . . . . 1 1 1 d d 1 1 1 . . . .
+    . . . . 1 1 1 1 1 1 1 1 . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+""")
+
+# TORRE B (MEDIANA)
+img_torre_b = img("""
+    . . . . . . . . . . . . . . . .
+    . . . . . . 1 1 1 1 . . . . . .
+    . . . . . 1 c b b c 1 . . . . .
+    . . . . . 1 c 1 1 c 1 . . . . .
+    . . 1 1 1 1 c 1 1 c 1 1 1 1 . .
+    . . 1 c b b b b b b b b c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 d c c c c c c c c d 1 . .
+    . . 1 1 1 1 1 1 1 1 1 1 1 1 . .
+    . . 1 1 1 1 1 d d 1 1 1 1 1 . .
+    . . 1 1 1 1 1 d d 1 1 1 1 1 . .
+    . . 1 1 1 1 1 1 1 1 1 1 1 1 . .
+""")
+
+# TORRE C (GRANDE)
+img_torre_c = img("""
+    . . . . . . . 1 1 . . . . . . .
+    . . . . . . 1 c c 1 . . . . . .
+    . . . . . 1 c b b c 1 . . . . .
+    . . . . . 1 c 1 1 c 1 . . . . .
+    . . 1 1 1 1 c 1 1 c 1 1 1 1 . .
+    . . 1 c b b b b b b b b c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    1 1 1 c 1 1 1 1 1 1 1 1 c 1 1 1
+    1 c b b b b b b b b b b b b c 1
+    1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+    1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+    1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+    1 d c c c c c c c c c c c c d 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 d d 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 d d 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+""")
 
 # [RESTO DE OBJETOS]
 img_fantasma = img("""
@@ -137,34 +204,80 @@ img_suelo_limpio = img("""
 
 def generar_mundo():
     global nivel_actual, items
+    
+    # Limpieza
     items = []
-
     sprites.destroy_all_sprites_of_kind(KIND_ENEMIGO)
     sprites.destroy_all_sprites_of_kind(KIND_META)
     sprites.destroy_all_sprites_of_kind(KIND_ITEM)
+    sprites.destroy_all_sprites_of_kind(KIND_TORRE)
     
     scene.set_background_color(13)
 
+    # --- CASO 0: MAPA GENERAL ---
+    if nivel_actual == 0:
+        tiles.set_current_tilemap(tilemap("""mapa_general"""))
+        game.splash("MAPA DE ESPAÑA", "Busca la Torre A")
+        
+        # Colocar Jugador
+        lista_jugador = tiles.get_tiles_by_type(assets.tile("""marcador_jugador"""))
+        if len(lista_jugador) > 0:
+            tiles.place_on_tile(jugador, lista_jugador[0])
+            tiles.set_tile_at(lista_jugador[0], img_suelo_limpio)
+            
+        # COLOCAR TORRES
+        
+        # Torre A
+        lista_torre_a = tiles.get_tiles_by_type(assets.tile("""marcador_torre_a"""))
+        for i in range(len(lista_torre_a)):
+            loc = lista_torre_a[i]
+            t = sprites.create(img_torre_a, KIND_TORRE)
+            tiles.place_on_tile(t, loc)
+            tiles.set_tile_at(loc, img_suelo_limpio)
+            
+        # Torre B
+        lista_torre_b = tiles.get_tiles_by_type(assets.tile("""marcador_torre_b"""))
+        for i in range(len(lista_torre_b)):
+            loc = lista_torre_b[i]
+            t = sprites.create(img_torre_b, KIND_TORRE)
+            tiles.place_on_tile(t, loc)
+            tiles.set_tile_at(loc, img_suelo_limpio)
+
+        # Torre C
+        lista_torre_c = tiles.get_tiles_by_type(assets.tile("""marcador_torre_c"""))
+        for i in range(len(lista_torre_c)):
+            loc = lista_torre_c[i]
+            t = sprites.create(img_torre_c, KIND_TORRE)
+            tiles.place_on_tile(t, loc)
+            tiles.set_tile_at(loc, img_suelo_limpio)
+            
+        return
+
+    # --- CASO NIVELES (1, 2, 3) ---
     if nivel_actual == 1:
         tiles.set_current_tilemap(tilemap("""level1"""))
+        game.splash("TORRE A", "Objetivo: 1 Panel")
     elif nivel_actual == 2:
         tiles.set_current_tilemap(tilemap("""level2"""))
+        game.splash("TORRE B", "Objetivo: 2 Paneles")
     elif nivel_actual == 3:
         tiles.set_current_tilemap(tilemap("""level3"""))
-    else:
-        game.over(True)
+        game.splash("TORRE C", "Objetivo: 3 Paneles")
 
+    # Colocar Jugador
     lista_jugador = tiles.get_tiles_by_type(assets.tile("""marcador_jugador"""))
     if len(lista_jugador) > 0:
         tiles.place_on_tile(jugador, lista_jugador[0])
         tiles.set_tile_at(lista_jugador[0], img_suelo_limpio)
 
+    # Colocar Enemigos
     lista_enemigos = tiles.get_tiles_by_type(assets.tile("""marcador_enemigo"""))
     for i in range(len(lista_enemigos)):
         loc = lista_enemigos[i]
         crear_enemigo(loc)
         tiles.set_tile_at(loc, img_suelo_limpio)
 
+    # Colocar Meta (Caldero/Centro Control)
     lista_caldero = tiles.get_tiles_by_type(assets.tile("""marcador_caldero"""))
     for i in range(len(lista_caldero)):
         loc = lista_caldero[i]
@@ -173,6 +286,7 @@ def generar_mundo():
         caldero.start_effect(effects.fountain, 50000)
         tiles.set_tile_at(loc, img_suelo_limpio)
     
+    # Colocar Items
     lista_gema = tiles.get_tiles_by_type(assets.tile("""marcador_item1"""))
     for i in range(len(lista_gema)):
         loc = lista_gema[i]
@@ -191,7 +305,6 @@ def generar_mundo():
         crear_item("Panel Torre C", img_libro, loc, "mision")
         tiles.set_tile_at(loc, img_suelo_limpio)
 
-    game.splash("NIVEL " + str(nivel_actual))
 
 def crear_enemigo(loc: tiles.Location):
     ene = sprites.create(img_fantasma, KIND_ENEMIGO)
@@ -261,8 +374,6 @@ def bucle_principal():
     
     if estado_actual != ultimo_estado_hero:
         animation.stop_animation(animation.AnimationTypes.ALL, jugador)
-        
-        # IMPORTANTE: Selecciona tus animaciones aquí
         if estado_actual == "izquierda":
             animation.run_image_animation(jugador, assets.animation("""anim_hero_izquierda"""), 100, True)
         elif estado_actual == "derecha":
@@ -316,9 +427,35 @@ def on_enemy_overlap(player, enemy):
 
 sprites.on_overlap(SpriteKind.player, KIND_ENEMIGO, on_enemy_overlap)
 
-# INTERACCIÓN META
+# INTERACCIÓN CON LAS TORRES (ENTRADA A NIVELES)
+def on_torre_overlap(player, torre):
+    global nivel_actual, niveles_desbloqueados
+    
+    if torre.image == img_torre_a:
+        nivel_actual = 1
+        generar_mundo()
+        
+    elif torre.image == img_torre_b:
+        if niveles_desbloqueados >= 2:
+            nivel_actual = 2
+            generar_mundo()
+        else:
+            player.say("¡Bloqueada! Termina la Torre A", 1000)
+            player.y += 16
+            
+    elif torre.image == img_torre_c:
+        if niveles_desbloqueados >= 3:
+            nivel_actual = 3
+            generar_mundo()
+        else:
+            player.say("¡Bloqueada! Termina la Torre B", 1000)
+            player.y += 16
+
+sprites.on_overlap(SpriteKind.player, KIND_TORRE, on_torre_overlap)
+
+# INTERACCIÓN CALDERO (COMPLETAR NIVEL)
 def on_meta_overlap(player, meta):
-    global nivel_actual
+    global nivel_actual, niveles_desbloqueados
     
     objetivos: List[str] = []
     
@@ -342,18 +479,26 @@ def on_meta_overlap(player, meta):
             
     if len(faltan) == 0:
         music.ba_ding.play()
-        if nivel_actual < 3:
-            game.show_long_text("¡Sistema restablecido!\nAvanzando...", DialogLayout.BOTTOM)
-            nivel_actual += 1
-            player.start_effect(effects.halo, 1000)
-            pause(1000)
+        
+        if nivel_actual == 1:
+            game.show_long_text("Torre A reactivada.\nVolviendo al mapa...", DialogLayout.BOTTOM)
+            niveles_desbloqueados = 2
+            nivel_actual = 0 # Volver al mapa
             generar_mundo()
-        else:
-            game.over(True, effects.star_field)
+            
+        elif nivel_actual == 2:
+            game.show_long_text("Torre B reactivada.\nVolviendo al mapa...", DialogLayout.BOTTOM)
+            niveles_desbloqueados = 3
+            nivel_actual = 0 # Volver al mapa
+            generar_mundo()
+            
+        elif nivel_actual == 3:
+            game.over(True, effects.star_field) # FIN DEL JUEGO
+            
     else:
         player.y += 10
         scene.camera_shake(2, 200)
-        texto_falta = "Faltan Paneles:\n"
+        texto_falta = "Faltan:\n"
         for f in faltan:
             texto_falta += "- " + f + "\n"
         game.show_long_text(texto_falta, DialogLayout.BOTTOM)
@@ -362,26 +507,20 @@ sprites.on_overlap(SpriteKind.player, KIND_META, on_meta_overlap)
 
 # --- 6. HISTORIA Y MENÚS ---
 
-# [NUEVA HISTORIA CORREGIDA: TEXTO LIMPIO]
 def introduccion_historia():
-    # Fondo negro para máxima legibilidad
     scene.set_background_color(15)
     
-    # Usamos FULL para que sea como una pantalla de cine muda
     game.show_long_text("ESPAÑA SE APAGO\nEN UNA SOLA NOCHE.", DialogLayout.FULL)
-    
     game.show_long_text("Las ciudades quedaron\nen silencio.\nLos cielos, sin luz.", DialogLayout.FULL)
     
     music.big_crash.play()
     game.show_long_text("El sistema electrico\nnacional colapso.\nEl tiempo corre...", DialogLayout.FULL)
     
     game.show_long_text("MISIÓN:\nActivar 3 paneles de\nluz ocultos en los\nsotanos de las torres.", DialogLayout.FULL)
-    
     game.show_long_text("ADVERTENCIA:\nDebes activarlos en\norden correcto:\nA -> B -> C", DialogLayout.FULL)
     
     music.beam_up.play()
     game.show_long_text("Si fallas, la\noscuridad sera\nirreversible.", DialogLayout.FULL)
-    
     game.show_long_text("El destino de España\nesta en tus manos.", DialogLayout.FULL)
 
 def mostrar_inventari():
@@ -401,14 +540,15 @@ def inicio():
     global juego_activo, energia, nivel_actual, items
     
     game.splash("BLACKOUT", "España Edition")
-    
     introduccion_historia()
 
     setup_hero()
     controller.B.on_event(ControllerButtonEvent.PRESSED, mostrar_inventari)
     
     items = []
-    nivel_actual = 1
+    
+    # EMPEZAMOS EN EL MAPA (Nivel 0)
+    nivel_actual = 0
     energia = 999.0
     
     generar_mundo()
