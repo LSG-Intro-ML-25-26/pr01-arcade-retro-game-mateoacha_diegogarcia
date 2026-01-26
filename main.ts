@@ -1,6 +1,6 @@
 /** 
 👑 BLACKOUT: ESPAÑA EDITION 👑
-(Mapa Abierto + Torres Blancas + Lore + Sin Errores)
+(Versión Final Corregida: Sin Errores de Bucle)
 
  */
 //  --- 1. CLASES ---
@@ -38,12 +38,87 @@ let KIND_META = SpriteKind.create()
 let KIND_ENEMIGO = SpriteKind.Enemy
 let KIND_NPC = SpriteKind.create()
 let KIND_TORRE = SpriteKind.create()
-//  Nuevo tipo para las torres
 //  --- 3. ARTE PIXEL ---
-//  [HÉROE ANIMADO] - Haz clic para elegir tu dibujo
+//  [HÉROE ANIMADO]
 let img_hero = assets.image`hero_quieto`
-//  [TORRES DEL MAPA - YA INCLUIDAS EN EL CÓDIGO]
-//  TORRE A (PEQUEÑA)
+//  [TUS TEXTURAS DECORATIVAS]
+//  Suelo 1
+let img_suelo_1 = img`
+    c c b c c b c c c c c c c c c
+    b c c c c b c c c c c c c c c
+    c b b b b b b c b c c c c c c
+    c c c c c c c c c c c c c c c
+    c b b c b b c c b c c b c c c
+    b c b b c c b c c c c c c c c
+    b b b b c b b c c c c c c c c
+    b b b b c b b c b c c c c c c
+    b b b b c b b c b b c c c c c
+    b b b b b b c c c b c c b c c
+    b b b b c b b c b c c c c c c
+    b b b b c c b c b c c c b c c
+    b c b c c b c c c c c c c c c
+    b b b b b b b b c b c c c c c
+    b b b c c b b c c c c c c c c
+    b b b b b b b c c b c c c c c
+`
+//  Pared 1
+let img_pared_1 = img`
+    1 1 d 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 d 1 1 1 1 1 1 1 1 1
+    1 1 d 1 1 1 1 1 1 1 1 d 1 1 1
+    d d d d d d d 1 d 1 d d d d d
+    1 1 1 d 1 d 1 1 1 1 1 1 d 1 1
+    1 1 d 1 1 1 1 1 1 1 1 1 1 1 1
+    d d d d d d d d d d d d d d d
+    d d d d d d d d d d d d d d d
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 d 1 d 1 1 d 1 1 1 d 1 1
+    d d d d d d d d d d d d d d d
+    1 1 d 1 1 1 1 1 1 1 1 d 1 1 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 d 1 d 1 1 1 1 1 1 d 1 1
+    1 1 d 1 1 1 1 1 1 1 1 1 1 1 1
+`
+//  Suelo 2
+let img_suelo_2 = img`
+    c c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    f c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    f c c c c c c c c c c c c c c
+    f c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    f c c c c c c c c c c c c c c
+    f c c c c c c c c c c c c c c
+    f c c c c c c c c c c c c c c
+    f c c c c c c c c c c c c c c
+`
+//  Pared 2
+let img_pared_2 = img`
+    f f f f 8 8 8 8 8 8 f f f f f
+    f 8 f f 6 8 8 8 8 6 f f 8 f f
+    f 8 f f 6 8 8 8 8 6 f f 8 f f
+    f f f f 6 f f f f 6 f f 8 f f
+    f f f f 8 8 f f f 8 f f f f f
+    f f f f f 8 f f f f f f f f f
+    f f f f f f f f f f f f f f f
+    f f f f f f f f f f f f f f f
+    f f f f f f f f f f f f f f f
+    f f f f f f f f f f f f f f f
+    f f f f f f f f f f f f f f f
+    f f f f f f f f f f f f f f f
+    f 8 f f f f 8 f f f f 8 f f 8
+    f f f f f f f f f f f f f f f
+    f f f f f f f f f f f f f f f
+    f f f f f f f f f f f f f f f
+`
+//  [TORRES BLANCAS]
 let img_torre_a = img`
     . . . . . . . . . . . . . . . .
     . . . . 1 1 1 1 1 1 1 1 . . . .
@@ -62,7 +137,6 @@ let img_torre_a = img`
     . . . . . . . . . . . . . . . .
     . . . . . . . . . . . . . . . .
 `
-//  TORRE B (MEDIANA)
 let img_torre_b = img`
     . . . . . . . . . . . . . . . .
     . . . . . . 1 1 1 1 . . . . . .
@@ -81,7 +155,6 @@ let img_torre_b = img`
     . . 1 1 1 1 1 d d 1 1 1 1 1 . .
     . . 1 1 1 1 1 1 1 1 1 1 1 1 . .
 `
-//  TORRE C (GRANDE)
 let img_torre_c = img`
     . . . . . . . 1 1 . . . . . . .
     . . . . . . 1 c c 1 . . . . . .
@@ -177,22 +250,22 @@ let img_caldero = img`
     . . d . . . . . . d . .
 `
 let img_suelo_limpio = img`
-    c c b c c c b c c c b c c c b c
-    c c b c c c b c c c b c c c b c
     b b b b b b b b b b b b b b b b
-    c b c c c b c c c b c c c b c c
-    c b c c c b c c c b c c c b c c
+    b d d d d d d d d d d d d d d b
+    b d c c c c c c c c c c c c d b
+    b d c 1 c c c c c c c c 1 c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c 1 c c c c c c c c d b
+    b d c c 1 1 1 c c c c c c c d b
+    b d c c c 1 c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c 1 c c c c c c c c 1 c d b
+    b d c c c c c c c c c c c c d b
+    b d d d d d d d d d d d d d d b
     b b b b b b b b b b b b b b b b
-    c c c b c c c b c c c b c c c b
-    c c c b c c c b c c c b c c c b
-    b b b b b b b b b b b b b b b b
-    c c b c c c b c c c b c c c b c
-    c c b c c c b c c c b c c c b c
-    b b b b b b b b b b b b b b b b
-    c b c c c b c c c b c c c b c c
-    c b c c c b c c c b c c c b c c
-    b b b b b b b b b b b b b b b b
-    c c c b c c c b c c c b c c c b
 `
 //  --- 4. MAPA Y ENTIDADES ---
 function generar_mundo() {
@@ -253,16 +326,45 @@ function generar_mundo() {
     
     //  --- CASO NIVELES (1, 2, 3) ---
     if (nivel_actual == 1) {
-        tiles.setCurrentTilemap(tilemap`level01`)
+        tiles.setCurrentTilemap(tilemap`level1`)
         game.splash("TORRE A", "Objetivo: 1 Panel")
     } else if (nivel_actual == 2) {
-        tiles.setCurrentTilemap(tilemap`level02`)
+        tiles.setCurrentTilemap(tilemap`level2`)
         game.splash("TORRE B", "Objetivo: 2 Paneles")
     } else if (nivel_actual == 3) {
-        tiles.setCurrentTilemap(tilemap`level03`)
+        tiles.setCurrentTilemap(tilemap`level3`)
         game.splash("TORRE C", "Objetivo: 3 Paneles")
     }
     
+    //  [CORREGIDO] SUSTITUIR DECORACIÓN CON BUCLES SEGUROS
+    //  Suelo 1
+    let lista_s1 = tiles.getTilesByType(assets.tile`marcador_suelo_1`)
+    for (i = 0; i < lista_s1.length; i++) {
+        loc = lista_s1[i]
+        tiles.setTileAt(loc, img_suelo_1)
+        tiles.setWallAt(loc, false)
+    }
+    //  Suelo 2
+    let lista_s2 = tiles.getTilesByType(assets.tile`marcador_suelo_2`)
+    for (i = 0; i < lista_s2.length; i++) {
+        loc = lista_s2[i]
+        tiles.setTileAt(loc, img_suelo_2)
+        tiles.setWallAt(loc, false)
+    }
+    //  Pared 1
+    let lista_p1 = tiles.getTilesByType(assets.tile`marcador_pared_1`)
+    for (i = 0; i < lista_p1.length; i++) {
+        loc = lista_p1[i]
+        tiles.setTileAt(loc, img_pared_1)
+        tiles.setWallAt(loc, true)
+    }
+    //  Pared 2
+    let lista_p2 = tiles.getTilesByType(assets.tile`marcador_pared_2`)
+    for (i = 0; i < lista_p2.length; i++) {
+        loc = lista_p2[i]
+        tiles.setTileAt(loc, img_pared_2)
+        tiles.setWallAt(loc, true)
+    }
     //  Colocar Jugador
     lista_jugador = tiles.getTilesByType(assets.tile`marcador_jugador`)
     if (lista_jugador.length > 0) {

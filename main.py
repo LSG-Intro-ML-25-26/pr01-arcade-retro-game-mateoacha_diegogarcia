@@ -1,6 +1,6 @@
 """
 👑 BLACKOUT: ESPAÑA EDITION 👑
-(Mapa Abierto + Torres Blancas + Lore + Sin Errores)
+(Versión Final Corregida: Sin Errores de Bucle)
 """
 
 # --- 1. CLASES ---
@@ -30,16 +30,96 @@ KIND_ITEM = SpriteKind.create()
 KIND_META = SpriteKind.create()
 KIND_ENEMIGO = SpriteKind.enemy
 KIND_NPC = SpriteKind.create()
-KIND_TORRE = SpriteKind.create() # Nuevo tipo para las torres
+KIND_TORRE = SpriteKind.create()
 
 # --- 3. ARTE PIXEL ---
 
-# [HÉROE ANIMADO] - Haz clic para elegir tu dibujo
+# [HÉROE ANIMADO]
 img_hero = assets.image("""hero_quieto""")
 
-# [TORRES DEL MAPA - YA INCLUIDAS EN EL CÓDIGO]
+# [TUS TEXTURAS DECORATIVAS]
 
-# TORRE A (PEQUEÑA)
+# Suelo 1
+img_suelo_1 = img("""
+    c c b c c b c c c c c c c c c
+    b c c c c b c c c c c c c c c
+    c b b b b b b c b c c c c c c
+    c c c c c c c c c c c c c c c
+    c b b c b b c c b c c b c c c
+    b c b b c c b c c c c c c c c
+    b b b b c b b c c c c c c c c
+    b b b b c b b c b c c c c c c
+    b b b b c b b c b b c c c c c
+    b b b b b b c c c b c c b c c
+    b b b b c b b c b c c c c c c
+    b b b b c c b c b c c c b c c
+    b c b c c b c c c c c c c c c
+    b b b b b b b b c b c c c c c
+    b b b c c b b c c c c c c c c
+    b b b b b b b c c b c c c c c
+""")
+
+# Pared 1
+img_pared_1 = img("""
+    1 1 d 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 d 1 1 1 1 1 1 1 1 1
+    1 1 d 1 1 1 1 1 1 1 1 d 1 1 1
+    d d d d d d d 1 d 1 d d d d d
+    1 1 1 d 1 d 1 1 1 1 1 1 d 1 1
+    1 1 d 1 1 1 1 1 1 1 1 1 1 1 1
+    d d d d d d d d d d d d d d d
+    d d d d d d d d d d d d d d d
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 d 1 d 1 1 d 1 1 1 d 1 1
+    d d d d d d d d d d d d d d d
+    1 1 d 1 1 1 1 1 1 1 1 d 1 1 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 d 1 d 1 1 1 1 1 1 d 1 1
+    1 1 d 1 1 1 1 1 1 1 1 1 1 1 1
+""")
+
+# Suelo 2
+img_suelo_2 = img("""
+    c c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    f c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    f c c c c c c c c c c c c c c
+    f c c c c c c c c c c c c c c
+    c c c c c c c c c c c c c c c
+    f c c c c c c c c c c c c c c
+    f c c c c c c c c c c c c c c
+    f c c c c c c c c c c c c c c
+    f c c c c c c c c c c c c c c
+""")
+
+# Pared 2
+img_pared_2 = img("""
+    f f f f 8 8 8 8 8 8 f f f f f
+    f 8 f f 6 8 8 8 8 6 f f 8 f f
+    f 8 f f 6 8 8 8 8 6 f f 8 f f
+    f f f f 6 f f f f 6 f f 8 f f
+    f f f f 8 8 f f f 8 f f f f f
+    f f f f f 8 f f f f f f f f f
+    f f f f f f f f f f f f f f f
+    f f f f f f f f f f f f f f f
+    f f f f f f f f f f f f f f f
+    f f f f f f f f f f f f f f f
+    f f f f f f f f f f f f f f f
+    f f f f f f f f f f f f f f f
+    f 8 f f f f 8 f f f f 8 f f 8
+    f f f f f f f f f f f f f f f
+    f f f f f f f f f f f f f f f
+    f f f f f f f f f f f f f f f
+""")
+
+# [TORRES BLANCAS]
 img_torre_a = img("""
     . . . . . . . . . . . . . . . .
     . . . . 1 1 1 1 1 1 1 1 . . . .
@@ -59,7 +139,6 @@ img_torre_a = img("""
     . . . . . . . . . . . . . . . .
 """)
 
-# TORRE B (MEDIANA)
 img_torre_b = img("""
     . . . . . . . . . . . . . . . .
     . . . . . . 1 1 1 1 . . . . . .
@@ -79,7 +158,6 @@ img_torre_b = img("""
     . . 1 1 1 1 1 1 1 1 1 1 1 1 . .
 """)
 
-# TORRE C (GRANDE)
 img_torre_c = img("""
     . . . . . . . 1 1 . . . . . . .
     . . . . . . 1 c c 1 . . . . . .
@@ -182,22 +260,22 @@ img_caldero = img("""
 """)
 
 img_suelo_limpio = img("""
-    c c b c c c b c c c b c c c b c
-    c c b c c c b c c c b c c c b c
     b b b b b b b b b b b b b b b b
-    c b c c c b c c c b c c c b c c
-    c b c c c b c c c b c c c b c c
+    b d d d d d d d d d d d d d d b
+    b d c c c c c c c c c c c c d b
+    b d c 1 c c c c c c c c 1 c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c 1 c c c c c c c c d b
+    b d c c 1 1 1 c c c c c c c d b
+    b d c c c 1 c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c 1 c c c c c c c c 1 c d b
+    b d c c c c c c c c c c c c d b
+    b d d d d d d d d d d d d d d b
     b b b b b b b b b b b b b b b b
-    c c c b c c c b c c c b c c c b
-    c c c b c c c b c c c b c c c b
-    b b b b b b b b b b b b b b b b
-    c c b c c c b c c c b c c c b c
-    c c b c c c b c c c b c c c b c
-    b b b b b b b b b b b b b b b b
-    c b c c c b c c c b c c c b c c
-    c b c c c b c c c b c c c b c c
-    b b b b b b b b b b b b b b b b
-    c c c b c c c b c c c b c c c b
 """)
 
 # --- 4. MAPA Y ENTIDADES ---
@@ -255,14 +333,44 @@ def generar_mundo():
 
     # --- CASO NIVELES (1, 2, 3) ---
     if nivel_actual == 1:
-        tiles.set_current_tilemap(tilemap("""level01"""))
+        tiles.set_current_tilemap(tilemap("""level1"""))
         game.splash("TORRE A", "Objetivo: 1 Panel")
     elif nivel_actual == 2:
-        tiles.set_current_tilemap(tilemap("""level02"""))
+        tiles.set_current_tilemap(tilemap("""level2"""))
         game.splash("TORRE B", "Objetivo: 2 Paneles")
     elif nivel_actual == 3:
-        tiles.set_current_tilemap(tilemap("""level03"""))
+        tiles.set_current_tilemap(tilemap("""level3"""))
         game.splash("TORRE C", "Objetivo: 3 Paneles")
+
+    # [CORREGIDO] SUSTITUIR DECORACIÓN CON BUCLES SEGUROS
+    
+    # Suelo 1
+    lista_s1 = tiles.get_tiles_by_type(assets.tile("""marcador_suelo_1"""))
+    for i in range(len(lista_s1)):
+        loc = lista_s1[i]
+        tiles.set_tile_at(loc, img_suelo_1)
+        tiles.set_wall_at(loc, False)
+
+    # Suelo 2
+    lista_s2 = tiles.get_tiles_by_type(assets.tile("""marcador_suelo_2"""))
+    for i in range(len(lista_s2)):
+        loc = lista_s2[i]
+        tiles.set_tile_at(loc, img_suelo_2)
+        tiles.set_wall_at(loc, False)
+
+    # Pared 1
+    lista_p1 = tiles.get_tiles_by_type(assets.tile("""marcador_pared_1"""))
+    for i in range(len(lista_p1)):
+        loc = lista_p1[i]
+        tiles.set_tile_at(loc, img_pared_1)
+        tiles.set_wall_at(loc, True)
+
+    # Pared 2
+    lista_p2 = tiles.get_tiles_by_type(assets.tile("""marcador_pared_2"""))
+    for i in range(len(lista_p2)):
+        loc = lista_p2[i]
+        tiles.set_tile_at(loc, img_pared_2)
+        tiles.set_wall_at(loc, True)
 
     # Colocar Jugador
     lista_jugador = tiles.get_tiles_by_type(assets.tile("""marcador_jugador"""))
