@@ -1,6 +1,6 @@
 """
-👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
-(Sin Rey + Sin Confeti + Sin Empujes + Héroe Animado + Vida 999)
+👑 BLACKOUT: ESPAÑA EDITION 👑
+(Historia corregida: Texto legible y bien colocado)
 """
 
 # --- 1. CLASES ---
@@ -28,14 +28,14 @@ ultimo_estado_hero = "parado"
 KIND_ITEM = SpriteKind.create()
 KIND_META = SpriteKind.create()
 KIND_ENEMIGO = SpriteKind.enemy
+KIND_NPC = SpriteKind.create()
 
 # --- 3. ARTE PIXEL ---
 
 # [HÉROE ANIMADO]
-# Haz clic aquí para elegir tu dibujo del héroe quieto
 img_hero = assets.image("""hero_quieto""")
 
-# [RESTO DE OBJETOS - TEXTO]
+# [RESTO DE OBJETOS]
 img_fantasma = img("""
     . . . . . . . . . . . .
     . . . . 1 1 1 1 . . . .
@@ -50,7 +50,6 @@ img_fantasma = img("""
     . . . . . . . . . . . .
 """)
 
-# --- LOS 3 OBJETOS ÚNICOS ---
 img_gema = img("""
     . . . . . . . . . . . .
     . . . . . 2 2 . . . . .
@@ -115,7 +114,6 @@ img_caldero = img("""
     . . d . . . . . . d . .
 """)
 
-# Tile de limpieza
 img_suelo_limpio = img("""
     c c b c c c b c c c b c c c b c
     c c b c c c b c c c b c c c b c
@@ -139,43 +137,34 @@ img_suelo_limpio = img("""
 
 def generar_mundo():
     global nivel_actual, items
-    
-    # REINICIAMOS LOS OBJETOS EN CADA NIVEL
     items = []
 
-    # 1. LIMPIEZA
     sprites.destroy_all_sprites_of_kind(KIND_ENEMIGO)
     sprites.destroy_all_sprites_of_kind(KIND_META)
     sprites.destroy_all_sprites_of_kind(KIND_ITEM)
     
     scene.set_background_color(13)
 
-    # 2. CARGAR TILEMAP VISUAL
     if nivel_actual == 1:
-        tiles.set_current_tilemap(tilemap("""level01"""))
+        tiles.set_current_tilemap(tilemap("""level1"""))
     elif nivel_actual == 2:
-        tiles.set_current_tilemap(tilemap("""level02"""))
+        tiles.set_current_tilemap(tilemap("""level2"""))
     elif nivel_actual == 3:
-        tiles.set_current_tilemap(tilemap("""level03"""))
+        tiles.set_current_tilemap(tilemap("""level3"""))
     else:
         game.over(True)
 
-    # 3. COLOCAR OBJETOS BASADO EN MARCADORES
-
-    # --- A. JUGADOR ---
     lista_jugador = tiles.get_tiles_by_type(assets.tile("""marcador_jugador"""))
     if len(lista_jugador) > 0:
         tiles.place_on_tile(jugador, lista_jugador[0])
         tiles.set_tile_at(lista_jugador[0], img_suelo_limpio)
 
-    # --- B. ENEMIGOS ---
     lista_enemigos = tiles.get_tiles_by_type(assets.tile("""marcador_enemigo"""))
     for i in range(len(lista_enemigos)):
         loc = lista_enemigos[i]
         crear_enemigo(loc)
         tiles.set_tile_at(loc, img_suelo_limpio)
 
-    # --- C. CALDERO ---
     lista_caldero = tiles.get_tiles_by_type(assets.tile("""marcador_caldero"""))
     for i in range(len(lista_caldero)):
         loc = lista_caldero[i]
@@ -184,27 +173,22 @@ def generar_mundo():
         caldero.start_effect(effects.fountain, 50000)
         tiles.set_tile_at(loc, img_suelo_limpio)
     
-    # --- D. ITEMS (OBJETOS) ---
-    
-    # 1. GEMA MAGICA
     lista_gema = tiles.get_tiles_by_type(assets.tile("""marcador_item1"""))
     for i in range(len(lista_gema)):
         loc = lista_gema[i]
-        crear_item("Gema Magica", img_gema, loc, "mision")
+        crear_item("Panel Torre A", img_gema, loc, "mision")
         tiles.set_tile_at(loc, img_suelo_limpio)
 
-    # 2. HIERBA SANTA
     lista_planta = tiles.get_tiles_by_type(assets.tile("""marcador_item2"""))
     for i in range(len(lista_planta)):
         loc = lista_planta[i]
-        crear_item("Hierba Santa", img_planta, loc, "mision")
+        crear_item("Panel Torre B", img_planta, loc, "mision")
         tiles.set_tile_at(loc, img_suelo_limpio)
         
-    # 3. LIBRO ANTIGUO
     lista_libro = tiles.get_tiles_by_type(assets.tile("""marcador_item3"""))
     for i in range(len(lista_libro)):
         loc = lista_libro[i]
-        crear_item("Libro Antiguo", img_libro, loc, "mision")
+        crear_item("Panel Torre C", img_libro, loc, "mision")
         tiles.set_tile_at(loc, img_suelo_limpio)
 
     game.splash("NIVEL " + str(nivel_actual))
@@ -237,7 +221,6 @@ def setup_hero():
     if jugador:
         jugador.destroy()
 
-    # Se crea el héroe usando la imagen de Assets que definiste arriba
     jugador = sprites.create(img_hero, SpriteKind.player)
     controller.move_sprite(jugador, 80, 80)
     scene.camera_follow_sprite(jugador)
@@ -260,7 +243,7 @@ def bucle_principal():
     
     controller.move_sprite(jugador, velocidad, velocidad)
 
-    # --- LÓGICA DE ANIMACIÓN DEL HÉROE ---
+    # --- ANIMACIÓN ---
     estado_actual = "parado"
 
     if controller.left.is_pressed():
@@ -279,7 +262,7 @@ def bucle_principal():
     if estado_actual != ultimo_estado_hero:
         animation.stop_animation(animation.AnimationTypes.ALL, jugador)
         
-        # IMPORTANTE: Selecciona aquí tus animaciones
+        # IMPORTANTE: Selecciona tus animaciones aquí
         if estado_actual == "izquierda":
             animation.run_image_animation(jugador, assets.animation("""anim_hero_izquierda"""), 100, True)
         elif estado_actual == "derecha":
@@ -306,7 +289,7 @@ def on_item_overlap(player, other):
     for it in items:
         if it.sprite_fisico == other:
             if it.tipo == "curacion":
-                energia = min(999, energia + 30) # Aumentado el tope de curación
+                energia = min(999, energia + 30)
                 other.destroy(effects.hearts, 500)
                 music.power_up.play()
                 player.say("Recuperado!", 500)
@@ -315,12 +298,9 @@ def on_item_overlap(player, other):
 
             if it.tipo == "mision":
                 it.recogido = True
-                
-                # Simplemente destruimos el objeto (desaparece sin confeti)
                 other.destroy()
-                
                 music.magic_wand.play()
-                energia = min(999, energia + 10) # Aumentado el tope de energía
+                energia = min(999, energia + 10)
                 game.show_long_text("¡Conseguido!\n" + it.nombre, DialogLayout.BOTTOM)
                 break
 
@@ -332,25 +312,22 @@ def on_enemy_overlap(player, enemy):
     energia -= 5
     scene.camera_shake(4, 200)
     music.zapped.play()
-    
-    # Pausa para evitar muerte instantánea al atravesar
     pause(200)
 
 sprites.on_overlap(SpriteKind.player, KIND_ENEMIGO, on_enemy_overlap)
 
-# INTERACCIÓN CALDERO (META)
+# INTERACCIÓN META
 def on_meta_overlap(player, meta):
     global nivel_actual
     
     objetivos: List[str] = []
     
-    # REQUERIMIENTOS POR NIVEL
     if nivel_actual == 1:
-        objetivos = ["Gema Magica"]
+        objetivos = ["Panel Torre A"]
     elif nivel_actual == 2:
-        objetivos = ["Gema Magica", "Hierba Santa"]
+        objetivos = ["Panel Torre A", "Panel Torre B"]
     elif nivel_actual == 3:
-        objetivos = ["Gema Magica", "Hierba Santa", "Libro Antiguo"]
+        objetivos = ["Panel Torre A", "Panel Torre B", "Panel Torre C"]
     
     faltan: List[str] = []
     
@@ -366,7 +343,7 @@ def on_meta_overlap(player, meta):
     if len(faltan) == 0:
         music.ba_ding.play()
         if nivel_actual < 3:
-            game.show_long_text("¡Caldero activado!\nViajando...", DialogLayout.BOTTOM)
+            game.show_long_text("¡Sistema restablecido!\nAvanzando...", DialogLayout.BOTTOM)
             nivel_actual += 1
             player.start_effect(effects.halo, 1000)
             pause(1000)
@@ -376,42 +353,62 @@ def on_meta_overlap(player, meta):
     else:
         player.y += 10
         scene.camera_shake(2, 200)
-        texto_falta = "Falta:\n"
+        texto_falta = "Faltan Paneles:\n"
         for f in faltan:
             texto_falta += "- " + f + "\n"
         game.show_long_text(texto_falta, DialogLayout.BOTTOM)
 
 sprites.on_overlap(SpriteKind.player, KIND_META, on_meta_overlap)
 
-# --- 6. MENÚS Y ARRANQUE ---
+# --- 6. HISTORIA Y MENÚS ---
+
+# [NUEVA HISTORIA CORREGIDA: TEXTO LIMPIO]
+def introduccion_historia():
+    # Fondo negro para máxima legibilidad
+    scene.set_background_color(15)
+    
+    # Usamos FULL para que sea como una pantalla de cine muda
+    game.show_long_text("ESPAÑA SE APAGO\nEN UNA SOLA NOCHE.", DialogLayout.FULL)
+    
+    game.show_long_text("Las ciudades quedaron\nen silencio.\nLos cielos, sin luz.", DialogLayout.FULL)
+    
+    music.big_crash.play()
+    game.show_long_text("El sistema electrico\nnacional colapso.\nEl tiempo corre...", DialogLayout.FULL)
+    
+    game.show_long_text("MISIÓN:\nActivar 3 paneles de\nluz ocultos en los\nsotanos de las torres.", DialogLayout.FULL)
+    
+    game.show_long_text("ADVERTENCIA:\nDebes activarlos en\norden correcto:\nA -> B -> C", DialogLayout.FULL)
+    
+    music.beam_up.play()
+    game.show_long_text("Si fallas, la\noscuridad sera\nirreversible.", DialogLayout.FULL)
+    
+    game.show_long_text("El destino de España\nesta en tus manos.", DialogLayout.FULL)
 
 def mostrar_inventari():
-    texto = "MOCHILA:\n"
+    texto = "EQUIPO:\n"
     encontrados = 0
     for i in items:
         if i.tipo == "mision" and i.recogido:
-            texto += "[X] " + i.nombre + "\n"
+            texto += "[ON] " + i.nombre + "\n"
             encontrados += 1
     
     if encontrados == 0:
-        texto += "(Vacia)"
+        texto += "(Sin energia)"
         
     game.show_long_text(texto, DialogLayout.FULL)
 
 def inicio():
     global juego_activo, energia, nivel_actual, items
-    game.splash("THE ALCHEMIST", "Ghost Edition")
     
-    game.show_long_text("Si tu energia llega a 0,\nperderas TODOS los objetos.", DialogLayout.FULL)
+    game.splash("BLACKOUT", "España Edition")
+    
+    introduccion_historia()
 
     setup_hero()
     controller.B.on_event(ControllerButtonEvent.PRESSED, mostrar_inventari)
     
-    # Inicialización limpia
     items = []
     nivel_actual = 1
-    
-    # VIDA INICIAL 999
     energia = 999.0
     
     generar_mundo()

@@ -1,6 +1,6 @@
 /** 
-👑 THE ALCHEMIST: GHOST PHASE EDITION 👑
-(Sin Rey + Sin Confeti + Sin Empujes + Héroe Animado + Vida 999)
+👑 BLACKOUT: ESPAÑA EDITION 👑
+(Historia corregida: Texto legible y bien colocado)
 
  */
 //  --- 1. CLASES ---
@@ -34,11 +34,11 @@ let ultimo_estado_hero = "parado"
 let KIND_ITEM = SpriteKind.create()
 let KIND_META = SpriteKind.create()
 let KIND_ENEMIGO = SpriteKind.Enemy
+let KIND_NPC = SpriteKind.create()
 //  --- 3. ARTE PIXEL ---
 //  [HÉROE ANIMADO]
-//  Haz clic aquí para elegir tu dibujo del héroe quieto
 let img_hero = assets.image`hero_quieto`
-//  [RESTO DE OBJETOS - TEXTO]
+//  [RESTO DE OBJETOS]
 let img_fantasma = img`
     . . . . . . . . . . . .
     . . . . 1 1 1 1 . . . .
@@ -52,7 +52,6 @@ let img_fantasma = img`
     . . 1 . 1 . 1 . 1 . . .
     . . . . . . . . . . . .
 `
-//  --- LOS 3 OBJETOS ÚNICOS ---
 let img_gema = img`
     . . . . . . . . . . . .
     . . . . . 2 2 . . . . .
@@ -112,7 +111,6 @@ let img_caldero = img`
     . . . d . . . . d . . .
     . . d . . . . . . d . .
 `
-//  Tile de limpieza
 let img_suelo_limpio = img`
     c c b c c c b c c c b c c c b c
     c c b c c c b c c c b c c c b c
@@ -137,40 +135,33 @@ function generar_mundo() {
     let loc: tiles.Location;
     let caldero: Sprite;
     
-    //  REINICIAMOS LOS OBJETOS EN CADA NIVEL
     items = []
-    //  1. LIMPIEZA
     sprites.destroyAllSpritesOfKind(KIND_ENEMIGO)
     sprites.destroyAllSpritesOfKind(KIND_META)
     sprites.destroyAllSpritesOfKind(KIND_ITEM)
     scene.setBackgroundColor(13)
-    //  2. CARGAR TILEMAP VISUAL
     if (nivel_actual == 1) {
-        tiles.setCurrentTilemap(tilemap`level01`)
+        tiles.setCurrentTilemap(tilemap`level1`)
     } else if (nivel_actual == 2) {
-        tiles.setCurrentTilemap(tilemap`level02`)
+        tiles.setCurrentTilemap(tilemap`level2`)
     } else if (nivel_actual == 3) {
-        tiles.setCurrentTilemap(tilemap`level03`)
+        tiles.setCurrentTilemap(tilemap`level3`)
     } else {
         game.over(true)
     }
     
-    //  3. COLOCAR OBJETOS BASADO EN MARCADORES
-    //  --- A. JUGADOR ---
     let lista_jugador = tiles.getTilesByType(assets.tile`marcador_jugador`)
     if (lista_jugador.length > 0) {
         tiles.placeOnTile(jugador, lista_jugador[0])
         tiles.setTileAt(lista_jugador[0], img_suelo_limpio)
     }
     
-    //  --- B. ENEMIGOS ---
     let lista_enemigos = tiles.getTilesByType(assets.tile`marcador_enemigo`)
     for (i = 0; i < lista_enemigos.length; i++) {
         loc = lista_enemigos[i]
         crear_enemigo(loc)
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-    //  --- C. CALDERO ---
     let lista_caldero = tiles.getTilesByType(assets.tile`marcador_caldero`)
     for (i = 0; i < lista_caldero.length; i++) {
         loc = lista_caldero[i]
@@ -179,26 +170,22 @@ function generar_mundo() {
         caldero.startEffect(effects.fountain, 50000)
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-    //  --- D. ITEMS (OBJETOS) ---
-    //  1. GEMA MAGICA
     let lista_gema = tiles.getTilesByType(assets.tile`marcador_item1`)
     for (i = 0; i < lista_gema.length; i++) {
         loc = lista_gema[i]
-        crear_item("Gema Magica", img_gema, loc, "mision")
+        crear_item("Panel Torre A", img_gema, loc, "mision")
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-    //  2. HIERBA SANTA
     let lista_planta = tiles.getTilesByType(assets.tile`marcador_item2`)
     for (i = 0; i < lista_planta.length; i++) {
         loc = lista_planta[i]
-        crear_item("Hierba Santa", img_planta, loc, "mision")
+        crear_item("Panel Torre B", img_planta, loc, "mision")
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-    //  3. LIBRO ANTIGUO
     let lista_libro = tiles.getTilesByType(assets.tile`marcador_item3`)
     for (i = 0; i < lista_libro.length; i++) {
         loc = lista_libro[i]
-        crear_item("Libro Antiguo", img_libro, loc, "mision")
+        crear_item("Panel Torre C", img_libro, loc, "mision")
         tiles.setTileAt(loc, img_suelo_limpio)
     }
     game.splash("NIVEL " + ("" + nivel_actual))
@@ -237,7 +224,6 @@ function setup_hero() {
         jugador.destroy()
     }
     
-    //  Se crea el héroe usando la imagen de Assets que definiste arriba
     jugador = sprites.create(img_hero, SpriteKind.Player)
     controller.moveSprite(jugador, 80, 80)
     scene.cameraFollowSprite(jugador)
@@ -260,7 +246,7 @@ game.onUpdate(function bucle_principal() {
     }
     
     controller.moveSprite(jugador, velocidad, velocidad)
-    //  --- LÓGICA DE ANIMACIÓN DEL HÉROE ---
+    //  --- ANIMACIÓN ---
     let estado_actual = "parado"
     if (controller.left.isPressed()) {
         estado_actual = "izquierda"
@@ -278,7 +264,7 @@ game.onUpdate(function bucle_principal() {
     
     if (estado_actual != ultimo_estado_hero) {
         animation.stopAnimation(animation.AnimationTypes.All, jugador)
-        //  IMPORTANTE: Selecciona aquí tus animaciones
+        //  IMPORTANTE: Selecciona tus animaciones aquí
         if (estado_actual == "izquierda") {
             animation.runImageAnimation(jugador, assets.animation`anim_hero_izquierda`, 100, true)
         } else if (estado_actual == "derecha") {
@@ -307,7 +293,6 @@ sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player:
         if (it.sprite_fisico == other) {
             if (it.tipo == "curacion") {
                 energia = Math.min(999, energia + 30)
-                //  Aumentado el tope de curación
                 other.destroy(effects.hearts, 500)
                 music.powerUp.play()
                 player.say("Recuperado!", 500)
@@ -317,11 +302,9 @@ sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player:
             
             if (it.tipo == "mision") {
                 it.recogido = true
-                //  Simplemente destruimos el objeto (desaparece sin confeti)
                 other.destroy()
                 music.magicWand.play()
                 energia = Math.min(999, energia + 10)
-                //  Aumentado el tope de energía
                 game.showLongText("¡Conseguido!\n" + it.nombre, DialogLayout.Bottom)
                 break
             }
@@ -336,22 +319,20 @@ sprites.onOverlap(SpriteKind.Player, KIND_ENEMIGO, function on_enemy_overlap(pla
     energia -= 5
     scene.cameraShake(4, 200)
     music.zapped.play()
-    //  Pausa para evitar muerte instantánea al atravesar
     pause(200)
 })
-//  INTERACCIÓN CALDERO (META)
+//  INTERACCIÓN META
 sprites.onOverlap(SpriteKind.Player, KIND_META, function on_meta_overlap(player: Sprite, meta: Sprite) {
     let tenemos_este: boolean;
     let texto_falta: string;
     
     let objetivos : string[] = []
-    //  REQUERIMIENTOS POR NIVEL
     if (nivel_actual == 1) {
-        objetivos = ["Gema Magica"]
+        objetivos = ["Panel Torre A"]
     } else if (nivel_actual == 2) {
-        objetivos = ["Gema Magica", "Hierba Santa"]
+        objetivos = ["Panel Torre A", "Panel Torre B"]
     } else if (nivel_actual == 3) {
-        objetivos = ["Gema Magica", "Hierba Santa", "Libro Antiguo"]
+        objetivos = ["Panel Torre A", "Panel Torre B", "Panel Torre C"]
     }
     
     let faltan : string[] = []
@@ -372,8 +353,8 @@ sprites.onOverlap(SpriteKind.Player, KIND_META, function on_meta_overlap(player:
     if (faltan.length == 0) {
         music.baDing.play()
         if (nivel_actual < 3) {
-            game.showLongText(`¡Caldero activado!
-Viajando...`, DialogLayout.Bottom)
+            game.showLongText(`¡Sistema restablecido!
+Avanzando...`, DialogLayout.Bottom)
             nivel_actual += 1
             player.startEffect(effects.halo, 1000)
             pause(1000)
@@ -385,7 +366,7 @@ Viajando...`, DialogLayout.Bottom)
     } else {
         player.y += 10
         scene.cameraShake(2, 200)
-        texto_falta = "Falta:\n"
+        texto_falta = "Faltan Paneles:\n"
         for (let f of faltan) {
             texto_falta += "- " + f + "\n"
         }
@@ -393,33 +374,60 @@ Viajando...`, DialogLayout.Bottom)
     }
     
 })
-//  --- 6. MENÚS Y ARRANQUE ---
+//  --- 6. HISTORIA Y MENÚS ---
+//  [NUEVA HISTORIA CORREGIDA: TEXTO LIMPIO]
+function introduccion_historia() {
+    //  Fondo negro para máxima legibilidad
+    scene.setBackgroundColor(15)
+    //  Usamos FULL para que sea como una pantalla de cine muda
+    game.showLongText(`ESPAÑA SE APAGO
+EN UNA SOLA NOCHE.`, DialogLayout.Full)
+    game.showLongText(`Las ciudades quedaron
+en silencio.
+Los cielos, sin luz.`, DialogLayout.Full)
+    music.bigCrash.play()
+    game.showLongText(`El sistema electrico
+nacional colapso.
+El tiempo corre...`, DialogLayout.Full)
+    game.showLongText(`MISIÓN:
+Activar 3 paneles de
+luz ocultos en los
+sotanos de las torres.`, DialogLayout.Full)
+    game.showLongText(`ADVERTENCIA:
+Debes activarlos en
+orden correcto:
+A -> B -> C`, DialogLayout.Full)
+    music.beamUp.play()
+    game.showLongText(`Si fallas, la
+oscuridad sera
+irreversible.`, DialogLayout.Full)
+    game.showLongText(`El destino de España
+esta en tus manos.`, DialogLayout.Full)
+}
+
 function inicio() {
     
-    game.splash("THE ALCHEMIST", "Ghost Edition")
-    game.showLongText(`Si tu energia llega a 0,
-perderas TODOS los objetos.`, DialogLayout.Full)
+    game.splash("BLACKOUT", "España Edition")
+    introduccion_historia()
     setup_hero()
     controller.B.onEvent(ControllerButtonEvent.Pressed, function mostrar_inventari() {
-        let texto = "MOCHILA:\n"
+        let texto = "EQUIPO:\n"
         let encontrados = 0
         for (let i of items) {
             if (i.tipo == "mision" && i.recogido) {
-                texto += "[X] " + i.nombre + "\n"
+                texto += "[ON] " + i.nombre + "\n"
                 encontrados += 1
             }
             
         }
         if (encontrados == 0) {
-            texto += "(Vacia)"
+            texto += "(Sin energia)"
         }
         
         game.showLongText(texto, DialogLayout.Full)
     })
-    //  Inicialización limpia
     items = []
     nivel_actual = 1
-    //  VIDA INICIAL 999
     energia = 999.0
     generar_mundo()
     juego_activo = true
