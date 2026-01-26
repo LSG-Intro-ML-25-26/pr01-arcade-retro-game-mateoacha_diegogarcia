@@ -1,6 +1,6 @@
 """
 👑 BLACKOUT: ESPAÑA EDITION 👑
-(Versión Final Corregida: Sin Errores de Bucle)
+(Torres Blancas + Mapa Abierto + Lore + Sin Decoración Auto)
 """
 
 # --- 1. CLASES ---
@@ -36,88 +36,6 @@ KIND_TORRE = SpriteKind.create()
 
 # [HÉROE ANIMADO]
 img_hero = assets.image("""hero_quieto""")
-
-# [TUS TEXTURAS DECORATIVAS]
-
-# Suelo 1
-img_suelo_1 = img("""
-    c c b c c b c c c c c c c c c
-    b c c c c b c c c c c c c c c
-    c b b b b b b c b c c c c c c
-    c c c c c c c c c c c c c c c
-    c b b c b b c c b c c b c c c
-    b c b b c c b c c c c c c c c
-    b b b b c b b c c c c c c c c
-    b b b b c b b c b c c c c c c
-    b b b b c b b c b b c c c c c
-    b b b b b b c c c b c c b c c
-    b b b b c b b c b c c c c c c
-    b b b b c c b c b c c c b c c
-    b c b c c b c c c c c c c c c
-    b b b b b b b b c b c c c c c
-    b b b c c b b c c c c c c c c
-    b b b b b b b c c b c c c c c
-""")
-
-# Pared 1
-img_pared_1 = img("""
-    1 1 d 1 1 1 1 1 1 1 1 1 1 1 1
-    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-    1 1 1 1 1 d 1 1 1 1 1 1 1 1 1
-    1 1 d 1 1 1 1 1 1 1 1 d 1 1 1
-    d d d d d d d 1 d 1 d d d d d
-    1 1 1 d 1 d 1 1 1 1 1 1 d 1 1
-    1 1 d 1 1 1 1 1 1 1 1 1 1 1 1
-    d d d d d d d d d d d d d d d
-    d d d d d d d d d d d d d d d
-    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-    1 1 1 d 1 d 1 1 d 1 1 1 d 1 1
-    d d d d d d d d d d d d d d d
-    1 1 d 1 1 1 1 1 1 1 1 d 1 1 1
-    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-    1 1 1 d 1 d 1 1 1 1 1 1 d 1 1
-    1 1 d 1 1 1 1 1 1 1 1 1 1 1 1
-""")
-
-# Suelo 2
-img_suelo_2 = img("""
-    c c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    f c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    f c c c c c c c c c c c c c c
-    f c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    f c c c c c c c c c c c c c c
-    f c c c c c c c c c c c c c c
-    f c c c c c c c c c c c c c c
-    f c c c c c c c c c c c c c c
-""")
-
-# Pared 2
-img_pared_2 = img("""
-    f f f f 8 8 8 8 8 8 f f f f f
-    f 8 f f 6 8 8 8 8 6 f f 8 f f
-    f 8 f f 6 8 8 8 8 6 f f 8 f f
-    f f f f 6 f f f f 6 f f 8 f f
-    f f f f 8 8 f f f 8 f f f f f
-    f f f f f 8 f f f f f f f f f
-    f f f f f f f f f f f f f f f
-    f f f f f f f f f f f f f f f
-    f f f f f f f f f f f f f f f
-    f f f f f f f f f f f f f f f
-    f f f f f f f f f f f f f f f
-    f f f f f f f f f f f f f f f
-    f 8 f f f f 8 f f f f 8 f f 8
-    f f f f f f f f f f f f f f f
-    f f f f f f f f f f f f f f f
-    f f f f f f f f f f f f f f f
-""")
 
 # [TORRES BLANCAS]
 img_torre_a = img("""
@@ -259,6 +177,7 @@ img_caldero = img("""
     . . d . . . . . . d . .
 """)
 
+# Tile de suelo metálico (sigue disponible para usarse)
 img_suelo_limpio = img("""
     b b b b b b b b b b b b b b b b
     b d d d d d d d d d d d d d d b
@@ -301,7 +220,9 @@ def generar_mundo():
         lista_jugador = tiles.get_tiles_by_type(assets.tile("""marcador_jugador"""))
         if len(lista_jugador) > 0:
             tiles.place_on_tile(jugador, lista_jugador[0])
-            tiles.set_tile_at(lista_jugador[0], img_suelo_limpio)
+            # Si quieres usar el suelo metálico donde sale el jugador, descomenta esto:
+            # tiles.set_tile_at(lista_jugador[0], img_suelo_limpio)
+            # De lo contrario, se verá lo que hayas pintado en el mapa.
             
         # COLOCAR TORRES
         
@@ -311,6 +232,7 @@ def generar_mundo():
             loc = lista_torre_a[i]
             t = sprites.create(img_torre_a, KIND_TORRE)
             tiles.place_on_tile(t, loc)
+            # Limpiamos el marcador
             tiles.set_tile_at(loc, img_suelo_limpio)
             
         # Torre B
@@ -341,36 +263,6 @@ def generar_mundo():
     elif nivel_actual == 3:
         tiles.set_current_tilemap(tilemap("""level3"""))
         game.splash("TORRE C", "Objetivo: 3 Paneles")
-
-    # [CORREGIDO] SUSTITUIR DECORACIÓN CON BUCLES SEGUROS
-    
-    # Suelo 1
-    lista_s1 = tiles.get_tiles_by_type(assets.tile("""marcador_suelo_1"""))
-    for i in range(len(lista_s1)):
-        loc = lista_s1[i]
-        tiles.set_tile_at(loc, img_suelo_1)
-        tiles.set_wall_at(loc, False)
-
-    # Suelo 2
-    lista_s2 = tiles.get_tiles_by_type(assets.tile("""marcador_suelo_2"""))
-    for i in range(len(lista_s2)):
-        loc = lista_s2[i]
-        tiles.set_tile_at(loc, img_suelo_2)
-        tiles.set_wall_at(loc, False)
-
-    # Pared 1
-    lista_p1 = tiles.get_tiles_by_type(assets.tile("""marcador_pared_1"""))
-    for i in range(len(lista_p1)):
-        loc = lista_p1[i]
-        tiles.set_tile_at(loc, img_pared_1)
-        tiles.set_wall_at(loc, True)
-
-    # Pared 2
-    lista_p2 = tiles.get_tiles_by_type(assets.tile("""marcador_pared_2"""))
-    for i in range(len(lista_p2)):
-        loc = lista_p2[i]
-        tiles.set_tile_at(loc, img_pared_2)
-        tiles.set_wall_at(loc, True)
 
     # Colocar Jugador
     lista_jugador = tiles.get_tiles_by_type(assets.tile("""marcador_jugador"""))

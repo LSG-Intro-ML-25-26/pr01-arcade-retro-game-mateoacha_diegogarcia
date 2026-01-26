@@ -1,6 +1,6 @@
 /** 
 👑 BLACKOUT: ESPAÑA EDITION 👑
-(Versión Final Corregida: Sin Errores de Bucle)
+(Torres Blancas + Mapa Abierto + Lore + Sin Decoración Auto)
 
  */
 //  --- 1. CLASES ---
@@ -41,83 +41,6 @@ let KIND_TORRE = SpriteKind.create()
 //  --- 3. ARTE PIXEL ---
 //  [HÉROE ANIMADO]
 let img_hero = assets.image`hero_quieto`
-//  [TUS TEXTURAS DECORATIVAS]
-//  Suelo 1
-let img_suelo_1 = img`
-    c c b c c b c c c c c c c c c
-    b c c c c b c c c c c c c c c
-    c b b b b b b c b c c c c c c
-    c c c c c c c c c c c c c c c
-    c b b c b b c c b c c b c c c
-    b c b b c c b c c c c c c c c
-    b b b b c b b c c c c c c c c
-    b b b b c b b c b c c c c c c
-    b b b b c b b c b b c c c c c
-    b b b b b b c c c b c c b c c
-    b b b b c b b c b c c c c c c
-    b b b b c c b c b c c c b c c
-    b c b c c b c c c c c c c c c
-    b b b b b b b b c b c c c c c
-    b b b c c b b c c c c c c c c
-    b b b b b b b c c b c c c c c
-`
-//  Pared 1
-let img_pared_1 = img`
-    1 1 d 1 1 1 1 1 1 1 1 1 1 1 1
-    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-    1 1 1 1 1 d 1 1 1 1 1 1 1 1 1
-    1 1 d 1 1 1 1 1 1 1 1 d 1 1 1
-    d d d d d d d 1 d 1 d d d d d
-    1 1 1 d 1 d 1 1 1 1 1 1 d 1 1
-    1 1 d 1 1 1 1 1 1 1 1 1 1 1 1
-    d d d d d d d d d d d d d d d
-    d d d d d d d d d d d d d d d
-    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-    1 1 1 d 1 d 1 1 d 1 1 1 d 1 1
-    d d d d d d d d d d d d d d d
-    1 1 d 1 1 1 1 1 1 1 1 d 1 1 1
-    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-    1 1 1 d 1 d 1 1 1 1 1 1 d 1 1
-    1 1 d 1 1 1 1 1 1 1 1 1 1 1 1
-`
-//  Suelo 2
-let img_suelo_2 = img`
-    c c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    f c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    f c c c c c c c c c c c c c c
-    f c c c c c c c c c c c c c c
-    c c c c c c c c c c c c c c c
-    f c c c c c c c c c c c c c c
-    f c c c c c c c c c c c c c c
-    f c c c c c c c c c c c c c c
-    f c c c c c c c c c c c c c c
-`
-//  Pared 2
-let img_pared_2 = img`
-    f f f f 8 8 8 8 8 8 f f f f f
-    f 8 f f 6 8 8 8 8 6 f f 8 f f
-    f 8 f f 6 8 8 8 8 6 f f 8 f f
-    f f f f 6 f f f f 6 f f 8 f f
-    f f f f 8 8 f f f 8 f f f f f
-    f f f f f 8 f f f f f f f f f
-    f f f f f f f f f f f f f f f
-    f f f f f f f f f f f f f f f
-    f f f f f f f f f f f f f f f
-    f f f f f f f f f f f f f f f
-    f f f f f f f f f f f f f f f
-    f f f f f f f f f f f f f f f
-    f 8 f f f f 8 f f f f 8 f f 8
-    f f f f f f f f f f f f f f f
-    f f f f f f f f f f f f f f f
-    f f f f f f f f f f f f f f f
-`
 //  [TORRES BLANCAS]
 let img_torre_a = img`
     . . . . . . . . . . . . . . . .
@@ -249,6 +172,7 @@ let img_caldero = img`
     . . . d . . . . d . . .
     . . d . . . . . . d . .
 `
+//  Tile de suelo metálico (sigue disponible para usarse)
 let img_suelo_limpio = img`
     b b b b b b b b b b b b b b b b
     b d d d d d d d d d d d d d d b
@@ -293,9 +217,11 @@ function generar_mundo() {
         lista_jugador = tiles.getTilesByType(assets.tile`marcador_jugador`)
         if (lista_jugador.length > 0) {
             tiles.placeOnTile(jugador, lista_jugador[0])
-            tiles.setTileAt(lista_jugador[0], img_suelo_limpio)
         }
         
+        //  Si quieres usar el suelo metálico donde sale el jugador, descomenta esto:
+        //  tiles.set_tile_at(lista_jugador[0], img_suelo_limpio)
+        //  De lo contrario, se verá lo que hayas pintado en el mapa.
         //  COLOCAR TORRES
         //  Torre A
         lista_torre_a = tiles.getTilesByType(assets.tile`marcador_torre_a`)
@@ -303,6 +229,7 @@ function generar_mundo() {
             loc = lista_torre_a[i]
             t = sprites.create(img_torre_a, KIND_TORRE)
             tiles.placeOnTile(t, loc)
+            //  Limpiamos el marcador
             tiles.setTileAt(loc, img_suelo_limpio)
         }
         //  Torre B
@@ -336,35 +263,6 @@ function generar_mundo() {
         game.splash("TORRE C", "Objetivo: 3 Paneles")
     }
     
-    //  [CORREGIDO] SUSTITUIR DECORACIÓN CON BUCLES SEGUROS
-    //  Suelo 1
-    let lista_s1 = tiles.getTilesByType(assets.tile`marcador_suelo_1`)
-    for (i = 0; i < lista_s1.length; i++) {
-        loc = lista_s1[i]
-        tiles.setTileAt(loc, img_suelo_1)
-        tiles.setWallAt(loc, false)
-    }
-    //  Suelo 2
-    let lista_s2 = tiles.getTilesByType(assets.tile`marcador_suelo_2`)
-    for (i = 0; i < lista_s2.length; i++) {
-        loc = lista_s2[i]
-        tiles.setTileAt(loc, img_suelo_2)
-        tiles.setWallAt(loc, false)
-    }
-    //  Pared 1
-    let lista_p1 = tiles.getTilesByType(assets.tile`marcador_pared_1`)
-    for (i = 0; i < lista_p1.length; i++) {
-        loc = lista_p1[i]
-        tiles.setTileAt(loc, img_pared_1)
-        tiles.setWallAt(loc, true)
-    }
-    //  Pared 2
-    let lista_p2 = tiles.getTilesByType(assets.tile`marcador_pared_2`)
-    for (i = 0; i < lista_p2.length; i++) {
-        loc = lista_p2[i]
-        tiles.setTileAt(loc, img_pared_2)
-        tiles.setWallAt(loc, true)
-    }
     //  Colocar Jugador
     lista_jugador = tiles.getTilesByType(assets.tile`marcador_jugador`)
     if (lista_jugador.length > 0) {
