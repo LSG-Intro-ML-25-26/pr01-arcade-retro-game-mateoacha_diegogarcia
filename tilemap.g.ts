@@ -33,25 +33,7 @@ namespace myTiles {
     //% fixedInstance jres blockIdentity=images._tile
     export const tile15 = image.ofBuffer(hex``);
     //% fixedInstance jres blockIdentity=images._tile
-    export const tile16 = image.ofBuffer(hex``);
-    //% fixedInstance jres blockIdentity=images._tile
-    export const tile17 = image.ofBuffer(hex``);
-    //% fixedInstance jres blockIdentity=images._tile
-    export const tile18 = image.ofBuffer(hex``);
-    //% fixedInstance jres blockIdentity=images._tile
-    export const tile19 = image.ofBuffer(hex``);
-    //% fixedInstance jres blockIdentity=images._tile
-    export const tile20 = image.ofBuffer(hex``);
-    //% fixedInstance jres blockIdentity=images._tile
-    export const tile21 = image.ofBuffer(hex``);
-    //% fixedInstance jres blockIdentity=images._tile
-    export const tile22 = image.ofBuffer(hex``);
-    //% fixedInstance jres blockIdentity=images._tile
-    export const tile23 = image.ofBuffer(hex``);
-    //% fixedInstance jres blockIdentity=images._tile
     export const tile24 = image.ofBuffer(hex``);
-    //% fixedInstance jres blockIdentity=images._tile
-    export const tile25 = image.ofBuffer(hex``);
     //% fixedInstance jres blockIdentity=images._tile
     export const tile26 = image.ofBuffer(hex``);
 
@@ -197,26 +179,8 @@ namespace myTiles {
             case "tile13":return tile13;
             case "miMosaico1":
             case "tile15":return tile15;
-            case "miMosaico2":
-            case "tile16":return tile16;
-            case "miMosaico3":
-            case "tile17":return tile17;
-            case "miMosaico4":
-            case "tile18":return tile18;
-            case "miMosaico5":
-            case "tile19":return tile19;
-            case "miMosaico6":
-            case "tile20":return tile20;
-            case "miMosaico7":
-            case "tile21":return tile21;
-            case "miMosaico8":
-            case "tile22":return tile22;
-            case "miMosaico9":
-            case "tile23":return tile23;
             case "miMosaico10":
             case "tile24":return tile24;
-            case "miMosaico11":
-            case "tile25":return tile25;
             case "miMosaico12":
             case "tile26":return tile26;
         }
