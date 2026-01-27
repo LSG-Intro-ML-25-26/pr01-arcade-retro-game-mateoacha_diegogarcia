@@ -1,6 +1,6 @@
 """
 👑 BLACKOUT: ESPAÑA EDITION 👑
-(Torres Blancas + Mapa Abierto + Lore + Sin Decoración Auto)
+(Torres Blancas + Mapa Abierto + Lore Ilustrado)
 """
 
 # --- 1. CLASES ---
@@ -220,9 +220,7 @@ def generar_mundo():
         lista_jugador = tiles.get_tiles_by_type(assets.tile("""marcador_jugador"""))
         if len(lista_jugador) > 0:
             tiles.place_on_tile(jugador, lista_jugador[0])
-            # Si quieres usar el suelo metálico donde sale el jugador, descomenta esto:
-            # tiles.set_tile_at(lista_jugador[0], img_suelo_limpio)
-            # De lo contrario, se verá lo que hayas pintado en el mapa.
+            tiles.set_tile_at(lista_jugador[0], img_suelo_limpio)
             
         # COLOCAR TORRES
         
@@ -232,7 +230,6 @@ def generar_mundo():
             loc = lista_torre_a[i]
             t = sprites.create(img_torre_a, KIND_TORRE)
             tiles.place_on_tile(t, loc)
-            # Limpiamos el marcador
             tiles.set_tile_at(loc, img_suelo_limpio)
             
         # Torre B
@@ -258,10 +255,10 @@ def generar_mundo():
         tiles.set_current_tilemap(tilemap("""level01"""))
         game.splash("TORRE A", "Objetivo: 1 Panel")
     elif nivel_actual == 2:
-        tiles.set_current_tilemap(tilemap("""level0"""))
+        tiles.set_current_tilemap(tilemap("""level02"""))
         game.splash("TORRE B", "Objetivo: 2 Paneles")
     elif nivel_actual == 3:
-        tiles.set_current_tilemap(tilemap("""nivel"""))
+        tiles.set_current_tilemap(tilemap("""level03"""))
         game.splash("TORRE C", "Objetivo: 3 Paneles")
 
     # Colocar Jugador
@@ -511,47 +508,60 @@ def introduccion_historia():
     # Fondo negro para mejor contraste
     scene.set_background_color(15)
 
-    game.show_long_text("ESPAÑA\n02:17 A.M.", DialogLayout.CENTER)
+    # 1. CIUDAD (Imagen)
+    scene.set_background_image(assets.image("""intro_ciudad"""))
+
+    game.show_long_text("ESPAÑA\n02:17 A.M.", DialogLayout.BOTTOM)
     
     music.big_crash.play()
-    game.show_long_text("LA RED...\nSE APAGA.", DialogLayout.CENTER)
+    game.show_long_text("LA RED...\nSE APAGA.", DialogLayout.BOTTOM)
 
-    game.show_long_text("No fue un fallo.\nNi un ataque.", DialogLayout.CENTER)
-    game.show_long_text("La electricidad\nsimplemente...", DialogLayout.CENTER)
-    game.show_long_text("DESAPARECIO.", DialogLayout.CENTER)
-
-    # Pausa narrativa
-    game.show_long_text("Las torres entraron\nen contencion.", DialogLayout.CENTER)
-    game.show_long_text("Los sistemas\nquedaron bajo tierra.", DialogLayout.CENTER)
-
-    game.show_long_text("Los tecnicos\nnunca salieron.", DialogLayout.CENTER)
+    game.show_long_text("No fue un fallo.\nNi un ataque.", DialogLayout.BOTTOM)
     
+    # 2. RAYO (Imagen)
+    scene.set_background_image(assets.image("""intro_rayo"""))
+    game.show_long_text("La electricidad\nsimplemente...", DialogLayout.BOTTOM)
+    game.show_long_text("DESAPARECIO.", DialogLayout.BOTTOM)
 
-    game.show_long_text("Algo de ellos\nsigue abajo.", DialogLayout.CENTER)
+    game.show_long_text("Las torres entraron\nen contencion.", DialogLayout.BOTTOM)
+    game.show_long_text("Los sistemas\nquedaron bajo tierra.", DialogLayout.BOTTOM)
 
-    # --- CAMBIO 1: LISTA DE AMENAZAS LIMPIA ---
-    game.show_long_text("SENSORES ACTIVOS:", DialogLayout.CENTER)
-    # Mostramos uno a uno abajo para dar tensión y claridad
+    # 3. MAPA (Imagen)
+    scene.set_background_image(assets.image("""intro_mapa"""))
+    game.show_long_text("Los tecnicos\nnunca salieron.", DialogLayout.BOTTOM)
+    
+    
+    game.show_long_text("Algo de ellos\nsigue abajo.", DialogLayout.BOTTOM)
+
+    # --- LISTA DE AMENAZAS ---
+    game.show_long_text("SENSORES ACTIVOS:", DialogLayout.BOTTOM)
     game.show_long_text("Detectando\nRadiacion residual...", DialogLayout.BOTTOM)
     game.show_long_text("Detectando\nEnergia inestable...", DialogLayout.BOTTOM)
     game.show_long_text("Detectando\nEcos humanos...", DialogLayout.BOTTOM)
 
+    # 4. HÉROE (Imagen)
+    scene.set_background_image(assets.image("""intro_heroe"""))
     music.beam_up.play()
-    game.show_long_text("Eres un\nOPERADOR DE\nCONTINGENCIA.", DialogLayout.CENTER)
+    game.show_long_text("Eres un\nOPERADOR DE\nCONTINGENCIA.", DialogLayout.BOTTOM)
 
-    game.show_long_text("Tu traje te protege.\nPero tu energia\nNO es infinita.", DialogLayout.CENTER)
+    game.show_long_text("Tu traje te protege.\nPero tu energia\nNO es infinita.", DialogLayout.BOTTOM)
 
     # La misión clara
-    game.show_long_text("MISION PRIORITY:", DialogLayout.CENTER)
-    game.show_long_text("Recuperar los\nPANELES DE REINICIO\nde los sotanos.", DialogLayout.CENTER)
+    game.show_long_text("MISION PRIORITY:", DialogLayout.BOTTOM)
+    game.show_long_text("Recuperar los\nPANELES DE REINICIO\nde los sotanos.", DialogLayout.BOTTOM)
 
-    game.show_long_text("ADVERTENCIA:\nEl sistema exige\nun orden exacto.", DialogLayout.CENTER)
+    # Volvemos al MAPA para explicar el plan
+    scene.set_background_image(assets.image("""intro_mapa"""))
+    game.show_long_text("ADVERTENCIA:\nEl sistema exige\nun orden exacto.", DialogLayout.BOTTOM)
     
-    # --- CAMBIO 2: ORDEN DE TORRES SECUENCIAL ---
-    # En vez de un dibujo raro, damos instrucciones paso a paso
-    game.show_long_text("FASE 1:\nIr a Torre A", DialogLayout.CENTER)
-    game.show_long_text("FASE 2:\nIr a Torre B", DialogLayout.CENTER)
-    game.show_long_text("FASE 3:\nIr a Torre C", DialogLayout.CENTER)
+    # --- ORDEN DE TORRES SECUENCIAL ---
+    game.show_long_text("FASE 1:\nIr a Torre A", DialogLayout.BOTTOM)
+    game.show_long_text("FASE 2:\nIr a Torre B", DialogLayout.BOTTOM)
+    game.show_long_text("FASE 3:\nIr a Torre C", DialogLayout.BOTTOM)
+
+    # Fondo negro final para dramatismo
+    scene.set_background_image(None)
+    scene.set_background_color(15)
 
     game.show_long_text("Si fallas,\nla red caera\npara siempre.", DialogLayout.CENTER)
 
