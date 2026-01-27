@@ -42,12 +42,17 @@ Antics tècnics atrapats fora del temps. Són energia inestable i radiació resi
 
 
 ### Objectius: Els Panells de Reinici
-Per reactivar les torres, cal trobar aquests objectes ocults als nivells:
-* **Gemma de Poder** (Torre A)
-* **Planta Sintètica** (Torre B)
-* **Llibre de Codis** (Torre C)
+Per reactivar les torres, cal trobar aquests objectes ocults als nivells y ficarlos dins de la bosa vermella:
+* **Cable Taronja** 
+* **Cable Verd** 
+* **Cable Groc**
+* **Bosa**
 
-![Imatge dels Items](URL_DE_LA_TEVA_IMATGE_ITEMS_AQUI)
+<img width="168" height="132" alt="image" src="https://github.com/user-attachments/assets/f8ffbb84-3271-4597-9d55-0d9e9a1f89be" />
+<img width="154" height="132" alt="image" src="https://github.com/user-attachments/assets/7105450d-b8ba-4e71-a9de-e171f02e0d3b" />
+<img width="172" height="132" alt="image" src="https://github.com/user-attachments/assets/f7042e26-9700-420b-84f5-26b94c3abb34" />
+<img width="155" height="132" alt="image" src="https://github.com/user-attachments/assets/e6aad5f5-ca09-42a1-ba9c-2c093ddbaa34" />
+
 
 ---
 
