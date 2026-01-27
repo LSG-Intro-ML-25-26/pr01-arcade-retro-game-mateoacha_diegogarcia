@@ -1,6 +1,6 @@
 /** 
 👑 BLACKOUT: ESPAÑA EDITION 👑
-(Torres Blancas + Mapa Abierto + Lore Ilustrado)
+(FIX FINAL: Limpieza de Pantalla + Pausa de Renderizado)
 
  */
 //  --- 1. CLASES ---
@@ -14,7 +14,6 @@ class ItemJuego {
         this.nombre = nombre
         this.imagen = imagen
         this.tipo = tipo
-        //  "mision" o "curacion"
         this.recogido = false
         this.sprite_fisico = null
     }
@@ -28,18 +27,14 @@ let jugador : Sprite = null
 let energia = 999.0
 let juego_activo = false
 let nivel_actual = 0
-//  0 = MAPA, 1,2,3 = NIVELES
 let niveles_desbloqueados = 1
-//  Variable para controlar la animación
 let ultimo_estado_hero = "parado"
-//  Tipos de Sprite
 let KIND_ITEM = SpriteKind.create()
 let KIND_META = SpriteKind.create()
 let KIND_ENEMIGO = SpriteKind.Enemy
 let KIND_NPC = SpriteKind.create()
 let KIND_TORRE = SpriteKind.create()
 //  --- 3. ARTE PIXEL ---
-//  [HÉROE ANIMADO]
 let img_hero = assets.image`hero_quieto`
 //  [TORRES BLANCAS]
 let img_torre_a = img`
@@ -172,7 +167,7 @@ let img_caldero = img`
     . . . d . . . . d . . .
     . . d . . . . . . d . .
 `
-//  Tile de suelo metálico (sigue disponible para usarse)
+//  Tile de suelo metálico
 let img_suelo_limpio = img`
     b b b b b b b b b b b b b b b b
     b d d d d d d d d d d d d d d b
@@ -523,16 +518,15 @@ Volviendo al mapa...`, DialogLayout.Bottom)
 })
 //  --- 6. HISTORIA Y MENÚS ---
 function introduccion_historia() {
-    //  Fondo negro para mejor contraste
     scene.setBackgroundColor(15)
-    //  1. CIUDAD (Imagen)
+    //  1. CIUDAD
     scene.setBackgroundImage(assets.image`intro_ciudad`)
     game.showLongText("ESPAÑA\n02:17 A.M.", DialogLayout.Bottom)
     music.bigCrash.play()
     game.showLongText("LA RED...\nSE APAGA.", DialogLayout.Bottom)
     game.showLongText(`No fue un fallo.
 Ni un ataque.`, DialogLayout.Bottom)
-    //  2. RAYO (Imagen)
+    //  2. RAYO
     scene.setBackgroundImage(assets.image`intro_rayo`)
     game.showLongText(`La electricidad
 simplemente...`, DialogLayout.Bottom)
@@ -541,13 +535,12 @@ simplemente...`, DialogLayout.Bottom)
 en contencion.`, DialogLayout.Bottom)
     game.showLongText(`Los sistemas
 quedaron bajo tierra.`, DialogLayout.Bottom)
-    //  3. MAPA (Imagen)
+    //  3. MAPA
     scene.setBackgroundImage(assets.image`intro_mapa`)
     game.showLongText(`Los tecnicos
 nunca salieron.`, DialogLayout.Bottom)
     game.showLongText(`Algo de ellos
 sigue abajo.`, DialogLayout.Bottom)
-    //  --- LISTA DE AMENAZAS ---
     game.showLongText("SENSORES ACTIVOS:", DialogLayout.Bottom)
     game.showLongText(`Detectando
 Radiacion residual...`, DialogLayout.Bottom)
@@ -555,7 +548,7 @@ Radiacion residual...`, DialogLayout.Bottom)
 Energia inestable...`, DialogLayout.Bottom)
     game.showLongText(`Detectando
 Ecos humanos...`, DialogLayout.Bottom)
-    //  4. HÉROE (Imagen)
+    //  4. HÉROE
     scene.setBackgroundImage(assets.image`intro_heroe`)
     music.beamUp.play()
     game.showLongText(`Eres un
@@ -564,21 +557,18 @@ CONTINGENCIA.`, DialogLayout.Bottom)
     game.showLongText(`Tu traje te protege.
 Pero tu energia
 NO es infinita.`, DialogLayout.Bottom)
-    //  La misión clara
     game.showLongText("MISION PRIORITY:", DialogLayout.Bottom)
     game.showLongText(`Recuperar los
 PANELES DE REINICIO
 de los sotanos.`, DialogLayout.Bottom)
-    //  Volvemos al MAPA para explicar el plan
+    //  Volvemos al MAPA
     scene.setBackgroundImage(assets.image`intro_mapa`)
     game.showLongText(`ADVERTENCIA:
 El sistema exige
 un orden exacto.`, DialogLayout.Bottom)
-    //  --- ORDEN DE TORRES SECUENCIAL ---
     game.showLongText("FASE 1:\nIr a Torre A", DialogLayout.Bottom)
     game.showLongText("FASE 2:\nIr a Torre B", DialogLayout.Bottom)
     game.showLongText("FASE 3:\nIr a Torre C", DialogLayout.Bottom)
-    //  Fondo negro final para dramatismo
     scene.setBackgroundImage(null)
     scene.setBackgroundColor(15)
     game.showLongText(`Si fallas,
@@ -590,9 +580,63 @@ a encenderse.`, DialogLayout.Center)
     game.showLongText("A cualquier precio.", DialogLayout.Center)
 }
 
-function inicio() {
+function menu_principal() {
+    let bg_controles: Image;
+    //  1. LIMPIEZA TOTAL
+    scene.setBackgroundColor(15)
+    //  Fondo negro (15)
+    scene.setBackgroundImage(null)
+    //  Quitar cualquier imagen anterior
+    //  2. FONDO NEGRO FORZADO (La solución al bug gráfico)
+    //  Creamos una imagen negra nueva y la ponemos.
+    //  Esto "tapa" lo que hubiera antes en la memoria de vídeo.
+    let bg_negro = image.create(160, 120)
+    bg_negro.fill(15)
+    scene.setBackgroundImage(bg_negro)
+    //  3. PAUSA TÉCNICA
+    //  Damos tiempo (100ms) al motor para pintar el negro antes de lanzar el diálogo.
+    pause(100)
+    //  4. AHORA SÍ, LA PREGUNTA
+    let jugar = game.ask("¿INICIAR MISION?", "A: Jugar  B: Controles")
+    if (jugar) {
+        //  Pulsó A -> Jugar
+        comenzar_juego()
+    } else {
+        //  Pulsó B -> Controles (TABS)
+        //  TAB 1: MOVIMIENTO
+        bg_controles = image.create(160, 120)
+        bg_controles.fill(15)
+        bg_controles.printCenter("CONTROLES (1/3)", 5, 1)
+        bg_controles.print("MOVIMIENTO:", 10, 30, 1)
+        bg_controles.print("Usa FLECHAS", 20, 45, 6)
+        bg_controles.print("o teclas WASD", 20, 60, 6)
+        scene.setBackgroundImage(bg_controles)
+        game.showLongText("Siguiente: Pulsa (A)", DialogLayout.Bottom)
+        //  TAB 2: ACCIÓN
+        bg_controles.fill(15)
+        //  Limpiamos la misma imagen
+        bg_controles.printCenter("CONTROLES (2/3)", 5, 1)
+        bg_controles.print("ACCION:", 10, 30, 1)
+        bg_controles.print("Pulsa ESPACIO", 20, 45, 6)
+        bg_controles.print("o Boton (A)", 20, 60, 6)
+        scene.setBackgroundImage(bg_controles)
+        game.showLongText("Siguiente: Pulsa (A)", DialogLayout.Bottom)
+        //  TAB 3: CORRER
+        bg_controles.fill(15)
+        bg_controles.printCenter("CONTROLES (3/3)", 5, 1)
+        bg_controles.print("CORRER:", 10, 30, 1)
+        bg_controles.print("Manten ESPACIO", 20, 45, 6)
+        bg_controles.print("mientras andas", 20, 60, 6)
+        scene.setBackgroundImage(bg_controles)
+        game.showLongText("Volver al menu: (A)", DialogLayout.Bottom)
+        //  RECURSIVIDAD: Volvemos al inicio de esta función
+        menu_principal()
+    }
     
-    game.splash("BLACKOUT", "España Edition")
+}
+
+function comenzar_juego() {
+    
     introduccion_historia()
     setup_hero()
     controller.B.onEvent(ControllerButtonEvent.Pressed, function mostrar_inventari() {
@@ -619,4 +663,8 @@ function inicio() {
     juego_activo = true
 }
 
-inicio()
+//  --- INICIO DEL PROGRAMA ---
+//  Primero mostramos el título (Splash) una sola vez
+game.splash("BLACKOUT", "España Edition")
+//  Luego entramos al menú principal
+menu_principal()

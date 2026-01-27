@@ -1,6 +1,6 @@
 """
 👑 BLACKOUT: ESPAÑA EDITION 👑
-(Torres Blancas + Mapa Abierto + Lore Ilustrado)
+(FIX FINAL: Limpieza de Pantalla + Pausa de Renderizado)
 """
 
 # --- 1. CLASES ---
@@ -8,7 +8,7 @@ class ItemJuego:
     def __init__(self, nombre: str, imagen: Image, tipo: str):
         self.nombre = nombre
         self.imagen = imagen
-        self.tipo = tipo # "mision" o "curacion"
+        self.tipo = tipo
         self.recogido = False
         self.sprite_fisico = None
 
@@ -19,13 +19,11 @@ jugador: Sprite = None
 
 energia = 999.0
 juego_activo = False
-nivel_actual = 0 # 0 = MAPA, 1,2,3 = NIVELES
+nivel_actual = 0
 niveles_desbloqueados = 1
 
-# Variable para controlar la animación
 ultimo_estado_hero = "parado"
 
-# Tipos de Sprite
 KIND_ITEM = SpriteKind.create()
 KIND_META = SpriteKind.create()
 KIND_ENEMIGO = SpriteKind.enemy
@@ -34,7 +32,6 @@ KIND_TORRE = SpriteKind.create()
 
 # --- 3. ARTE PIXEL ---
 
-# [HÉROE ANIMADO]
 img_hero = assets.image("""hero_quieto""")
 
 # [TORRES BLANCAS]
@@ -177,7 +174,7 @@ img_caldero = img("""
     . . d . . . . . . d . .
 """)
 
-# Tile de suelo metálico (sigue disponible para usarse)
+# Tile de suelo metálico
 img_suelo_limpio = img("""
     b b b b b b b b b b b b b b b b
     b d d d d d d d d d d d d d d b
@@ -505,68 +502,56 @@ sprites.on_overlap(SpriteKind.player, KIND_META, on_meta_overlap)
 # --- 6. HISTORIA Y MENÚS ---
 
 def introduccion_historia():
-    # Fondo negro para mejor contraste
     scene.set_background_color(15)
 
-    # 1. CIUDAD (Imagen)
+    # 1. CIUDAD
     scene.set_background_image(assets.image("""intro_ciudad"""))
-
+    
     game.show_long_text("ESPAÑA\n02:17 A.M.", DialogLayout.BOTTOM)
     
     music.big_crash.play()
     game.show_long_text("LA RED...\nSE APAGA.", DialogLayout.BOTTOM)
-
     game.show_long_text("No fue un fallo.\nNi un ataque.", DialogLayout.BOTTOM)
     
-    # 2. RAYO (Imagen)
+    # 2. RAYO
     scene.set_background_image(assets.image("""intro_rayo"""))
     game.show_long_text("La electricidad\nsimplemente...", DialogLayout.BOTTOM)
     game.show_long_text("DESAPARECIO.", DialogLayout.BOTTOM)
-
     game.show_long_text("Las torres entraron\nen contencion.", DialogLayout.BOTTOM)
     game.show_long_text("Los sistemas\nquedaron bajo tierra.", DialogLayout.BOTTOM)
 
-    # 3. MAPA (Imagen)
+    # 3. MAPA
     scene.set_background_image(assets.image("""intro_mapa"""))
     game.show_long_text("Los tecnicos\nnunca salieron.", DialogLayout.BOTTOM)
-    
-    
     game.show_long_text("Algo de ellos\nsigue abajo.", DialogLayout.BOTTOM)
 
-    # --- LISTA DE AMENAZAS ---
     game.show_long_text("SENSORES ACTIVOS:", DialogLayout.BOTTOM)
     game.show_long_text("Detectando\nRadiacion residual...", DialogLayout.BOTTOM)
     game.show_long_text("Detectando\nEnergia inestable...", DialogLayout.BOTTOM)
     game.show_long_text("Detectando\nEcos humanos...", DialogLayout.BOTTOM)
 
-    # 4. HÉROE (Imagen)
+    # 4. HÉROE
     scene.set_background_image(assets.image("""intro_heroe"""))
     music.beam_up.play()
     game.show_long_text("Eres un\nOPERADOR DE\nCONTINGENCIA.", DialogLayout.BOTTOM)
-
     game.show_long_text("Tu traje te protege.\nPero tu energia\nNO es infinita.", DialogLayout.BOTTOM)
 
-    # La misión clara
     game.show_long_text("MISION PRIORITY:", DialogLayout.BOTTOM)
     game.show_long_text("Recuperar los\nPANELES DE REINICIO\nde los sotanos.", DialogLayout.BOTTOM)
 
-    # Volvemos al MAPA para explicar el plan
+    # Volvemos al MAPA
     scene.set_background_image(assets.image("""intro_mapa"""))
     game.show_long_text("ADVERTENCIA:\nEl sistema exige\nun orden exacto.", DialogLayout.BOTTOM)
     
-    # --- ORDEN DE TORRES SECUENCIAL ---
     game.show_long_text("FASE 1:\nIr a Torre A", DialogLayout.BOTTOM)
     game.show_long_text("FASE 2:\nIr a Torre B", DialogLayout.BOTTOM)
     game.show_long_text("FASE 3:\nIr a Torre C", DialogLayout.BOTTOM)
 
-    # Fondo negro final para dramatismo
     scene.set_background_image(None)
     scene.set_background_color(15)
 
     game.show_long_text("Si fallas,\nla red caera\npara siempre.", DialogLayout.CENTER)
-
     game.show_long_text("Si tienes exito...\nEspaña volvera\na encenderse.", DialogLayout.CENTER)
-    
     game.show_long_text("A cualquier precio.", DialogLayout.CENTER)
 
 def mostrar_inventari():
@@ -582,10 +567,65 @@ def mostrar_inventari():
         
     game.show_long_text(texto, DialogLayout.FULL)
 
-def inicio():
+def menu_principal():
+    # 1. LIMPIEZA TOTAL
+    scene.set_background_color(15) # Fondo negro (15)
+    scene.set_background_image(None) # Quitar cualquier imagen anterior
+
+    # 2. FONDO NEGRO FORZADO (La solución al bug gráfico)
+    # Creamos una imagen negra nueva y la ponemos.
+    # Esto "tapa" lo que hubiera antes en la memoria de vídeo.
+    bg_negro = image.create(160, 120)
+    bg_negro.fill(15)
+    scene.set_background_image(bg_negro)
+
+    # 3. PAUSA TÉCNICA
+    # Damos tiempo (100ms) al motor para pintar el negro antes de lanzar el diálogo.
+    pause(100)
+
+    # 4. AHORA SÍ, LA PREGUNTA
+    jugar = game.ask("¿INICIAR MISION?", "A: Jugar  B: Controles")
+    
+    if jugar:
+        # Pulsó A -> Jugar
+        comenzar_juego()
+    else:
+        # Pulsó B -> Controles (TABS)
+        
+        # TAB 1: MOVIMIENTO
+        bg_controles = image.create(160, 120)
+        bg_controles.fill(15)
+        bg_controles.print_center("CONTROLES (1/3)", 5, 1)
+        bg_controles.print("MOVIMIENTO:", 10, 30, 1)
+        bg_controles.print("Usa FLECHAS", 20, 45, 6)
+        bg_controles.print("o teclas WASD", 20, 60, 6)
+        scene.set_background_image(bg_controles)
+        game.show_long_text("Siguiente: Pulsa (A)", DialogLayout.BOTTOM)
+        
+        # TAB 2: ACCIÓN
+        bg_controles.fill(15) # Limpiamos la misma imagen
+        bg_controles.print_center("CONTROLES (2/3)", 5, 1)
+        bg_controles.print("ACCION:", 10, 30, 1)
+        bg_controles.print("Pulsa ESPACIO", 20, 45, 6)
+        bg_controles.print("o Boton (A)", 20, 60, 6)
+        scene.set_background_image(bg_controles)
+        game.show_long_text("Siguiente: Pulsa (A)", DialogLayout.BOTTOM)
+        
+        # TAB 3: CORRER
+        bg_controles.fill(15)
+        bg_controles.print_center("CONTROLES (3/3)", 5, 1)
+        bg_controles.print("CORRER:", 10, 30, 1)
+        bg_controles.print("Manten ESPACIO", 20, 45, 6)
+        bg_controles.print("mientras andas", 20, 60, 6)
+        scene.set_background_image(bg_controles)
+        game.show_long_text("Volver al menu: (A)", DialogLayout.BOTTOM)
+
+        # RECURSIVIDAD: Volvemos al inicio de esta función
+        menu_principal()
+
+def comenzar_juego():
     global juego_activo, energia, nivel_actual, items
     
-    game.splash("BLACKOUT", "España Edition")
     introduccion_historia()
 
     setup_hero()
@@ -601,4 +641,10 @@ def inicio():
     
     juego_activo = True
 
-inicio()
+# --- INICIO DEL PROGRAMA ---
+
+# Primero mostramos el título (Splash) una sola vez
+game.splash("BLACKOUT", "España Edition")
+
+# Luego entramos al menú principal
+menu_principal()
