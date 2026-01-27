@@ -10,7 +10,7 @@
 
 ---
 
-## 📖 Lore i Història
+## Lore i Història
 
 **Espanya, 02:17 A.M.**
 La xarxa elèctrica nacional s'ha apagat. No ha estat un atac terrorista ni una fallada mecànica. L'electricitat simplement ha desaparegut.
