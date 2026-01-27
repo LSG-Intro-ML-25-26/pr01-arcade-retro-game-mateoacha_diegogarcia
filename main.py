@@ -261,7 +261,7 @@ def generar_mundo():
         tiles.set_current_tilemap(tilemap("""level0"""))
         game.splash("TORRE B", "Objetivo: 2 Paneles")
     elif nivel_actual == 3:
-        tiles.set_current_tilemap(tilemap("""level5"""))
+        tiles.set_current_tilemap(tilemap("""nivel"""))
         game.splash("TORRE C", "Objetivo: 3 Paneles")
 
     # Colocar Jugador
