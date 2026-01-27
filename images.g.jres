@@ -24,6 +24,31 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "intro_mapa"
     },
+    "image7": {
+        "data": "hwQMAAsAAAAAAAAAAAAAAADw////AAAAAB8REREPAADwERER8QAAABARHxERDwAAEBEREfEAAAAQEREREQ8AABARHxHxAAAAABEREREPAAAAEBER8QAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "img_fantasma"
+    },
+    "image6": {
+        "data": "hwQMAAsAAAAAAPD//wAAAAAALyIiDwAAAAAiIiIPAADw/yISIg8AAPARIhIiDwAA8AEiEiIPAADw8SISIg8AAPARIhIiDwAAAAAiEiIPAAAAACIiIg8AAAAAICIiDwAAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "img_bolsa"
+    },
+    "image9": {
+        "data": "hwQMAAsAAAAAAAAAAAAAAAAAdwAAAAAAAHBmBwAAAAAAZ3d2AAAAAHB2d2cHAAAAcHZ3ZwcAAABwd3d3BwAAAHBnd3YAAAAAAHdmBwcAAAAAcHcABwAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "img_cableVerde"
+    },
+    "image10": {
+        "data": "hwQQABAAAAAAACIAAAAAAAAgVQIAAAAAAFIiJQAAAAAgJVVSAgAAAFJSVSUlAAAAUlJVJSUAAABSVVVVJQAAAFIlVVIiAAAAIFUiJSUAAAAAUlUiJQAAAAAgIiAlAAAAAAAAACUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "img_cableAmarillo"
+    },
+    "image8": {
+        "data": "hwQMAAsAAAAAAAAAAAAAAAAA7u4AAAAAAOBERA4AAAAATu7u5AAAAABOXuXkAAAAAE5e5eQAAAAATu7u5AAAAABO5E7kAAAAAOBERO4AAAAAAO7u5AAAAAAAAEAOAAAAAAAA5AAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "img_cableNaranja"
+    },
     "anim6": {
         "namespace": "myAnimations",
         "id": "anim6",
