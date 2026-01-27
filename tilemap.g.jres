@@ -100,25 +100,17 @@
         "tilemapTile": true,
         "displayName": "miMosaico12"
     },
-    "level2": {
-        "id": "level2",
-        "mimeType": "application/mkcd-tilemap",
-        "data": "MTAxMDAwMTAwMDBhMGEwYTBhMGEwYTBhMGEwYTBhMGEwYTBhMGEwYTBhMGEwMTAxMDIwMjAyMDIwMjAyMDEwMTBiMGIwYjA0MGEwYTAxMDEwMjBiMDgwYjAyMDIwMjAyMDEwYjAyMDIwYTBhMDEwMTAyMGIwYjAyMDIwMjAyMDIwMjBiMDIwOTBhMGEwMTAyMDIwYjAxMDIwMjA5MDEwMjAyMDIwMjBiMGEwYTAyMDIwYjAxMDIwMjBiMDQwYjAyMDIwMjAyMGIwYTBhMDIwYjA3MDEwMjAyMDIwYjAyMDIwMjAyMGIwYjBhMGEwMjAyMDIwMjAyMDIwMjAyMDIwMjAyMGIwYjBiMGEwYTAxMDIwMjAyMGIwYjAxMDIwMjAyMGIwNjBiMGIwYTBhMDEwMjAyMDIwNTBiMDEwMTAyMDIwMjAyMDIwMjBhMGEwMTAyMDIwMjBiMGIwMTAxMDEwMjAyMGIwYjBiMGEwYTAxMGIwMjAyMDIwMTAxMDEwMjAyMGIwYjBiMGIwYTBhMGIwYjBiMDIwMjAyMDEwMTAyMDIwMjBiMGIwYjBhMGEwYjBiMDQwMjAyMDIwMjAyMDIwMjAyMDIwMjAyMGEwYTBiMGIwYjBiMGIwYjBiMGIwYjAxMDIwMjAyMDMwYTBhMGEwYTBhMGEwYTBhMGEwYTBhMGEwYTBhMGEwYTBhMjIyMjIyMjIyMjIyMjIyMjIyMDIwMDAwMjAyMjIyMjAyMjAyMDIwMjAwMjAwMjIwMjIwMjIyMDAwMDAwMDIyMDIyMDAyMjAwMjAwMDAwMjIwMjIwMDIyMDIwMDAwMDIyMDIwMjAyMDAwMjAwMjAyMjAyMDAwMDAwMDAwMDIyMjIyMjAwMjAyMjAwMjAyMDIyMjIwMDAwMjIwMjAwMDAyMDIyMDAyMDIyMjIwMDIyMjIyMjAyMDAyMjAyMjAyMjIyMjIyMjAwMjAwMjAwMjIyMjIyMDIwMDAwMDAwMDAwMjAyMjIyMjIyMjIyMDIwMDIwMjIyMjIyMjIyMjIyMjIyMg==",
-        "tileset": [
-            "myTiles.transparency16",
-            "sprites.dungeon.floorLight0",
-            "sprites.dungeon.darkGroundSouthWest1",
-            "myTiles.tile3",
-            "myTiles.tile4",
-            "myTiles.tile6",
-            "myTiles.tile8",
-            "myTiles.tile9",
-            "myTiles.tile7",
-            "sprites.dungeon.darkGroundCenter",
-            "sprites.dungeon.collectibleInsignia",
-            "sprites.dungeon.floorLight1"
-        ],
-        "displayName": "level03"
+    "tile12": {
+        "data": "hwQQABAAAADMzMzMzMzMzMzMzMzMzMzMiIiIiIiIiIjMzMzMzMzMzF/MzMzMzMzM9bzLzMy7zMxfzMzMzMzMzPXMzMzMzMzMX8zMu8vMzMz1zMzLy8zMzF/MzLvLzMzM9czMzMzMzMxfzMzMzMzMzPXMzMzMzMzMX8zMzMzMzMz1vMvMzLvMzA==",
+        "mimeType": "image/x-mkcd-f4",
+        "tilemapTile": true,
+        "displayName": "miMosaico2"
+    },
+    "tile16": {
+        "data": "hwQQABAAAADMzMzMzMzMzLz7/////7/LvM/MzMzM/Mv8////////z/z////////P/P///////8/8////////z/z////////P/P///////8/8////////z/z////////P/P///////8/8////////z7zPzMzMzPzLvPv/////v8vMzMzMzMzMzA==",
+        "mimeType": "image/x-mkcd-f4",
+        "tilemapTile": true,
+        "displayName": "miMosaico3"
     },
     "mapa_general1": {
         "id": "mapa_general1",
@@ -170,6 +162,23 @@
             "myTiles.tile26"
         ],
         "displayName": "level0"
+    },
+    "level2": {
+        "id": "level2",
+        "mimeType": "application/mkcd-tilemap",
+        "data": "MTAxMDAwMTAwMDA3MDcwNzA3MDcwNzA3MDcwNzA3MDcwNzA3MDcwNzA3MDcwNzA3MDgwODA4MDgwODA4MDcwNzA3MDcwNzAyMDcwNzA3MDcwODA3MDYwNzA4MDgwODA4MDcwNzA4MDgwNzA3MDcwNzA4MDcwNzA4MDgwODA4MDgwODA3MDgwODA3MDcwNzA4MDgwNzA3MDgwODA4MDcwODA4MDgwODA3MDcwNzA4MDgwNzA3MDgwODA3MDIwNzA4MDgwODA4MDcwNzA3MDgwNzA1MDcwODA4MDgwNzA4MDgwODA4MDcwNzA3MDcwODA4MDgwODA4MDgwODA4MDgwODA4MDcwNzA3MDcwNzA3MDgwODA4MDcwNzA3MDgwODA4MDcwNDA3MDcwNzA3MDcwODA4MDgwMzA3MDcwNzA4MDgwODA4MDgwODA3MDcwNzA4MDgwODA3MDcwNzA3MDcwODA4MDcwNzA3MDcwNzA3MDcwODA4MDgwNzA3MDcwODA4MDcwNzA3MDcwNzA3MDcwNzA3MDgwODA4MDcwNzA4MDgwODA3MDcwNzA3MDcwNzA3MDIwODA4MDgwODA4MDgwODA4MDgwODA4MDcwNzA3MDcwNzA3MDcwNzA3MDcwNzA3MDgwODA4MDEwNzA3MDcwNzA3MDcwNzA3MDcwNzA3MDcwNzA3MDcwNzA3MjIyMjIyMjIyMjIyMjIyMjIyMDIwMDAwMjAyMjIyMjAyMjAyMDIwMjAwMjAwMjIwMjIwMjIyMDAwMDAwMDIyMDIyMDAyMjAwMjAwMDAwMjIwMjIwMDIyMDIwMDAwMDIyMDIwMjAyMDAwMjAwMjAyMjAyMDAwMDAwMDAwMDIyMjIyMjAwMjAyMjAwMjAyMDIyMjIwMDAwMjIwMjAwMDAyMDIyMDAyMDIyMjIwMDIyMjIyMjAyMDAyMjAyMjAyMjIyMjIyMjAwMjAwMjAwMjIyMjIyMDIwMDAwMDAwMDAwMjAyMjIyMjIyMjIyMDIwMDIwMjIyMjIyMjIyMjIyMjIyMg==",
+        "tileset": [
+            "myTiles.transparency16",
+            "myTiles.tile3",
+            "myTiles.tile4",
+            "myTiles.tile6",
+            "myTiles.tile8",
+            "myTiles.tile9",
+            "myTiles.tile7",
+            "myTiles.tile12",
+            "myTiles.tile16"
+        ],
+        "displayName": "level03"
     },
     "*": {
         "mimeType": "image/x-mkcd-f4",
