@@ -508,20 +508,56 @@ sprites.on_overlap(SpriteKind.player, KIND_META, on_meta_overlap)
 # --- 6. HISTORIA Y MENÚS ---
 
 def introduccion_historia():
+    # Fondo negro para mejor contraste
     scene.set_background_color(15)
-    
-    game.show_long_text("ESPAÑA SE APAGO\nEN UNA SOLA NOCHE.", DialogLayout.FULL)
-    game.show_long_text("Las ciudades quedaron\nen silencio.\nLos cielos, sin luz.", DialogLayout.FULL)
+
+    game.show_long_text("ESPAÑA\n02:17 A.M.", DialogLayout.CENTER)
     
     music.big_crash.play()
-    game.show_long_text("El sistema electrico\nnacional colapso.\nEl tiempo corre...", DialogLayout.FULL)
+    game.show_long_text("LA RED...\nSE APAGA.", DialogLayout.CENTER)
+
+    game.show_long_text("No fue un fallo.\nNi un ataque.", DialogLayout.CENTER)
+    game.show_long_text("La electricidad\nsimplemente...", DialogLayout.CENTER)
+    game.show_long_text("DESAPARECIO.", DialogLayout.CENTER)
+
+    # Pausa narrativa
+    game.show_long_text("Las torres entraron\nen contencion.", DialogLayout.CENTER)
+    game.show_long_text("Los sistemas\nquedaron bajo tierra.", DialogLayout.CENTER)
+
+    game.show_long_text("Los tecnicos\nnunca salieron.", DialogLayout.CENTER)
     
-    game.show_long_text("MISIÓN:\nActivar 3 paneles de\nluz ocultos en los\nsotanos de las torres.", DialogLayout.FULL)
-    game.show_long_text("ADVERTENCIA:\nDebes activarlos en\norden correcto:\nA -> B -> C", DialogLayout.FULL)
-    
+
+    game.show_long_text("Algo de ellos\nsigue abajo.", DialogLayout.CENTER)
+
+    # --- CAMBIO 1: LISTA DE AMENAZAS LIMPIA ---
+    game.show_long_text("SENSORES ACTIVOS:", DialogLayout.CENTER)
+    # Mostramos uno a uno abajo para dar tensión y claridad
+    game.show_long_text("Detectando\nRadiacion residual...", DialogLayout.BOTTOM)
+    game.show_long_text("Detectando\nEnergia inestable...", DialogLayout.BOTTOM)
+    game.show_long_text("Detectando\nEcos humanos...", DialogLayout.BOTTOM)
+
     music.beam_up.play()
-    game.show_long_text("Si fallas, la\noscuridad sera\nirreversible.", DialogLayout.FULL)
-    game.show_long_text("El destino de España\nesta en tus manos.", DialogLayout.FULL)
+    game.show_long_text("Eres un\nOPERADOR DE\nCONTINGENCIA.", DialogLayout.CENTER)
+
+    game.show_long_text("Tu traje te protege.\nPero tu energia\nNO es infinita.", DialogLayout.CENTER)
+
+    # La misión clara
+    game.show_long_text("MISION PRIORITY:", DialogLayout.CENTER)
+    game.show_long_text("Recuperar los\nPANELES DE REINICIO\nde los sotanos.", DialogLayout.CENTER)
+
+    game.show_long_text("ADVERTENCIA:\nEl sistema exige\nun orden exacto.", DialogLayout.CENTER)
+    
+    # --- CAMBIO 2: ORDEN DE TORRES SECUENCIAL ---
+    # En vez de un dibujo raro, damos instrucciones paso a paso
+    game.show_long_text("FASE 1:\nIr a Torre A", DialogLayout.CENTER)
+    game.show_long_text("FASE 2:\nIr a Torre B", DialogLayout.CENTER)
+    game.show_long_text("FASE 3:\nIr a Torre C", DialogLayout.CENTER)
+
+    game.show_long_text("Si fallas,\nla red caera\npara siempre.", DialogLayout.CENTER)
+
+    game.show_long_text("Si tienes exito...\nEspaña volvera\na encenderse.", DialogLayout.CENTER)
+    
+    game.show_long_text("A cualquier precio.", DialogLayout.CENTER)
 
 def mostrar_inventari():
     texto = "EQUIPO:\n"

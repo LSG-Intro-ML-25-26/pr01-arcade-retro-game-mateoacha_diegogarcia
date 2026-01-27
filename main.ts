@@ -526,30 +526,61 @@ Volviendo al mapa...`, DialogLayout.Bottom)
 })
 //  --- 6. HISTORIA Y MENÚS ---
 function introduccion_historia() {
+    //  Fondo negro para mejor contraste
     scene.setBackgroundColor(15)
-    game.showLongText(`ESPAÑA SE APAGO
-EN UNA SOLA NOCHE.`, DialogLayout.Full)
-    game.showLongText(`Las ciudades quedaron
-en silencio.
-Los cielos, sin luz.`, DialogLayout.Full)
+    game.showLongText("ESPAÑA\n02:17 A.M.", DialogLayout.Center)
     music.bigCrash.play()
-    game.showLongText(`El sistema electrico
-nacional colapso.
-El tiempo corre...`, DialogLayout.Full)
-    game.showLongText(`MISIÓN:
-Activar 3 paneles de
-luz ocultos en los
-sotanos de las torres.`, DialogLayout.Full)
-    game.showLongText(`ADVERTENCIA:
-Debes activarlos en
-orden correcto:
-A -> B -> C`, DialogLayout.Full)
+    game.showLongText("LA RED...\nSE APAGA.", DialogLayout.Center)
+    game.showLongText(`No fue un fallo.
+Ni un ataque.`, DialogLayout.Center)
+    game.showLongText(`La electricidad
+simplemente...`, DialogLayout.Center)
+    game.showLongText("DESAPARECIO.", DialogLayout.Center)
+    //  Pausa narrativa
+    game.showLongText(`Las torres entraron
+en contencion.`, DialogLayout.Center)
+    game.showLongText(`Los sistemas
+quedaron bajo tierra.`, DialogLayout.Center)
+    game.showLongText(`Los tecnicos
+nunca salieron.`, DialogLayout.Center)
+    game.showLongText(`Algo de ellos
+sigue abajo.`, DialogLayout.Center)
+    //  --- CAMBIO 1: LISTA DE AMENAZAS LIMPIA ---
+    game.showLongText("SENSORES ACTIVOS:", DialogLayout.Center)
+    //  Mostramos uno a uno abajo para dar tensión y claridad
+    game.showLongText(`Detectando
+Radiacion residual...`, DialogLayout.Bottom)
+    game.showLongText(`Detectando
+Energia inestable...`, DialogLayout.Bottom)
+    game.showLongText(`Detectando
+Ecos humanos...`, DialogLayout.Bottom)
     music.beamUp.play()
-    game.showLongText(`Si fallas, la
-oscuridad sera
-irreversible.`, DialogLayout.Full)
-    game.showLongText(`El destino de España
-esta en tus manos.`, DialogLayout.Full)
+    game.showLongText(`Eres un
+OPERADOR DE
+CONTINGENCIA.`, DialogLayout.Center)
+    game.showLongText(`Tu traje te protege.
+Pero tu energia
+NO es infinita.`, DialogLayout.Center)
+    //  La misión clara
+    game.showLongText("MISION PRIORITY:", DialogLayout.Center)
+    game.showLongText(`Recuperar los
+PANELES DE REINICIO
+de los sotanos.`, DialogLayout.Center)
+    game.showLongText(`ADVERTENCIA:
+El sistema exige
+un orden exacto.`, DialogLayout.Center)
+    //  --- CAMBIO 2: ORDEN DE TORRES SECUENCIAL ---
+    //  En vez de un dibujo raro, damos instrucciones paso a paso
+    game.showLongText("FASE 1:\nIr a Torre A", DialogLayout.Center)
+    game.showLongText("FASE 2:\nIr a Torre B", DialogLayout.Center)
+    game.showLongText("FASE 3:\nIr a Torre C", DialogLayout.Center)
+    game.showLongText(`Si fallas,
+la red caera
+para siempre.`, DialogLayout.Center)
+    game.showLongText(`Si tienes exito...
+España volvera
+a encenderse.`, DialogLayout.Center)
+    game.showLongText("A cualquier precio.", DialogLayout.Center)
 }
 
 function inicio() {
