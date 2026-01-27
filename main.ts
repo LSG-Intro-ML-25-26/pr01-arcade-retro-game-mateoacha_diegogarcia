@@ -1,6 +1,6 @@
 /** 
 👑 BLACKOUT: ESPAÑA EDITION 👑
-(ACTUALIZADO: Assets Vinculados - Cables y Herramientas)
+(ACTUALIZADO: Objetos Nuevos - Cables y Caja de Herramientas)
 
  */
 //  --- 1. CLASES ---
@@ -34,9 +34,9 @@ let KIND_META = SpriteKind.create()
 let KIND_ENEMIGO = SpriteKind.Enemy
 let KIND_NPC = SpriteKind.create()
 let KIND_TORRE = SpriteKind.create()
-//  --- 3. ARTE PIXEL Y ASSETS ---
+//  --- 3. ARTE PIXEL ---
 let img_hero = assets.image`hero_quieto`
-//  -- TORRES (Se mantienen inline o puedes pasarlas a assets también) --
+//  [TORRES BLANCAS]
 let img_torre_a = img`
     . . . . . . . . . . . . . . . .
     . . . . 1 1 1 1 1 1 1 1 . . . .
@@ -94,19 +94,83 @@ let img_torre_c = img`
     1 1 1 1 1 1 1 d d 1 1 1 1 1 1 1
     1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 `
-//  -- OBJETOS DESDE ASSETS --
-let img_fantasma = assets.image`img_fantasma`
-//  Objetos de misión (Cables)
-let img_cableNaranja = assets.image`img_cableNaranja`
-//  Para Torre A
-let img_cableVerde = assets.image`img_cableVerde`
-//  Para Torre B
-let img_cableAmarillo = assets.image`img_cableAmarillo`
-//  Para Torre C
-//  Otros objetos
-let img_salud = assets.image`img_salud`
-let img_caldero = assets.image`img_caldero`
-//  Caja de herramientas
+//  [RESTO DE OBJETOS]
+let img_fantasma = img`
+. . . . . . . . . . . .
+. . . f 1 1 1 1 . . . .
+. . f 1 1 1 1 1 1 . . .
+. f 1 1 1 1 1 1 1 1 . .
+. f 1 1 f 1 1 f 1 1 . .
+. f 1 1 1 1 1 1 1 1 . .
+. f 1 1 1 1 1 1 1 1 . .
+. f 1 1 1 1 1 1 1 1 . .
+. f 1 1 1 1 1 1 1 1 . .
+. f 1 f 1 f 1 f 1 f . .
+. . f . f . f . f . . .
+`
+//  CAMBIO 1: ROLLO DE CABLES (Antes Gema)
+let img_gema = img`
+    . . . . . . . . . . . .
+    . . . . . . . . . . . .
+    . . . e e e e e . . . .
+    . . e 4 4 4 4 4 e . . .
+    . e 4 4 4 4 4 4 4 e . .
+    . e 4 4 5 5 4 4 4 e . .
+    . e 4 4 5 5 4 4 4 e . .
+    . e 4 4 4 4 4 4 4 e . .
+    . . e 4 4 4 4 4 e . . .
+    . . . e e e e e . . . .
+    . . . . . . . . . . . .
+`
+let img_planta = img`
+    . . . . . . . . . . . .
+    . . . . . . 7 . . . . .
+    . . . . . 7 7 . . . . .
+    . . . 7 . 7 7 . 7 . . .
+    . . . 7 7 7 7 7 7 . . .
+    . . . . 7 7 7 7 . . . .
+    . . . . 7 7 7 7 . . . .
+    . . . . . 7 7 . . . . .
+    . . . . . . . . . . . .
+`
+let img_libro = img`
+    . . . . . . . . . . . .
+    . . . b b b b . . . . .
+    . . b 1 1 1 1 b . . . .
+    . b 1 1 1 1 1 1 b . . .
+    . b c c c c c c b . . .
+    . b c c c c c c b . . .
+    . b c c c c c c b . . .
+    . b 1 1 1 1 1 1 b . . .
+    . . b b b b b b . . . .
+`
+let img_salud = img`
+    . . . . . . . . . . . .
+    . . . . . 1 1 . . . . .
+    . . . . . 1 1 . . . . .
+    . . . . 1 1 1 1 . . . .
+    . . . 1 2 2 2 2 1 . . .
+    . . . 1 2 2 2 2 1 . . .
+    . . 1 2 2 2 2 2 2 1 . .
+    . . 1 2 f f f 2 2 1 . .
+    . . 1 2 2 2 2 2 2 1 . .
+    . . . 1 2 2 2 2 1 . . .
+    . . . . 1 1 1 1 . . . .
+`
+//  CAMBIO 2: CAJA DE HERRAMIENTAS (Antes Caldero)
+let img_caldero = img`
+    . . . . . . . . . . . .
+    . . . . . . . . . . . .
+    . . . . 1 1 1 1 . . . .
+    . . . . 1 . . 1 . . . .
+    . . 2 2 2 2 2 2 2 2 . .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . 2 2 1 1 1 1 1 1 2 2 .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . . . . . . . . . . . .
+`
 //  Tile de suelo metálico
 let img_suelo_limpio = img`
     b b b b b b b b b b b b b b b b
@@ -218,26 +282,23 @@ function generar_mundo() {
         caldero.startEffect(effects.fountain, 50000)
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-    //  --- COLOCAR ITEMS (Aquí usamos los nuevos nombres) ---
-    //  Marcador 1 -> Cable Naranja (Torre A)
-    let lista_cable1 = tiles.getTilesByType(assets.tile`marcador_item1`)
-    for (i = 0; i < lista_cable1.length; i++) {
-        loc = lista_cable1[i]
-        crear_item("Cable de Potencia", img_cableNaranja, loc, "mision")
+    //  Colocar Items
+    let lista_gema = tiles.getTilesByType(assets.tile`marcador_item1`)
+    for (i = 0; i < lista_gema.length; i++) {
+        loc = lista_gema[i]
+        crear_item("Panel Torre A", img_gema, loc, "mision")
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-    //  Marcador 2 -> Cable Verde (Torre B)
-    let lista_cable2 = tiles.getTilesByType(assets.tile`marcador_item2`)
-    for (i = 0; i < lista_cable2.length; i++) {
-        loc = lista_cable2[i]
-        crear_item("Cable de Datos", img_cableVerde, loc, "mision")
+    let lista_planta = tiles.getTilesByType(assets.tile`marcador_item2`)
+    for (i = 0; i < lista_planta.length; i++) {
+        loc = lista_planta[i]
+        crear_item("Panel Torre B", img_planta, loc, "mision")
         tiles.setTileAt(loc, img_suelo_limpio)
     }
-    //  Marcador 3 -> Cable Amarillo (Torre C)
-    let lista_cable3 = tiles.getTilesByType(assets.tile`marcador_item3`)
-    for (i = 0; i < lista_cable3.length; i++) {
-        loc = lista_cable3[i]
-        crear_item("Cable Maestro", img_cableAmarillo, loc, "mision")
+    let lista_libro = tiles.getTilesByType(assets.tile`marcador_item3`)
+    for (i = 0; i < lista_libro.length; i++) {
+        loc = lista_libro[i]
+        crear_item("Panel Torre C", img_libro, loc, "mision")
         tiles.setTileAt(loc, img_suelo_limpio)
     }
 }
@@ -345,6 +406,7 @@ sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player:
                 energia = Math.min(999, energia + 30)
                 other.destroy(effects.hearts, 500)
                 music.powerUp.play()
+                //  AUMENTADO A 2000ms
                 player.say("Recuperado!", 2000)
                 it.recogido = true
                 break
@@ -371,7 +433,8 @@ sprites.onOverlap(SpriteKind.Player, KIND_ENEMIGO, function on_enemy_overlap(pla
     music.zapped.play()
     pause(200)
 })
-//  --- INTERACCIÓN CON LAS TORRES ---
+//  --- INTERACCIÓN CON LAS TORRES (ENTRADA A NIVELES) ---
+//  --- AQUI ESTA LA MAGIA DEL BLOQUEO ---
 sprites.onOverlap(SpriteKind.Player, KIND_TORRE, function on_torre_overlap(player: Sprite, torre: Sprite) {
     
     //  TORRE A
@@ -380,19 +443,23 @@ sprites.onOverlap(SpriteKind.Player, KIND_TORRE, function on_torre_overlap(playe
             nivel_actual = 1
             generar_mundo()
         } else {
+            //  AUMENTADO A 2000ms
             player.say("Torre A: COMPLETADA", 2000)
             player.y += 16
         }
         
     } else if (torre.image == img_torre_b) {
+        //  Empujamos al jugador para que no entre
         //  TORRE B
         if (niveles_desbloqueados == 2) {
             nivel_actual = 2
             generar_mundo()
         } else if (niveles_desbloqueados > 2) {
+            //  AUMENTADO A 2000ms
             player.say("Torre B: COMPLETADA", 2000)
             player.y += 16
         } else {
+            //  AUMENTADO A 2000ms
             player.say("¡Bloqueada! Termina la Torre A", 2000)
             player.y += 16
         }
@@ -403,6 +470,7 @@ sprites.onOverlap(SpriteKind.Player, KIND_TORRE, function on_torre_overlap(playe
             nivel_actual = 3
             generar_mundo()
         } else {
+            //  AUMENTADO A 2000ms
             player.say("¡Bloqueada! Termina la Torre B", 2000)
             player.y += 16
         }
@@ -415,14 +483,13 @@ sprites.onOverlap(SpriteKind.Player, KIND_META, function on_meta_overlap(player:
     let tenemos_este: boolean;
     let texto_falta: string;
     
-    //  Nombres actualizados de los objetos
     let objetivos : string[] = []
     if (nivel_actual == 1) {
-        objetivos = ["Cable de Potencia"]
+        objetivos = ["Panel Torre A"]
     } else if (nivel_actual == 2) {
-        objetivos = ["Cable de Potencia", "Cable de Datos"]
+        objetivos = ["Panel Torre A", "Panel Torre B"]
     } else if (nivel_actual == 3) {
-        objetivos = ["Cable de Potencia", "Cable de Datos", "Cable Maestro"]
+        objetivos = ["Panel Torre A", "Panel Torre B", "Panel Torre C"]
     }
     
     let faltan : string[] = []
@@ -447,18 +514,21 @@ sprites.onOverlap(SpriteKind.Player, KIND_META, function on_meta_overlap(player:
 Volviendo al mapa...`, DialogLayout.Bottom)
             niveles_desbloqueados = 2
             nivel_actual = 0
+            //  Volver al mapa
             generar_mundo()
         } else if (nivel_actual == 2) {
             game.showLongText(`Torre B reactivada.
 Volviendo al mapa...`, DialogLayout.Bottom)
             niveles_desbloqueados = 3
             nivel_actual = 0
+            //  Volver al mapa
             generar_mundo()
         } else if (nivel_actual == 3) {
             game.over(true, effects.starField)
         }
         
     } else {
+        //  FIN DEL JUEGO
         player.y += 10
         scene.cameraShake(2, 200)
         texto_falta = "Faltan:\n"
@@ -535,16 +605,24 @@ a encenderse.`, DialogLayout.Center)
 
 function menu_principal() {
     let bg_controles: Image;
+    //  1. LIMPIEZA TOTAL
     scene.setBackgroundColor(15)
+    //  Fondo negro (15)
     scene.setBackgroundImage(null)
+    //  Quitar cualquier imagen anterior
+    //  2. FONDO NEGRO FORZADO
     let bg_negro = image.create(160, 120)
     bg_negro.fill(15)
     scene.setBackgroundImage(bg_negro)
+    //  3. PAUSA TÉCNICA
     pause(100)
+    //  4. AHORA SÍ, LA PREGUNTA
     let jugar = game.ask("¿INICIAR MISION?", "A: Jugar  B: Controles")
     if (jugar) {
+        //  Pulsó A -> Jugar
         comenzar_juego()
     } else {
+        //  Pulsó B -> Controles (TABS)
         //  TAB 1: MOVIMIENTO
         bg_controles = image.create(160, 120)
         bg_controles.fill(15)
@@ -570,6 +648,7 @@ function menu_principal() {
         bg_controles.print("mientras andas", 20, 60, 6)
         scene.setBackgroundImage(bg_controles)
         game.showLongText("Volver al menu: (A)", DialogLayout.Bottom)
+        //  RECURSIVIDAD: Volvemos al inicio de esta función
         menu_principal()
     }
     
@@ -596,6 +675,7 @@ function comenzar_juego() {
         game.showLongText(texto, DialogLayout.Full)
     })
     items = []
+    //  EMPEZAMOS EN EL MAPA (Nivel 0)
     nivel_actual = 0
     energia = 999.0
     generar_mundo()
@@ -603,5 +683,7 @@ function comenzar_juego() {
 }
 
 //  --- INICIO DEL PROGRAMA ---
+//  Primero mostramos el título (Splash) una sola vez
 game.splash("BLACKOUT", "España Edition")
+//  Luego entramos al menú principal
 menu_principal()
