@@ -1,6 +1,6 @@
 /** 
 👑 BLACKOUT: ESPAÑA EDITION 👑
-(FIX FINAL: Limpieza de Pantalla + Pausa de Renderizado)
+(FIX FINAL: Tiempos de Texto Ajustados para Leer Bien)
 
  */
 //  --- 1. CLASES ---
@@ -248,10 +248,10 @@ function generar_mundo() {
         tiles.setCurrentTilemap(tilemap`level01`)
         game.splash("TORRE A", "Objetivo: 1 Panel")
     } else if (nivel_actual == 2) {
-        tiles.setCurrentTilemap(tilemap`level0`)
+        tiles.setCurrentTilemap(tilemap`level02`)
         game.splash("TORRE B", "Objetivo: 2 Paneles")
     } else if (nivel_actual == 3) {
-        tiles.setCurrentTilemap(tilemap`nivel0`)
+        tiles.setCurrentTilemap(tilemap`level03`)
         game.splash("TORRE C", "Objetivo: 3 Paneles")
     }
     
@@ -402,7 +402,8 @@ sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player:
                 energia = Math.min(999, energia + 30)
                 other.destroy(effects.hearts, 500)
                 music.powerUp.play()
-                player.say("Recuperado!", 500)
+                //  AUMENTADO A 2000ms
+                player.say("Recuperado!", 2000)
                 it.recogido = true
                 break
             }
@@ -428,27 +429,45 @@ sprites.onOverlap(SpriteKind.Player, KIND_ENEMIGO, function on_enemy_overlap(pla
     music.zapped.play()
     pause(200)
 })
-//  INTERACCIÓN CON LAS TORRES (ENTRADA A NIVELES)
+//  --- INTERACCIÓN CON LAS TORRES (ENTRADA A NIVELES) ---
+//  --- AQUI ESTA LA MAGIA DEL BLOQUEO ---
 sprites.onOverlap(SpriteKind.Player, KIND_TORRE, function on_torre_overlap(player: Sprite, torre: Sprite) {
     
+    //  TORRE A
     if (torre.image == img_torre_a) {
-        nivel_actual = 1
-        generar_mundo()
-    } else if (torre.image == img_torre_b) {
-        if (niveles_desbloqueados >= 2) {
-            nivel_actual = 2
+        if (niveles_desbloqueados == 1) {
+            nivel_actual = 1
             generar_mundo()
         } else {
-            player.say("¡Bloqueada! Termina la Torre A", 1000)
+            //  AUMENTADO A 2000ms
+            player.say("Torre A: COMPLETADA", 2000)
+            player.y += 16
+        }
+        
+    } else if (torre.image == img_torre_b) {
+        //  Empujamos al jugador para que no entre
+        //  TORRE B
+        if (niveles_desbloqueados == 2) {
+            nivel_actual = 2
+            generar_mundo()
+        } else if (niveles_desbloqueados > 2) {
+            //  AUMENTADO A 2000ms
+            player.say("Torre B: COMPLETADA", 2000)
+            player.y += 16
+        } else {
+            //  AUMENTADO A 2000ms
+            player.say("¡Bloqueada! Termina la Torre A", 2000)
             player.y += 16
         }
         
     } else if (torre.image == img_torre_c) {
-        if (niveles_desbloqueados >= 3) {
+        //  TORRE C
+        if (niveles_desbloqueados == 3) {
             nivel_actual = 3
             generar_mundo()
         } else {
-            player.say("¡Bloqueada! Termina la Torre B", 1000)
+            //  AUMENTADO A 2000ms
+            player.say("¡Bloqueada! Termina la Torre B", 2000)
             player.y += 16
         }
         
@@ -587,14 +606,11 @@ function menu_principal() {
     //  Fondo negro (15)
     scene.setBackgroundImage(null)
     //  Quitar cualquier imagen anterior
-    //  2. FONDO NEGRO FORZADO (La solución al bug gráfico)
-    //  Creamos una imagen negra nueva y la ponemos.
-    //  Esto "tapa" lo que hubiera antes en la memoria de vídeo.
+    //  2. FONDO NEGRO FORZADO
     let bg_negro = image.create(160, 120)
     bg_negro.fill(15)
     scene.setBackgroundImage(bg_negro)
     //  3. PAUSA TÉCNICA
-    //  Damos tiempo (100ms) al motor para pintar el negro antes de lanzar el diálogo.
     pause(100)
     //  4. AHORA SÍ, LA PREGUNTA
     let jugar = game.ask("¿INICIAR MISION?", "A: Jugar  B: Controles")
@@ -614,7 +630,6 @@ function menu_principal() {
         game.showLongText("Siguiente: Pulsa (A)", DialogLayout.Bottom)
         //  TAB 2: ACCIÓN
         bg_controles.fill(15)
-        //  Limpiamos la misma imagen
         bg_controles.printCenter("CONTROLES (2/3)", 5, 1)
         bg_controles.print("ACCION:", 10, 30, 1)
         bg_controles.print("Pulsa ESPACIO", 20, 45, 6)

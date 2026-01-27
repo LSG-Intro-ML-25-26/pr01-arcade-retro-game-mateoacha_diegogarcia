@@ -1,6 +1,6 @@
 """
 👑 BLACKOUT: ESPAÑA EDITION 👑
-(FIX FINAL: Limpieza de Pantalla + Pausa de Renderizado)
+(FIX FINAL: Tiempos de Texto Ajustados para Leer Bien)
 """
 
 # --- 1. CLASES ---
@@ -252,10 +252,10 @@ def generar_mundo():
         tiles.set_current_tilemap(tilemap("""level01"""))
         game.splash("TORRE A", "Objetivo: 1 Panel")
     elif nivel_actual == 2:
-        tiles.set_current_tilemap(tilemap("""level0"""))
+        tiles.set_current_tilemap(tilemap("""level02"""))
         game.splash("TORRE B", "Objetivo: 2 Paneles")
     elif nivel_actual == 3:
-        tiles.set_current_tilemap(tilemap("""nivel0"""))
+        tiles.set_current_tilemap(tilemap("""level03"""))
         game.splash("TORRE C", "Objetivo: 3 Paneles")
 
     # Colocar Jugador
@@ -397,7 +397,8 @@ def on_item_overlap(player, other):
                 energia = min(999, energia + 30)
                 other.destroy(effects.hearts, 500)
                 music.power_up.play()
-                player.say("Recuperado!", 500)
+                # AUMENTADO A 2000ms
+                player.say("Recuperado!", 2000)
                 it.recogido = True
                 break
 
@@ -421,28 +422,43 @@ def on_enemy_overlap(player, enemy):
 
 sprites.on_overlap(SpriteKind.player, KIND_ENEMIGO, on_enemy_overlap)
 
-# INTERACCIÓN CON LAS TORRES (ENTRADA A NIVELES)
+# --- INTERACCIÓN CON LAS TORRES (ENTRADA A NIVELES) ---
+# --- AQUI ESTA LA MAGIA DEL BLOQUEO ---
 def on_torre_overlap(player, torre):
     global nivel_actual, niveles_desbloqueados
     
+    # TORRE A
     if torre.image == img_torre_a:
-        nivel_actual = 1
-        generar_mundo()
-        
-    elif torre.image == img_torre_b:
-        if niveles_desbloqueados >= 2:
-            nivel_actual = 2
+        if niveles_desbloqueados == 1:
+            nivel_actual = 1
             generar_mundo()
         else:
-            player.say("¡Bloqueada! Termina la Torre A", 1000)
+            # AUMENTADO A 2000ms
+            player.say("Torre A: COMPLETADA", 2000)
+            player.y += 16 # Empujamos al jugador para que no entre
+            
+    # TORRE B
+    elif torre.image == img_torre_b:
+        if niveles_desbloqueados == 2:
+            nivel_actual = 2
+            generar_mundo()
+        elif niveles_desbloqueados > 2:
+            # AUMENTADO A 2000ms
+            player.say("Torre B: COMPLETADA", 2000)
+            player.y += 16
+        else:
+            # AUMENTADO A 2000ms
+            player.say("¡Bloqueada! Termina la Torre A", 2000)
             player.y += 16
             
+    # TORRE C
     elif torre.image == img_torre_c:
-        if niveles_desbloqueados >= 3:
+        if niveles_desbloqueados == 3:
             nivel_actual = 3
             generar_mundo()
         else:
-            player.say("¡Bloqueada! Termina la Torre B", 1000)
+            # AUMENTADO A 2000ms
+            player.say("¡Bloqueada! Termina la Torre B", 2000)
             player.y += 16
 
 sprites.on_overlap(SpriteKind.player, KIND_TORRE, on_torre_overlap)
@@ -572,15 +588,12 @@ def menu_principal():
     scene.set_background_color(15) # Fondo negro (15)
     scene.set_background_image(None) # Quitar cualquier imagen anterior
 
-    # 2. FONDO NEGRO FORZADO (La solución al bug gráfico)
-    # Creamos una imagen negra nueva y la ponemos.
-    # Esto "tapa" lo que hubiera antes en la memoria de vídeo.
+    # 2. FONDO NEGRO FORZADO
     bg_negro = image.create(160, 120)
     bg_negro.fill(15)
     scene.set_background_image(bg_negro)
 
     # 3. PAUSA TÉCNICA
-    # Damos tiempo (100ms) al motor para pintar el negro antes de lanzar el diálogo.
     pause(100)
 
     # 4. AHORA SÍ, LA PREGUNTA
@@ -603,7 +616,7 @@ def menu_principal():
         game.show_long_text("Siguiente: Pulsa (A)", DialogLayout.BOTTOM)
         
         # TAB 2: ACCIÓN
-        bg_controles.fill(15) # Limpiamos la misma imagen
+        bg_controles.fill(15)
         bg_controles.print_center("CONTROLES (2/3)", 5, 1)
         bg_controles.print("ACCION:", 10, 30, 1)
         bg_controles.print("Pulsa ESPACIO", 20, 45, 6)
