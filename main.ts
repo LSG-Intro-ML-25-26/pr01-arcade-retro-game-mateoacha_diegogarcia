@@ -1,6 +1,6 @@
 /** 
 👑 BLACKOUT: ESPAÑA EDITION 👑
-(FIX FINAL: Tiempos de Texto Ajustados para Leer Bien)
+(ACTUALIZADO: Objetos Nuevos - Cables y Caja de Herramientas)
 
  */
 //  --- 1. CLASES ---
@@ -108,15 +108,18 @@ let img_fantasma = img`
     . . 1 . 1 . 1 . 1 . . .
     . . . . . . . . . . . .
 `
+//  CAMBIO 1: ROLLO DE CABLES (Antes Gema)
 let img_gema = img`
     . . . . . . . . . . . .
-    . . . . . 2 2 . . . . .
-    . . . . 2 4 4 2 . . . .
-    . . . 2 4 2 2 4 2 . . .
-    . . . 2 4 2 2 4 2 . . .
-    . . . 2 4 4 4 4 2 . . .
-    . . . . 2 4 4 2 . . . .
-    . . . . . 2 2 . . . . .
+    . . . . . . . . . . . .
+    . . . e e e e e . . . .
+    . . e 4 4 4 4 4 e . . .
+    . e 4 4 4 4 4 4 4 e . .
+    . e 4 4 5 5 4 4 4 e . .
+    . e 4 4 5 5 4 4 4 e . .
+    . e 4 4 4 4 4 4 4 e . .
+    . . e 4 4 4 4 4 e . . .
+    . . . e e e e e . . . .
     . . . . . . . . . . . .
 `
 let img_planta = img`
@@ -154,18 +157,19 @@ let img_salud = img`
     . . . 1 2 2 2 2 1 . . .
     . . . . 1 1 1 1 . . . .
 `
+//  CAMBIO 2: CAJA DE HERRAMIENTAS (Antes Caldero)
 let img_caldero = img`
     . . . . . . . . . . . .
-    . . . b b . . b b . . .
-    . . b 1 1 b b 1 1 b . .
-    . b 1 1 1 1 1 1 1 1 b .
-    . b 1 2 2 5 5 2 2 1 b .
-    . b 1 2 5 5 5 5 2 1 b .
-    . b b 2 5 5 5 5 2 b b .
-    . . b 2 2 5 5 2 2 b . .
-    . . . b b b b b b . . .
-    . . . d . . . . d . . .
-    . . d . . . . . . d . .
+    . . . . . . . . . . . .
+    . . . . 1 1 1 1 . . . .
+    . . . . 1 . . 1 . . . .
+    . . 2 2 2 2 2 2 2 2 . .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . 2 2 1 1 1 1 1 1 2 2 .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . . . . . . . . . . . .
 `
 //  Tile de suelo metálico
 let img_suelo_limpio = img`
@@ -248,10 +252,10 @@ function generar_mundo() {
         tiles.setCurrentTilemap(tilemap`level01`)
         game.splash("TORRE A", "Objetivo: 1 Panel")
     } else if (nivel_actual == 2) {
-        tiles.setCurrentTilemap(tilemap`level02`)
+        tiles.setCurrentTilemap(tilemap`level0`)
         game.splash("TORRE B", "Objetivo: 2 Paneles")
     } else if (nivel_actual == 3) {
-        tiles.setCurrentTilemap(tilemap`level03`)
+        tiles.setCurrentTilemap(tilemap`nivel0`)
         game.splash("TORRE C", "Objetivo: 3 Paneles")
     }
     

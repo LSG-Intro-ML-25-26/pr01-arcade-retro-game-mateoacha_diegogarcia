@@ -1,6 +1,6 @@
 """
 👑 BLACKOUT: ESPAÑA EDITION 👑
-(FIX FINAL: Tiempos de Texto Ajustados para Leer Bien)
+(ACTUALIZADO: Objetos Nuevos - Cables y Caja de Herramientas)
 """
 
 # --- 1. CLASES ---
@@ -110,15 +110,18 @@ img_fantasma = img("""
     . . . . . . . . . . . .
 """)
 
+# CAMBIO 1: ROLLO DE CABLES (Antes Gema)
 img_gema = img("""
     . . . . . . . . . . . .
-    . . . . . 2 2 . . . . .
-    . . . . 2 4 4 2 . . . .
-    . . . 2 4 2 2 4 2 . . .
-    . . . 2 4 2 2 4 2 . . .
-    . . . 2 4 4 4 4 2 . . .
-    . . . . 2 4 4 2 . . . .
-    . . . . . 2 2 . . . . .
+    . . . . . . . . . . . .
+    . . . e e e e e . . . .
+    . . e 4 4 4 4 4 e . . .
+    . e 4 4 4 4 4 4 4 e . .
+    . e 4 4 5 5 4 4 4 e . .
+    . e 4 4 5 5 4 4 4 e . .
+    . e 4 4 4 4 4 4 4 e . .
+    . . e 4 4 4 4 4 e . . .
+    . . . e e e e e . . . .
     . . . . . . . . . . . .
 """)
 
@@ -160,18 +163,19 @@ img_salud = img("""
     . . . . 1 1 1 1 . . . .
 """)
 
+# CAMBIO 2: CAJA DE HERRAMIENTAS (Antes Caldero)
 img_caldero = img("""
     . . . . . . . . . . . .
-    . . . b b . . b b . . .
-    . . b 1 1 b b 1 1 b . .
-    . b 1 1 1 1 1 1 1 1 b .
-    . b 1 2 2 5 5 2 2 1 b .
-    . b 1 2 5 5 5 5 2 1 b .
-    . b b 2 5 5 5 5 2 b b .
-    . . b 2 2 5 5 2 2 b . .
-    . . . b b b b b b . . .
-    . . . d . . . . d . . .
-    . . d . . . . . . d . .
+    . . . . . . . . . . . .
+    . . . . 1 1 1 1 . . . .
+    . . . . 1 . . 1 . . . .
+    . . 2 2 2 2 2 2 2 2 . .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . 2 2 1 1 1 1 1 1 2 2 .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . . . . . . . . . . . .
 """)
 
 # Tile de suelo metálico
@@ -252,10 +256,10 @@ def generar_mundo():
         tiles.set_current_tilemap(tilemap("""level01"""))
         game.splash("TORRE A", "Objetivo: 1 Panel")
     elif nivel_actual == 2:
-        tiles.set_current_tilemap(tilemap("""level02"""))
+        tiles.set_current_tilemap(tilemap("""level0"""))
         game.splash("TORRE B", "Objetivo: 2 Paneles")
     elif nivel_actual == 3:
-        tiles.set_current_tilemap(tilemap("""level03"""))
+        tiles.set_current_tilemap(tilemap("""nivel0"""))
         game.splash("TORRE C", "Objetivo: 3 Paneles")
 
     # Colocar Jugador
