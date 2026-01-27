@@ -24,6 +24,31 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "intro_mapa"
     },
+    "image7": {
+        "data": "hwQMAAsAAAAAAAAAAAAAAADw////AAAAAB8REREPAADwERER8QAAABARHxERDwAAEBEREfEAAAAQEREREQ8AABARHxHxAAAAABEREREPAAAAEBER8QAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "miImagen0"
+    },
+    "image6": {
+        "data": "hwQMAAsAAAAAAPD//wAAAAAALyIiDwAAAAAiIiIPAADw/yISIg8AAPARIhIiDwAA8AEiEiIPAADw8SISIg8AAPARIhIiDwAAAAAiEiIPAAAAACIiIg8AAAAAICIiDwAAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "miImagen"
+    },
+    "image9": {
+        "data": "hwQMAAsAAAAAAAAAAAAAAAAAdwAAAAAAAHBmBwAAAAAAZ3d2AAAAAHB2d2cHAAAAcHZ3ZwcAAABwd3d3BwAAAHBnd3YAAAAAAHdmBwcAAAAAcHcABwAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "miImagen2"
+    },
+    "image10": {
+        "data": "hwQQABAAAAAAACIAAAAAAAAgVQIAAAAAAFIiJQAAAAAgJVVSAgAAAFJSVSUlAAAAUlJVJSUAAABSVVVVJQAAAFIlVVIiAAAAIFUiJSUAAAAAUlUiJQAAAAAgIiAlAAAAAAAAACUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "miImagen3"
+    },
+    "image8": {
+        "data": "hwQMAAsAAAAAAAAAAAAAAAAA7u4AAAAAAOBERA4AAAAATu7u5AAAAABOXuXkAAAAAE5e5eQAAAAATu7u5AAAAABO5E7kAAAAAOBERO4AAAAAAO7u5AAAAAAAAEAOAAAAAAAA5AAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "miImagen1"
+    },
     "anim6": {
         "namespace": "myAnimations",
         "id": "anim6",
