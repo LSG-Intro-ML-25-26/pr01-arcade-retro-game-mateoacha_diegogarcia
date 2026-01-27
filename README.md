@@ -29,13 +29,17 @@ Tens energia limitada. Tens una llanterna. Si falles, la foscor serà eterna.
 ### El Protagonista: Operador de Contingència
 Equipat amb un vestit de protecció NBQ i una bateria limitada. La seva vida depèn de la seva energia. Ha de moure's ràpid però amb cura.
 
-![Imatge de l'Heroi](URL_DE_LA_TEVA_IMATGE_HEROI_AQUI)
-*(Substitueix aquest text pel link a la imatge del teu heroi, ex: assets/hero.png)*
+<img width="168" height="166" alt="image" src="https://github.com/user-attachments/assets/6e547f4e-e9db-41ca-99f7-8db9ebd9fd38" />
+<img width="174" height="166" alt="image" src="https://github.com/user-attachments/assets/db8fc78d-a604-42a7-877c-9d61e2a3bda9" />
+<img width="181" height="166" alt="image" src="https://github.com/user-attachments/assets/3d72c00c-6d24-4073-86de-f5f078d8ac8b" />
+<img width="175" height="166" alt="image" src="https://github.com/user-attachments/assets/63479de1-899f-43d5-9035-7b36563d26ca" />
+
 
 ### Els Enemics: Ecos Humans
 Antics tècnics atrapats fora del temps. Són energia inestable i radiació residual. Si et toquen, drenen la teva bateria ràpidament. Travessen parets.
 
-![Imatge del Fantasma](URL_DE_LA_TEVA_IMATGE_FANTASMA_AQUI)
+<img width="127" height="112" alt="image" src="https://github.com/user-attachments/assets/532cc39e-29ba-4fbf-8f71-a92fb2331676" />
+
 
 ### Objectius: Els Panells de Reinici
 Per reactivar les torres, cal trobar aquests objectes ocults als nivells:
