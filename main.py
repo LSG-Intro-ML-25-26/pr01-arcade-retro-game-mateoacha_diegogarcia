@@ -111,7 +111,7 @@ img_fantasma = img("""
 """)
 
 # CAMBIO 1: ROLLO DE CABLES (Antes Gema)
-img_gema = img("""
+img_cablenaranja = img("""
 . . . . . . . . . . . .
 . . . . . . . . . . . .
 . . . e e e e e . . . .
@@ -125,7 +125,7 @@ img_gema = img("""
 . . . . . . . . . . . .
 """)
 
-img_planta = img("""
+img_cableverde = img("""
 . . . . . . . . . . . .
 . . . . 7 7 7 7 . . . .
 . . . 7 6 6 7 7 7 . . .
@@ -139,7 +139,7 @@ img_planta = img("""
 . . . . . . . . . . . .
 """)
 
-img_libro = img("""
+img_cableamarillo = img("""
 . . . . 2 2 2 2 . . . . . . . .
 . . . 2 5 5 5 5 2 . . . . . . .
 . . 2 5 2 2 5 5 5 2 . . . . . .
@@ -292,19 +292,19 @@ def generar_mundo():
     lista_gema = tiles.get_tiles_by_type(assets.tile("""marcador_item1"""))
     for i in range(len(lista_gema)):
         loc = lista_gema[i]
-        crear_item("Panel Torre A", img_gema, loc, "mision")
+        crear_item("Panel Torre A", img_cablenaranja, loc, "mision")
         tiles.set_tile_at(loc, img_suelo_limpio)
 
     lista_planta = tiles.get_tiles_by_type(assets.tile("""marcador_item2"""))
     for i in range(len(lista_planta)):
         loc = lista_planta[i]
-        crear_item("Panel Torre B", img_planta, loc, "mision")
+        crear_item("Panel Torre B", img_cableverde, loc, "mision")
         tiles.set_tile_at(loc, img_suelo_limpio)
         
     lista_libro = tiles.get_tiles_by_type(assets.tile("""marcador_item3"""))
     for i in range(len(lista_libro)):
         loc = lista_libro[i]
-        crear_item("Panel Torre C", img_libro, loc, "mision")
+        crear_item("Panel Torre C", img_cableamarillo, loc, "mision")
         tiles.set_tile_at(loc, img_suelo_limpio)
 
 

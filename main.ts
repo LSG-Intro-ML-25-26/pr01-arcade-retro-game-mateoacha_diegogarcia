@@ -109,7 +109,7 @@ let img_fantasma = img`
 . . f . f . f . f . . .
 `
 //  CAMBIO 1: ROLLO DE CABLES (Antes Gema)
-let img_gema = img`
+let img_cablenaranja = img`
 . . . . . . . . . . . .
 . . . . . . . . . . . .
 . . . e e e e e . . . .
@@ -122,7 +122,7 @@ let img_gema = img`
 . . . e e e e e e e . .
 . . . . . . . . . . . .
 `
-let img_planta = img`
+let img_cableverde = img`
 . . . . . . . . . . . .
 . . . . 7 7 7 7 . . . .
 . . . 7 6 6 7 7 7 . . .
@@ -135,7 +135,7 @@ let img_planta = img`
 . . . . . . . . . . . .
 . . . . . . . . . . . .
 `
-let img_libro = img`
+let img_cableamarillo = img`
 . . . . 2 2 2 2 . . . . . . . .
 . . . 2 5 5 5 5 2 . . . . . . .
 . . 2 5 2 2 5 5 5 2 . . . . . .
@@ -290,19 +290,19 @@ function generar_mundo() {
     let lista_gema = tiles.getTilesByType(assets.tile`marcador_item1`)
     for (i = 0; i < lista_gema.length; i++) {
         loc = lista_gema[i]
-        crear_item("Panel Torre A", img_gema, loc, "mision")
+        crear_item("Panel Torre A", img_cablenaranja, loc, "mision")
         tiles.setTileAt(loc, img_suelo_limpio)
     }
     let lista_planta = tiles.getTilesByType(assets.tile`marcador_item2`)
     for (i = 0; i < lista_planta.length; i++) {
         loc = lista_planta[i]
-        crear_item("Panel Torre B", img_planta, loc, "mision")
+        crear_item("Panel Torre B", img_cableverde, loc, "mision")
         tiles.setTileAt(loc, img_suelo_limpio)
     }
     let lista_libro = tiles.getTilesByType(assets.tile`marcador_item3`)
     for (i = 0; i < lista_libro.length; i++) {
         loc = lista_libro[i]
-        crear_item("Panel Torre C", img_libro, loc, "mision")
+        crear_item("Panel Torre C", img_cableamarillo, loc, "mision")
         tiles.setTileAt(loc, img_suelo_limpio)
     }
 }
