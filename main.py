@@ -1,6 +1,5 @@
 """
-👑 BLACKOUT: ESPAÑA EDITION 👑
-(ACTUALIZADO: Objetos Nuevos - Cables y Caja de Herramientas)
+ BLACKOUT: ESPAÑA EDITION 
 """
 
 # --- 1. CLASES ---
@@ -110,7 +109,7 @@ img_fantasma = img("""
 . . f . f . f . f . . .
 """)
 
-# CAMBIO 1: ROLLO DE CABLES (Antes Gema)
+# CAMBIO 1: ROLLO DE CABLES 
 img_cablenaranja = img("""
 . . . . . . . . . . . .
 . . . . . . . . . . . .
@@ -167,7 +166,7 @@ img_salud = img("""
     . . . . 1 1 1 1 . . . .
 """)
 
-# CAMBIO 2: CAJA DE HERRAMIENTAS (Antes Caldero)
+# CAMBIO 2: CAJA DE HERRAMIENTAS
 img_caldero = img("""
     . . . . . . . . . . . .
     . . . . . . . . . . . .
@@ -260,10 +259,10 @@ def generar_mundo():
         tiles.set_current_tilemap(tilemap("""level01"""))
         game.splash("TORRE A", "Objetivo: 1 Panel")
     elif nivel_actual == 2:
-        tiles.set_current_tilemap(tilemap("""level0"""))
+        tiles.set_current_tilemap(tilemap("""level02"""))
         game.splash("TORRE B", "Objetivo: 2 Paneles")
     elif nivel_actual == 3:
-        tiles.set_current_tilemap(tilemap("""nivel0"""))
+        tiles.set_current_tilemap(tilemap("""level03"""))
         game.splash("TORRE C", "Objetivo: 3 Paneles")
 
     # Colocar Jugador
@@ -279,7 +278,7 @@ def generar_mundo():
         crear_enemigo(loc)
         tiles.set_tile_at(loc, img_suelo_limpio)
 
-    # Colocar Meta (Caldero/Centro Control)
+    # Colocar Caldero
     lista_caldero = tiles.get_tiles_by_type(assets.tile("""marcador_caldero"""))
     for i in range(len(lista_caldero)):
         loc = lista_caldero[i]
@@ -441,7 +440,7 @@ def on_torre_overlap(player, torre):
             nivel_actual = 1
             generar_mundo()
         else:
-            # AUMENTADO A 2000ms
+            
             player.say("Torre A: COMPLETADA", 2000)
             player.y += 16 # Empujamos al jugador para que no entre
             
@@ -451,11 +450,11 @@ def on_torre_overlap(player, torre):
             nivel_actual = 2
             generar_mundo()
         elif niveles_desbloqueados > 2:
-            # AUMENTADO A 2000ms
+           
             player.say("Torre B: COMPLETADA", 2000)
             player.y += 16
         else:
-            # AUMENTADO A 2000ms
+           
             player.say("¡Bloqueada! Termina la Torre A", 2000)
             player.y += 16
             
@@ -465,7 +464,7 @@ def on_torre_overlap(player, torre):
             nivel_actual = 3
             generar_mundo()
         else:
-            # AUMENTADO A 2000ms
+            
             player.say("¡Bloqueada! Termina la Torre B", 2000)
             player.y += 16
 
@@ -604,7 +603,7 @@ def menu_principal():
     # 3. PAUSA TÉCNICA
     pause(100)
 
-    # 4. AHORA SÍ, LA PREGUNTA
+
     jugar = game.ask("¿INICIAR MISION?", "A: Jugar  B: Controles")
     
     if jugar:
