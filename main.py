@@ -1,5 +1,6 @@
 """
-👑 THE ALCHEMIST👑
+👑 BLACKOUT: ESPAÑA EDITION 👑
+(ACTUALIZADO: Objetos Nuevos - Cables y Caja de Herramientas)
 """
 
 # --- 1. CLASES ---
@@ -7,7 +8,7 @@ class ItemJuego:
     def __init__(self, nombre: str, imagen: Image, tipo: str):
         self.nombre = nombre
         self.imagen = imagen
-        self.tipo = tipo # "mision" o "curacion"
+        self.tipo = tipo
         self.recogido = False
         self.sprite_fisico = None
 
@@ -15,102 +16,141 @@ class ItemJuego:
 items: List[ItemJuego] = []
 enemigos: List[Sprite] = []
 jugador: Sprite = None
-rey_npc: Sprite = None
 
-energia = 100.0
+energia = 999.0
 juego_activo = False
-mision_iniciada = False
+nivel_actual = 0
+niveles_desbloqueados = 1
 
-# Tipos de Sprite
+ultimo_estado_hero = "parado"
+
 KIND_ITEM = SpriteKind.create()
 KIND_META = SpriteKind.create()
 KIND_ENEMIGO = SpriteKind.enemy
 KIND_NPC = SpriteKind.create()
+KIND_TORRE = SpriteKind.create()
 
 # --- 3. ARTE PIXEL ---
 
-img_hero = img("""
-    . . . . 2 2 2 2 . . . .
-    . . . 2 2 2 2 2 2 . . .
-    . . 2 2 2 2 2 2 2 2 . .
-    . . 2 2 8 8 8 8 2 2 . .
-    . . 2 8 8 8 8 8 8 2 . .
-    . . 8 8 f f f f 8 8 . .
-    . . 8 f f 2 2 f f 8 . .
-    . . 8 f f f f f f 8 . .
-    . . 8 8 8 8 8 8 8 8 . .
-    . . f 8 8 8 8 8 8 f . .
-    . . f 8 5 5 5 5 8 f . .
-    . . . 8 5 5 5 5 8 . . .
-    . . . f f . . f f . . .
-    . . . . . . . . . . . .
+img_hero = assets.image("""hero_quieto""")
+
+# [TORRES BLANCAS]
+img_torre_a = img("""
+    . . . . . . . . . . . . . . . .
+    . . . . 1 1 1 1 1 1 1 1 . . . .
+    . . . . 1 c b b b b c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 d c c c c d 1 . . . .
+    . . . . 1 1 1 1 1 1 1 1 . . . .
+    . . . . 1 1 1 d d 1 1 1 . . . .
+    . . . . 1 1 1 d d 1 1 1 . . . .
+    . . . . 1 1 1 1 1 1 1 1 . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
 """)
 
-img_rey = img("""
-    . . . . 5 5 5 5 . . . .
-    . . . 5 5 4 4 5 5 . . .
-    . . 5 5 4 5 5 4 5 5 . .
-    . . 5 5 4 4 4 4 5 5 . .
-    . . . f f f f f f . . .
-    . . . f f 2 2 f f . . .
-    . . . f f f f f f . . .
-    . . . 5 5 5 5 5 5 . . .
-    . . . 5 4 5 5 4 5 . . .
-    . . . 5 5 5 5 5 5 . . .
-    . . . 5 5 5 5 5 5 . . .
-    . . . 5 5 . . 5 5 . . .
-    . . . . . . . . . . . .
-    . . . . . . . . . . . .
+img_torre_b = img("""
+    . . . . . . . . . . . . . . . .
+    . . . . . . 1 1 1 1 . . . . . .
+    . . . . . 1 c b b c 1 . . . . .
+    . . . . . 1 c 1 1 c 1 . . . . .
+    . . 1 1 1 1 c 1 1 c 1 1 1 1 . .
+    . . 1 c b b b b b b b b c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 d c c c c c c c c d 1 . .
+    . . 1 1 1 1 1 1 1 1 1 1 1 1 . .
+    . . 1 1 1 1 1 d d 1 1 1 1 1 . .
+    . . 1 1 1 1 1 d d 1 1 1 1 1 . .
+    . . 1 1 1 1 1 1 1 1 1 1 1 1 . .
 """)
 
+img_torre_c = img("""
+    . . . . . . . 1 1 . . . . . . .
+    . . . . . . 1 c c 1 . . . . . .
+    . . . . . 1 c b b c 1 . . . . .
+    . . . . . 1 c 1 1 c 1 . . . . .
+    . . 1 1 1 1 c 1 1 c 1 1 1 1 . .
+    . . 1 c b b b b b b b b c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    1 1 1 c 1 1 1 1 1 1 1 1 c 1 1 1
+    1 c b b b b b b b b b b b b c 1
+    1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+    1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+    1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+    1 d c c c c c c c c c c c c d 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 d d 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 d d 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+""")
+
+# [RESTO DE OBJETOS]
 img_fantasma = img("""
-    . . . . . . . . . . . .
-    . . . . 1 1 1 1 . . . .
-    . . . 1 1 1 1 1 1 . . .
-    . . 1 1 1 1 1 1 1 1 . .
-    . . 1 1 f 1 1 f 1 1 . .
-    . . 1 1 1 1 1 1 1 1 . .
-    . . 1 1 1 1 1 1 1 1 . .
-    . . 1 1 1 1 1 1 1 1 . .
-    . . 1 1 1 1 1 1 1 1 . .
-    . . 1 . 1 . 1 . 1 . . .
-    . . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . f 1 1 1 1 . . . .
+. . f 1 1 1 1 1 1 . . .
+. f 1 1 1 1 1 1 1 1 . .
+. f 1 1 f 1 1 f 1 1 . .
+. f 1 1 1 1 1 1 1 1 . .
+. f 1 1 1 1 1 1 1 1 . .
+. f 1 1 1 1 1 1 1 1 . .
+. f 1 1 1 1 1 1 1 1 . .
+. f 1 f 1 f 1 f 1 f . .
+. . f . f . f . f . . .
 """)
 
-img_gema = img("""
-    . . . . . . . . . . . .
-    . . . . . 2 2 . . . . .
-    . . . . 2 4 4 2 . . . .
-    . . . 2 4 2 2 4 2 . . .
-    . . . 2 4 2 2 4 2 . . .
-    . . . 2 4 4 4 4 2 . . .
-    . . . . 2 4 4 2 . . . .
-    . . . . . 2 2 . . . . .
-    . . . . . . . . . . . .
+# CAMBIO 1: ROLLO DE CABLES (Antes Gema)
+img_cablenaranja = img("""
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . e e e e e . . . .
+. . e 4 4 4 4 4 e . . .
+. e 4 e e e e 4 4 e . .
+. e 4 e 5 5 e e 4 e . .
+. e 4 e 5 5 e e 4 e . 4
+. e 4 e e e e 4 4 e 4 e
+. . e 4 4 4 4 4 e 4 e .
+. . . e e e e e e e . .
+. . . . . . . . . . . .
 """)
 
-img_planta = img("""
-    . . . . . . . . . . . .
-    . . . . . . 7 . . . . .
-    . . . . . 7 7 . . . . .
-    . . . 7 . 7 7 . 7 . . .
-    . . . 7 7 7 7 7 7 . . .
-    . . . . 7 7 7 7 . . . .
-    . . . . 7 7 7 7 . . . .
-    . . . . . 7 7 . . . . .
-    . . . . . . . . . . . .
+img_cableverde = img("""
+. . . . . . . . . . . .
+. . . . 7 7 7 7 . . . .
+. . . 7 6 6 7 7 7 . . .
+. . 7 6 7 7 7 6 7 7 . .
+. 7 6 7 7 7 7 7 6 7 . .
+. 7 6 7 7 7 7 7 6 7 . .
+. . 7 6 7 7 7 6 7 . . .
+. . . 7 6 6 7 7 . . . .
+. . . . 7 7 7 . 7 7 . .
+. . . . . . . . . . . .
+. . . . . . . . . . . .
 """)
 
-img_libro = img("""
-    . . . . . . . . . . . .
-    . . . b b b b . . . . .
-    . . b 1 1 1 1 b . . . .
-    . b 1 1 1 1 1 1 b . . .
-    . b c c c c c c b . . .
-    . b c c c c c c b . . .
-    . b c c c c c c b . . .
-    . b 1 1 1 1 1 1 b . . .
-    . . b b b b b b . . . .
+img_cableamarillo = img("""
+. . . . 2 2 2 2 . . . . . . . .
+. . . 2 5 5 5 5 2 . . . . . . .
+. . 2 5 2 2 5 5 5 2 . . . . . .
+. 2 5 2 5 5 5 2 5 5 2 . . . . .
+2 5 2 5 5 5 5 5 2 5 2 . . . . .
+2 5 2 5 5 5 5 5 2 5 2 . . . . .
+. 2 5 2 5 5 5 2 5 2 . . . . . .
+. . 2 5 2 2 5 5 2 2 2 . . . . .
+. . . 2 5 5 5 2 5 5 5 5 . . . .
+. . . . 2 2 2 2 2 2 2 2 . . . .
+. . . . . . . . . . . . . . . .
 """)
 
 img_salud = img("""
@@ -127,54 +167,37 @@ img_salud = img("""
     . . . . 1 1 1 1 . . . .
 """)
 
+# CAMBIO 2: CAJA DE HERRAMIENTAS (Antes Caldero)
 img_caldero = img("""
     . . . . . . . . . . . .
-    . . . b b . . b b . . .
-    . . b 1 1 b b 1 1 b . .
-    . b 1 1 1 1 1 1 1 1 b .
-    . b 1 2 2 5 5 2 2 1 b .
-    . b 1 2 5 5 5 5 2 1 b .
-    . b b 2 5 5 5 5 2 b b .
-    . . b 2 2 5 5 2 2 b . .
-    . . . b b b b b b . . .
-    . . . d . . . . d . . .
-    . . d . . . . . . d . .
+    . . . . . . . . . . . .
+    . . . . 1 1 1 1 . . . .
+    . . . . 1 . . 1 . . . .
+    . . 2 2 2 2 2 2 2 2 . .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . 2 2 1 1 1 1 1 1 2 2 .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . . . . . . . . . . . .
 """)
 
-img_suelo = img("""
-    c c b c c c b c c c b c c c b c
-    c c b c c c b c c c b c c c b c
-    b b b b b b b b b b b b b b b b
-    c b c c c b c c c b c c c b c c
-    c b c c c b c c c b c c c b c c
-    b b b b b b b b b b b b b b b b
-    c c c b c c c b c c c b c c c b
-    c c c b c c c b c c c b c c c b
-    b b b b b b b b b b b b b b b b
-    c c b c c c b c c c b c c c b c
-    c c b c c c b c c c b c c c b c
-    b b b b b b b b b b b b b b b b
-    c b c c c b c c c b c c c b c c
-    c b c c c b c c c b c c c b c c
-    b b b b b b b b b b b b b b b b
-    c c c b c c c b c c c b c c c b
-""")
-
-img_pared = img("""
+# Tile de suelo metálico
+img_suelo_limpio = img("""
     b b b b b b b b b b b b b b b b
     b d d d d d d d d d d d d d d b
     b d c c c c c c c c c c c c d b
-    b d c b b b c b b b c b b b c b
-    b d c b b b c b b b c b b b c b
-    b d c c c c c c c c c c c c c b
-    b d c b b b c b b b c b b b c b
-    b d c c c c c c c c c c c c c b
-    b d c c c c c c c c c c c c c b
-    b d c b b b c b b b c b b b c b
-    b d c b b b c b b b c b b b c b
-    b d c c c c c c c c c c c c c b
-    b d c b b b c b b b c b b b c b
-    b d c b b b c b b b c b b b c b
+    b d c 1 c c c c c c c c 1 c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c 1 c c c c c c c c d b
+    b d c c 1 1 1 c c c c c c c d b
+    b d c c c 1 c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c 1 c c c c c c c c 1 c d b
+    b d c c c c c c c c c c c c d b
     b d d d d d d d d d d d d d d b
     b b b b b b b b b b b b b b b b
 """)
@@ -182,83 +205,116 @@ img_pared = img("""
 # --- 4. MAPA Y ENTIDADES ---
 
 def generar_mundo():
+    global nivel_actual, items
+    
+    # Limpieza
+    items = []
+    sprites.destroy_all_sprites_of_kind(KIND_ENEMIGO)
+    sprites.destroy_all_sprites_of_kind(KIND_META)
+    sprites.destroy_all_sprites_of_kind(KIND_ITEM)
+    sprites.destroy_all_sprites_of_kind(KIND_TORRE)
+    
     scene.set_background_color(13)
-    # IMPORTANTE: Configurar mapa en el editor a 20x15
-    tiles.set_current_tilemap(tilemap("""level1"""))
-    
-    # N = NPC, S = Start, P = Pocion
-    nivel = [
-        "WWWWWWWWWWWWWWWWWWWW",
-        "W.S..N.............W",
-        "W.WWWWWWW.WW.WWWWW.W",
-        "W.W.....W.WW.W...W.W",
-        "W.W.1...W.WW.W.2.W.W",
-        "W.WWWWWWW.WW.WWWWW.W",
-        "W.........E........W",
-        "WWWWWWWW.....WWWWWWW",
-        "W......E...........W",
-        "W.WWWWWWW...WWWWWW.W",
-        "W.W.....W...W....W.W",
-        "W.W.3.......W..C.W.W",
-        "W.WWWWWWWW.WWWWWWW.W",
-        "W.........P........W",
-        "WWWWWWWWWWWWWWWWWWWW"
-    ]
-    
-    filas = len(nivel)
-    cols = len(nivel[0])
-    
-    for r in range(filas):
-        fila = nivel[r]
-        for c in range(cols):
-            char = fila[c]
-            loc = tiles.get_tile_location(c, r)
-            
-            # 1. Suelo
-            tiles.set_tile_at(loc, img_suelo)
-            
-            # 2. Elementos
-            if char == "W":
-                tiles.set_tile_at(loc, img_pared)
-                tiles.set_wall_at(loc, True)
-            
-            elif char == "C":
-                caldero = sprites.create(img_caldero, KIND_META)
-                tiles.place_on_tile(caldero, loc)
-                caldero.start_effect(effects.fountain, 50000)
-            
-            elif char == "S":
-                tiles.place_on_tile(jugador, loc)
-            
-            elif char == "N":
-                crear_rey(loc)
 
-            elif char == "E":
-                crear_enemigo(loc)
-                
-            elif char == "P":
-                crear_item("Pocion Salud", img_salud, loc, "curacion")
+    # --- CASO 0: MAPA GENERAL ---
+    if nivel_actual == 0:
+        tiles.set_current_tilemap(tilemap("""mapa_general"""))
+        game.splash("MAPA DE ESPAÑA", "Busca la Torre A")
+        
+        # Colocar Jugador
+        lista_jugador = tiles.get_tiles_by_type(assets.tile("""marcador_jugador"""))
+        if len(lista_jugador) > 0:
+            tiles.place_on_tile(jugador, lista_jugador[0])
+            tiles.set_tile_at(lista_jugador[0], img_suelo_limpio)
             
-            elif char == "1":
-                crear_item("Gema Magica", img_gema, loc, "mision")
-            elif char == "2":
-                crear_item("Hierba Santa", img_planta, loc, "mision")
-            elif char == "3":
-                crear_item("Libro Antiguo", img_libro, loc, "mision")
+        # COLOCAR TORRES
+        
+        # Torre A
+        lista_torre_a = tiles.get_tiles_by_type(assets.tile("""marcador_torre_a"""))
+        for i in range(len(lista_torre_a)):
+            loc = lista_torre_a[i]
+            t = sprites.create(img_torre_a, KIND_TORRE)
+            tiles.place_on_tile(t, loc)
+            tiles.set_tile_at(loc, img_suelo_limpio)
+            
+        # Torre B
+        lista_torre_b = tiles.get_tiles_by_type(assets.tile("""marcador_torre_b"""))
+        for i in range(len(lista_torre_b)):
+            loc = lista_torre_b[i]
+            t = sprites.create(img_torre_b, KIND_TORRE)
+            tiles.place_on_tile(t, loc)
+            tiles.set_tile_at(loc, img_suelo_limpio)
 
-def crear_rey(loc: tiles.Location):
-    global rey_npc
-    rey_npc = sprites.create(img_rey, KIND_NPC)
-    tiles.place_on_tile(rey_npc, loc)
-    rey_npc.start_effect(effects.smiles, 50000)
+        # Torre C
+        lista_torre_c = tiles.get_tiles_by_type(assets.tile("""marcador_torre_c"""))
+        for i in range(len(lista_torre_c)):
+            loc = lista_torre_c[i]
+            t = sprites.create(img_torre_c, KIND_TORRE)
+            tiles.place_on_tile(t, loc)
+            tiles.set_tile_at(loc, img_suelo_limpio)
+            
+        return
+
+    # --- CASO NIVELES (1, 2, 3) ---
+    if nivel_actual == 1:
+        tiles.set_current_tilemap(tilemap("""level01"""))
+        game.splash("TORRE A", "Objetivo: 1 Panel")
+    elif nivel_actual == 2:
+        tiles.set_current_tilemap(tilemap("""level0"""))
+        game.splash("TORRE B", "Objetivo: 2 Paneles")
+    elif nivel_actual == 3:
+        tiles.set_current_tilemap(tilemap("""nivel0"""))
+        game.splash("TORRE C", "Objetivo: 3 Paneles")
+
+    # Colocar Jugador
+    lista_jugador = tiles.get_tiles_by_type(assets.tile("""marcador_jugador"""))
+    if len(lista_jugador) > 0:
+        tiles.place_on_tile(jugador, lista_jugador[0])
+        tiles.set_tile_at(lista_jugador[0], img_suelo_limpio)
+
+    # Colocar Enemigos
+    lista_enemigos = tiles.get_tiles_by_type(assets.tile("""marcador_enemigo"""))
+    for i in range(len(lista_enemigos)):
+        loc = lista_enemigos[i]
+        crear_enemigo(loc)
+        tiles.set_tile_at(loc, img_suelo_limpio)
+
+    # Colocar Meta (Caldero/Centro Control)
+    lista_caldero = tiles.get_tiles_by_type(assets.tile("""marcador_caldero"""))
+    for i in range(len(lista_caldero)):
+        loc = lista_caldero[i]
+        caldero = sprites.create(img_caldero, KIND_META)
+        tiles.place_on_tile(caldero, loc)
+        caldero.start_effect(effects.fountain, 50000)
+        tiles.set_tile_at(loc, img_suelo_limpio)
+    
+    # Colocar Items
+    lista_gema = tiles.get_tiles_by_type(assets.tile("""marcador_item1"""))
+    for i in range(len(lista_gema)):
+        loc = lista_gema[i]
+        crear_item("Panel Torre A", img_cablenaranja, loc, "mision")
+        tiles.set_tile_at(loc, img_suelo_limpio)
+
+    lista_planta = tiles.get_tiles_by_type(assets.tile("""marcador_item2"""))
+    for i in range(len(lista_planta)):
+        loc = lista_planta[i]
+        crear_item("Panel Torre B", img_cableverde, loc, "mision")
+        tiles.set_tile_at(loc, img_suelo_limpio)
+        
+    lista_libro = tiles.get_tiles_by_type(assets.tile("""marcador_item3"""))
+    for i in range(len(lista_libro)):
+        loc = lista_libro[i]
+        crear_item("Panel Torre C", img_cableamarillo, loc, "mision")
+        tiles.set_tile_at(loc, img_suelo_limpio)
+
 
 def crear_enemigo(loc: tiles.Location):
     ene = sprites.create(img_fantasma, KIND_ENEMIGO)
     tiles.place_on_tile(ene, loc)
-    ene.follow(jugador, 25)
+    ene.follow(jugador, 20)
+    ene.set_flag(SpriteFlag.GHOST_THROUGH_WALLS, True)
 
 def crear_item(nombre: str, img_obj: Image, loc: tiles.Location, tipo: str):
-    # Items de curación no se guardan
     if tipo == "curacion":
         spr = sprites.create(img_obj, KIND_ITEM)
         tiles.place_on_tile(spr, loc)
@@ -267,20 +323,19 @@ def crear_item(nombre: str, img_obj: Image, loc: tiles.Location, tipo: str):
         items.append(nuevo_item)
         return
 
-    # Items de misión
     nuevo_item = ItemJuego(nombre, img_obj, tipo)
     items.append(nuevo_item)
     
-    if settings.read_number("got_" + nombre) == 1:
-        nuevo_item.recogido = True
-    else:
-        spr = sprites.create(img_obj, KIND_ITEM)
-        tiles.place_on_tile(spr, loc)
-        spr.start_effect(effects.halo, 50000)
-        nuevo_item.sprite_fisico = spr
+    spr = sprites.create(img_obj, KIND_ITEM)
+    tiles.place_on_tile(spr, loc)
+    spr.start_effect(effects.halo, 50000)
+    nuevo_item.sprite_fisico = spr
 
 def setup_hero():
     global jugador
+    if jugador:
+        jugador.destroy()
+
     jugador = sprites.create(img_hero, SpriteKind.player)
     controller.move_sprite(jugador, 80, 80)
     scene.camera_follow_sprite(jugador)
@@ -289,14 +344,13 @@ def setup_hero():
 # --- 5. LÓGICA DEL JUEGO ---
 
 def bucle_principal():
-    global energia, juego_activo
+    global energia, juego_activo, ultimo_estado_hero
     
     if not juego_activo: return
 
     velocidad = 80
     gasto = 0.05
 
-    # SPRINT (Correr)
     if controller.A.is_pressed():
         velocidad = 120
         gasto = 0.2
@@ -304,11 +358,37 @@ def bucle_principal():
     
     controller.move_sprite(jugador, velocidad, velocidad)
 
-    # Gasto de energía
-    if controller.left.is_pressed() or controller.right.is_pressed() or controller.up.is_pressed() or controller.down.is_pressed():
-        energia -= gasto
+    # --- ANIMACIÓN ---
+    estado_actual = "parado"
 
-    # HUD (Sin cambiar color para evitar errores)
+    if controller.left.is_pressed():
+        estado_actual = "izquierda"
+        energia -= gasto
+    elif controller.right.is_pressed():
+        estado_actual = "derecha"
+        energia -= gasto
+    elif controller.up.is_pressed():
+        estado_actual = "arriba"
+        energia -= gasto
+    elif controller.down.is_pressed():
+        estado_actual = "abajo"
+        energia -= gasto
+    
+    if estado_actual != ultimo_estado_hero:
+        animation.stop_animation(animation.AnimationTypes.ALL, jugador)
+        if estado_actual == "izquierda":
+            animation.run_image_animation(jugador, assets.animation("""anim_hero_izquierda"""), 100, True)
+        elif estado_actual == "derecha":
+            animation.run_image_animation(jugador, assets.animation("""anim_hero_derecha"""), 100, True)
+        elif estado_actual == "arriba":
+            animation.run_image_animation(jugador, assets.animation("""anim_hero_arriba"""), 100, True)
+        elif estado_actual == "abajo":
+            animation.run_image_animation(jugador, assets.animation("""anim_hero_abajo"""), 100, True)
+        elif estado_actual == "parado":
+            jugador.set_image(img_hero)
+
+        ultimo_estado_hero = estado_actual
+
     info.set_score(int(energia))
     
     if energia <= 0:
@@ -316,39 +396,26 @@ def bucle_principal():
 
 game.on_update(bucle_principal)
 
-# INTERACCIÓN NPC
-def on_npc_overlap(player, npc):
-    global mision_iniciada
-    if not mision_iniciada:
-        game.show_long_text("REY: ¡Alquimista!\nUna plaga destruye mi reino.\nEncuentra los 3 objetos sagrados y llevalos al caldero.", DialogLayout.BOTTOM)
-        game.show_long_text("REY: Ten cuidado con los fantasmas.\n¡Ve y salvanos!", DialogLayout.BOTTOM)
-        mision_iniciada = True
-        player.y += 16
-
-sprites.on_overlap(SpriteKind.player, KIND_NPC, on_npc_overlap)
-
 # INTERACCIÓN ITEMS
 def on_item_overlap(player, other):
     global energia
     for it in items:
         if it.sprite_fisico == other:
-            
             if it.tipo == "curacion":
-                energia = min(100, energia + 30)
+                energia = min(999, energia + 30)
                 other.destroy(effects.hearts, 500)
                 music.power_up.play()
-                player.say("Recuperado!", 500)
-                # No usamos remove, solo lo marcamos como recogido
+                # AUMENTADO A 2000ms
+                player.say("Recuperado!", 2000)
                 it.recogido = True
                 break
 
             if it.tipo == "mision":
                 it.recogido = True
-                other.destroy(effects.confetti, 500)
+                other.destroy()
                 music.magic_wand.play()
-                energia = min(100, energia + 10)
+                energia = min(999, energia + 10)
                 game.show_long_text("¡Conseguido!\n" + it.nombre, DialogLayout.BOTTOM)
-                settings.write_number("got_" + it.nombre, 1)
                 break
 
 sprites.on_overlap(SpriteKind.player, KIND_ITEM, on_item_overlap)
@@ -359,63 +426,246 @@ def on_enemy_overlap(player, enemy):
     energia -= 5
     scene.camera_shake(4, 200)
     music.zapped.play()
-    
-    if player.x < enemy.x:
-        player.x -= 16
-    else:
-        player.x += 16
-    
-    player.say("¡Ay!", 500)
+    pause(200)
 
 sprites.on_overlap(SpriteKind.player, KIND_ENEMIGO, on_enemy_overlap)
 
-# INTERACCIÓN META
-def on_meta_overlap(player, meta):
-    faltan = False
-    for i in items:
-        if i.tipo == "mision" and not i.recogido:
-            faltan = True
+# --- INTERACCIÓN CON LAS TORRES (ENTRADA A NIVELES) ---
+# --- AQUI ESTA LA MAGIA DEL BLOQUEO ---
+def on_torre_overlap(player, torre):
+    global nivel_actual, niveles_desbloqueados
     
-    if not faltan:
+    # TORRE A
+    if torre.image == img_torre_a:
+        if niveles_desbloqueados == 1:
+            nivel_actual = 1
+            generar_mundo()
+        else:
+            # AUMENTADO A 2000ms
+            player.say("Torre A: COMPLETADA", 2000)
+            player.y += 16 # Empujamos al jugador para que no entre
+            
+    # TORRE B
+    elif torre.image == img_torre_b:
+        if niveles_desbloqueados == 2:
+            nivel_actual = 2
+            generar_mundo()
+        elif niveles_desbloqueados > 2:
+            # AUMENTADO A 2000ms
+            player.say("Torre B: COMPLETADA", 2000)
+            player.y += 16
+        else:
+            # AUMENTADO A 2000ms
+            player.say("¡Bloqueada! Termina la Torre A", 2000)
+            player.y += 16
+            
+    # TORRE C
+    elif torre.image == img_torre_c:
+        if niveles_desbloqueados == 3:
+            nivel_actual = 3
+            generar_mundo()
+        else:
+            # AUMENTADO A 2000ms
+            player.say("¡Bloqueada! Termina la Torre B", 2000)
+            player.y += 16
+
+sprites.on_overlap(SpriteKind.player, KIND_TORRE, on_torre_overlap)
+
+# INTERACCIÓN CALDERO (COMPLETAR NIVEL)
+def on_meta_overlap(player, meta):
+    global nivel_actual, niveles_desbloqueados
+    
+    objetivos: List[str] = []
+    
+    if nivel_actual == 1:
+        objetivos = ["Panel Torre A"]
+    elif nivel_actual == 2:
+        objetivos = ["Panel Torre A", "Panel Torre B"]
+    elif nivel_actual == 3:
+        objetivos = ["Panel Torre A", "Panel Torre B", "Panel Torre C"]
+    
+    faltan: List[str] = []
+    
+    for obj_nombre in objetivos:
+        tenemos_este = False
+        for it in items:
+            if it.nombre == obj_nombre and it.recogido:
+                tenemos_este = True
+                break
+        if not tenemos_este:
+            faltan.append(obj_nombre)
+            
+    if len(faltan) == 0:
         music.ba_ding.play()
-        game.over(True, effects.star_field)
+        
+        if nivel_actual == 1:
+            game.show_long_text("Torre A reactivada.\nVolviendo al mapa...", DialogLayout.BOTTOM)
+            niveles_desbloqueados = 2
+            nivel_actual = 0 # Volver al mapa
+            generar_mundo()
+            
+        elif nivel_actual == 2:
+            game.show_long_text("Torre B reactivada.\nVolviendo al mapa...", DialogLayout.BOTTOM)
+            niveles_desbloqueados = 3
+            nivel_actual = 0 # Volver al mapa
+            generar_mundo()
+            
+        elif nivel_actual == 3:
+            game.over(True, effects.star_field) # FIN DEL JUEGO
+            
     else:
-        player.say("Necesito los 3 objetos!", 1000)
-        player.y -= 10
+        player.y += 10
+        scene.camera_shake(2, 200)
+        texto_falta = "Faltan:\n"
+        for f in faltan:
+            texto_falta += "- " + f + "\n"
+        game.show_long_text(texto_falta, DialogLayout.BOTTOM)
 
 sprites.on_overlap(SpriteKind.player, KIND_META, on_meta_overlap)
 
-# --- 6. MENÚS Y ARRANQUE ---
+# --- 6. HISTORIA Y MENÚS ---
+
+def introduccion_historia():
+    scene.set_background_color(15)
+
+    # 1. CIUDAD
+    scene.set_background_image(assets.image("""intro_ciudad"""))
+   
+    game.show_long_text("ESPAÑA\n02:17 A.M.", DialogLayout.BOTTOM)
+    
+    music.big_crash.play()
+    game.show_long_text("LA RED...\nSE APAGA.", DialogLayout.BOTTOM)
+    game.show_long_text("No fue un fallo.\nNi un ataque.", DialogLayout.BOTTOM)
+    
+    # 2. RAYO
+    scene.set_background_image(assets.image("""intro_rayo"""))
+    game.show_long_text("La electricidad\nsimplemente...", DialogLayout.BOTTOM)
+    game.show_long_text("DESAPARECIO.", DialogLayout.BOTTOM)
+    game.show_long_text("Las torres entraron\nen contencion.", DialogLayout.BOTTOM)
+    game.show_long_text("Los sistemas\nquedaron bajo tierra.", DialogLayout.BOTTOM)
+
+    # 3. MAPA
+    scene.set_background_image(assets.image("""intro_mapa"""))
+    game.show_long_text("Los tecnicos\nnunca salieron.", DialogLayout.BOTTOM)
+    game.show_long_text("Algo de ellos\nsigue abajo.", DialogLayout.BOTTOM)
+
+    game.show_long_text("SENSORES ACTIVOS:", DialogLayout.BOTTOM)
+    game.show_long_text("Detectando\nRadiacion residual...", DialogLayout.BOTTOM)
+    game.show_long_text("Detectando\nEnergia inestable...", DialogLayout.BOTTOM)
+    game.show_long_text("Detectando\nEcos humanos...", DialogLayout.BOTTOM)
+
+    # 4. HÉROE
+    scene.set_background_image(assets.image("""intro_heroe"""))
+    music.beam_up.play()
+    game.show_long_text("Eres un\nOPERADOR DE\nCONTINGENCIA.", DialogLayout.BOTTOM)
+    game.show_long_text("Tu traje te protege.\nPero tu energia\nNO es infinita.", DialogLayout.BOTTOM)
+
+    game.show_long_text("MISION PRIORITY:", DialogLayout.BOTTOM)
+    game.show_long_text("Recuperar los\nPANELES DE REINICIO\nde los sotanos.", DialogLayout.BOTTOM)
+
+    # Volvemos al MAPA
+    scene.set_background_image(assets.image("""intro_mapa"""))
+    game.show_long_text("ADVERTENCIA:\nEl sistema exige\nun orden exacto.", DialogLayout.BOTTOM)
+    
+    game.show_long_text("FASE 1:\nIr a Torre A", DialogLayout.BOTTOM)
+    game.show_long_text("FASE 2:\nIr a Torre B", DialogLayout.BOTTOM)
+    game.show_long_text("FASE 3:\nIr a Torre C", DialogLayout.BOTTOM)
+
+    scene.set_background_image(None)
+    scene.set_background_color(15)
+
+    game.show_long_text("Si fallas,\nla red caera\npara siempre.", DialogLayout.CENTER)
+    game.show_long_text("Si tienes exito...\nEspaña volvera\na encenderse.", DialogLayout.CENTER)
+    game.show_long_text("A cualquier precio.", DialogLayout.CENTER)
 
 def mostrar_inventari():
-    texto = "MOCHILA:\n"
+    texto = "EQUIPO:\n"
+    encontrados = 0
     for i in items:
-        if i.tipo == "mision":
-            estado = "[X] " if i.recogido else "[ ] "
-            texto += estado + i.nombre + "\n"
+        if i.tipo == "mision" and i.recogido:
+            texto += "[ON] " + i.nombre + "\n"
+            encontrados += 1
+    
+    if encontrados == 0:
+        texto += "(Sin energia)"
+        
     game.show_long_text(texto, DialogLayout.FULL)
 
-def inicio():
-    global juego_activo, energia
-    game.splash("THE ALCHEMIST", "Platinum Edition")
+def menu_principal():
+    # 1. LIMPIEZA TOTAL
+    scene.set_background_color(15) # Fondo negro (15)
+    scene.set_background_image(None) # Quitar cualquier imagen anterior
+
+    # 2. FONDO NEGRO FORZADO
+    bg_negro = image.create(160, 120)
+    bg_negro.fill(15)
+    scene.set_background_image(bg_negro)
+
+    # 3. PAUSA TÉCNICA
+    pause(100)
+
+    # 4. AHORA SÍ, LA PREGUNTA
+    jugar = game.ask("¿INICIAR MISION?", "A: Jugar  B: Controles")
     
-    opcion = game.ask_for_number("1. Jugar\n2. Borrar Progreso", 1)
+    if jugar:
+        # Pulsó A -> Jugar
+        comenzar_juego()
+    else:
+        # Pulsó B -> Controles (TABS)
+        
+        # TAB 1: MOVIMIENTO
+        bg_controles = image.create(160, 120)
+        bg_controles.fill(15)
+        bg_controles.print_center("CONTROLES (1/3)", 5, 1)
+        bg_controles.print("MOVIMIENTO:", 10, 30, 1)
+        bg_controles.print("Usa FLECHAS", 20, 45, 6)
+        bg_controles.print("o teclas WASD", 20, 60, 6)
+        scene.set_background_image(bg_controles)
+        game.show_long_text("Siguiente: Pulsa (A)", DialogLayout.BOTTOM)
+        
+        # TAB 2: ACCIÓN
+        bg_controles.fill(15)
+        bg_controles.print_center("CONTROLES (2/3)", 5, 1)
+        bg_controles.print("ACCION:", 10, 30, 1)
+        bg_controles.print("Pulsa ESPACIO", 20, 45, 6)
+        bg_controles.print("o Boton (A)", 20, 60, 6)
+        scene.set_background_image(bg_controles)
+        game.show_long_text("Siguiente: Pulsa (A)", DialogLayout.BOTTOM)
+        
+        # TAB 3: CORRER
+        bg_controles.fill(15)
+        bg_controles.print_center("CONTROLES (3/3)", 5, 1)
+        bg_controles.print("CORRER:", 10, 30, 1)
+        bg_controles.print("Manten ESPACIO", 20, 45, 6)
+        bg_controles.print("mientras andas", 20, 60, 6)
+        scene.set_background_image(bg_controles)
+        game.show_long_text("Volver al menu: (A)", DialogLayout.BOTTOM)
+
+        # RECURSIVIDAD: Volvemos al inicio de esta función
+        menu_principal()
+
+def comenzar_juego():
+    global juego_activo, energia, nivel_actual, items
     
-    if opcion == 2:
-        settings.write_number("got_Gema Magica", 0)
-        settings.write_number("got_Hierba Santa", 0)
-        settings.write_number("got_Libro Antiguo", 0)
-        game.splash("Memoria borrada")
+    introduccion_historia()
 
     setup_hero()
-    # Botón B activa inventario
     controller.B.on_event(ControllerButtonEvent.PRESSED, mostrar_inventari)
     
-    generar_mundo()
-    energia = 100.0
-    juego_activo = True
+    items = []
     
-    game.show_long_text("CONTROLES:\nA = Correr\nB = Inventario\n\nHabla con el REY para empezar.", DialogLayout.FULL)
+    # EMPEZAMOS EN EL MAPA (Nivel 0)
+    nivel_actual = 0
+    energia = 999.0
+    
+    generar_mundo()
+    
+    juego_activo = True
 
-# ¡ARRANCAR MOTOR!
-inicio()
+# --- INICIO DEL PROGRAMA ---
+
+# Primero mostramos el título (Splash) una sola vez
+game.splash("BLACKOUT", "España Edition")
+
+# Luego entramos al menú principal
+menu_principal()

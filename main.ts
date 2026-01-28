@@ -1,4 +1,8 @@
-/** 👑 THE ALCHEMIST👑 */
+/** 
+👑 BLACKOUT: ESPAÑA EDITION 👑
+(ACTUALIZADO: Objetos Nuevos - Cables y Caja de Herramientas)
+
+ */
 //  --- 1. CLASES ---
 class ItemJuego {
     nombre: string
@@ -10,7 +14,6 @@ class ItemJuego {
         this.nombre = nombre
         this.imagen = imagen
         this.tipo = tipo
-        //  "mision" o "curacion"
         this.recogido = false
         this.sprite_fisico = null
     }
@@ -21,93 +24,129 @@ class ItemJuego {
 let items : ItemJuego[] = []
 let enemigos : Sprite[] = []
 let jugador : Sprite = null
-let rey_npc : Sprite = null
-let energia = 100.0
+let energia = 999.0
 let juego_activo = false
-let mision_iniciada = false
-//  Tipos de Sprite
+let nivel_actual = 0
+let niveles_desbloqueados = 1
+let ultimo_estado_hero = "parado"
 let KIND_ITEM = SpriteKind.create()
 let KIND_META = SpriteKind.create()
 let KIND_ENEMIGO = SpriteKind.Enemy
 let KIND_NPC = SpriteKind.create()
+let KIND_TORRE = SpriteKind.create()
 //  --- 3. ARTE PIXEL ---
-let img_hero = img`
-    . . . . 2 2 2 2 . . . .
-    . . . 2 2 2 2 2 2 . . .
-    . . 2 2 2 2 2 2 2 2 . .
-    . . 2 2 8 8 8 8 2 2 . .
-    . . 2 8 8 8 8 8 8 2 . .
-    . . 8 8 f f f f 8 8 . .
-    . . 8 f f 2 2 f f 8 . .
-    . . 8 f f f f f f 8 . .
-    . . 8 8 8 8 8 8 8 8 . .
-    . . f 8 8 8 8 8 8 f . .
-    . . f 8 5 5 5 5 8 f . .
-    . . . 8 5 5 5 5 8 . . .
-    . . . f f . . f f . . .
-    . . . . . . . . . . . .
+let img_hero = assets.image`hero_quieto`
+//  [TORRES BLANCAS]
+let img_torre_a = img`
+    . . . . . . . . . . . . . . . .
+    . . . . 1 1 1 1 1 1 1 1 . . . .
+    . . . . 1 c b b b b c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 c 1 1 1 1 c 1 . . . .
+    . . . . 1 d c c c c d 1 . . . .
+    . . . . 1 1 1 1 1 1 1 1 . . . .
+    . . . . 1 1 1 d d 1 1 1 . . . .
+    . . . . 1 1 1 d d 1 1 1 . . . .
+    . . . . 1 1 1 1 1 1 1 1 . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
 `
-let img_rey = img`
-    . . . . 5 5 5 5 . . . .
-    . . . 5 5 4 4 5 5 . . .
-    . . 5 5 4 5 5 4 5 5 . .
-    . . 5 5 4 4 4 4 5 5 . .
-    . . . f f f f f f . . .
-    . . . f f 2 2 f f . . .
-    . . . f f f f f f . . .
-    . . . 5 5 5 5 5 5 . . .
-    . . . 5 4 5 5 4 5 . . .
-    . . . 5 5 5 5 5 5 . . .
-    . . . 5 5 5 5 5 5 . . .
-    . . . 5 5 . . 5 5 . . .
-    . . . . . . . . . . . .
-    . . . . . . . . . . . .
+let img_torre_b = img`
+    . . . . . . . . . . . . . . . .
+    . . . . . . 1 1 1 1 . . . . . .
+    . . . . . 1 c b b c 1 . . . . .
+    . . . . . 1 c 1 1 c 1 . . . . .
+    . . 1 1 1 1 c 1 1 c 1 1 1 1 . .
+    . . 1 c b b b b b b b b c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 d c c c c c c c c d 1 . .
+    . . 1 1 1 1 1 1 1 1 1 1 1 1 . .
+    . . 1 1 1 1 1 d d 1 1 1 1 1 . .
+    . . 1 1 1 1 1 d d 1 1 1 1 1 . .
+    . . 1 1 1 1 1 1 1 1 1 1 1 1 . .
 `
+let img_torre_c = img`
+    . . . . . . . 1 1 . . . . . . .
+    . . . . . . 1 c c 1 . . . . . .
+    . . . . . 1 c b b c 1 . . . . .
+    . . . . . 1 c 1 1 c 1 . . . . .
+    . . 1 1 1 1 c 1 1 c 1 1 1 1 . .
+    . . 1 c b b b b b b b b c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    . . 1 c 1 1 1 1 1 1 1 1 c 1 . .
+    1 1 1 c 1 1 1 1 1 1 1 1 c 1 1 1
+    1 c b b b b b b b b b b b b c 1
+    1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+    1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+    1 c 1 1 1 1 1 1 1 1 1 1 1 1 c 1
+    1 d c c c c c c c c c c c c d 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 d d 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 d d 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+`
+//  [RESTO DE OBJETOS]
 let img_fantasma = img`
-    . . . . . . . . . . . .
-    . . . . 1 1 1 1 . . . .
-    . . . 1 1 1 1 1 1 . . .
-    . . 1 1 1 1 1 1 1 1 . .
-    . . 1 1 f 1 1 f 1 1 . .
-    . . 1 1 1 1 1 1 1 1 . .
-    . . 1 1 1 1 1 1 1 1 . .
-    . . 1 1 1 1 1 1 1 1 . .
-    . . 1 1 1 1 1 1 1 1 . .
-    . . 1 . 1 . 1 . 1 . . .
-    . . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . f 1 1 1 1 . . . .
+. . f 1 1 1 1 1 1 . . .
+. f 1 1 1 1 1 1 1 1 . .
+. f 1 1 f 1 1 f 1 1 . .
+. f 1 1 1 1 1 1 1 1 . .
+. f 1 1 1 1 1 1 1 1 . .
+. f 1 1 1 1 1 1 1 1 . .
+. f 1 1 1 1 1 1 1 1 . .
+. f 1 f 1 f 1 f 1 f . .
+. . f . f . f . f . . .
 `
-let img_gema = img`
-    . . . . . . . . . . . .
-    . . . . . 2 2 . . . . .
-    . . . . 2 4 4 2 . . . .
-    . . . 2 4 2 2 4 2 . . .
-    . . . 2 4 2 2 4 2 . . .
-    . . . 2 4 4 4 4 2 . . .
-    . . . . 2 4 4 2 . . . .
-    . . . . . 2 2 . . . . .
-    . . . . . . . . . . . .
+//  CAMBIO 1: ROLLO DE CABLES (Antes Gema)
+let img_cablenaranja = img`
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . e e e e e . . . .
+. . e 4 4 4 4 4 e . . .
+. e 4 e e e e 4 4 e . .
+. e 4 e 5 5 e e 4 e . .
+. e 4 e 5 5 e e 4 e . 4
+. e 4 e e e e 4 4 e 4 e
+. . e 4 4 4 4 4 e 4 e .
+. . . e e e e e e e . .
+. . . . . . . . . . . .
 `
-let img_planta = img`
-    . . . . . . . . . . . .
-    . . . . . . 7 . . . . .
-    . . . . . 7 7 . . . . .
-    . . . 7 . 7 7 . 7 . . .
-    . . . 7 7 7 7 7 7 . . .
-    . . . . 7 7 7 7 . . . .
-    . . . . 7 7 7 7 . . . .
-    . . . . . 7 7 . . . . .
-    . . . . . . . . . . . .
+let img_cableverde = img`
+. . . . . . . . . . . .
+. . . . 7 7 7 7 . . . .
+. . . 7 6 6 7 7 7 . . .
+. . 7 6 7 7 7 6 7 7 . .
+. 7 6 7 7 7 7 7 6 7 . .
+. 7 6 7 7 7 7 7 6 7 . .
+. . 7 6 7 7 7 6 7 . . .
+. . . 7 6 6 7 7 . . . .
+. . . . 7 7 7 . 7 7 . .
+. . . . . . . . . . . .
+. . . . . . . . . . . .
 `
-let img_libro = img`
-    . . . . . . . . . . . .
-    . . . b b b b . . . . .
-    . . b 1 1 1 1 b . . . .
-    . b 1 1 1 1 1 1 b . . .
-    . b c c c c c c b . . .
-    . b c c c c c c b . . .
-    . b c c c c c c b . . .
-    . b 1 1 1 1 1 1 b . . .
-    . . b b b b b b . . . .
+let img_cableamarillo = img`
+. . . . 2 2 2 2 . . . . . . . .
+. . . 2 5 5 5 5 2 . . . . . . .
+. . 2 5 2 2 5 5 5 2 . . . . . .
+. 2 5 2 5 5 5 2 5 5 2 . . . . .
+2 5 2 5 5 5 5 5 2 5 2 . . . . .
+2 5 2 5 5 5 5 5 2 5 2 . . . . .
+. 2 5 2 5 5 5 2 5 2 . . . . . .
+. . 2 5 2 2 5 5 2 2 2 . . . . .
+. . . 2 5 5 5 2 5 5 5 5 . . . .
+. . . . 2 2 2 2 2 2 2 2 . . . .
+. . . . . . . . . . . . . . . .
 `
 let img_salud = img`
     . . . . . . . . . . . .
@@ -122,120 +161,162 @@ let img_salud = img`
     . . . 1 2 2 2 2 1 . . .
     . . . . 1 1 1 1 . . . .
 `
+//  CAMBIO 2: CAJA DE HERRAMIENTAS (Antes Caldero)
 let img_caldero = img`
     . . . . . . . . . . . .
-    . . . b b . . b b . . .
-    . . b 1 1 b b 1 1 b . .
-    . b 1 1 1 1 1 1 1 1 b .
-    . b 1 2 2 5 5 2 2 1 b .
-    . b 1 2 5 5 5 5 2 1 b .
-    . b b 2 5 5 5 5 2 b b .
-    . . b 2 2 5 5 2 2 b . .
-    . . . b b b b b b . . .
-    . . . d . . . . d . . .
-    . . d . . . . . . d . .
+    . . . . . . . . . . . .
+    . . . . 1 1 1 1 . . . .
+    . . . . 1 . . 1 . . . .
+    . . 2 2 2 2 2 2 2 2 . .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . 2 2 1 1 1 1 1 1 2 2 .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . 2 2 2 2 2 2 2 2 2 2 .
+    . . . . . . . . . . . .
 `
-let img_suelo = img`
-    c c b c c c b c c c b c c c b c
-    c c b c c c b c c c b c c c b c
-    b b b b b b b b b b b b b b b b
-    c b c c c b c c c b c c c b c c
-    c b c c c b c c c b c c c b c c
-    b b b b b b b b b b b b b b b b
-    c c c b c c c b c c c b c c c b
-    c c c b c c c b c c c b c c c b
-    b b b b b b b b b b b b b b b b
-    c c b c c c b c c c b c c c b c
-    c c b c c c b c c c b c c c b c
-    b b b b b b b b b b b b b b b b
-    c b c c c b c c c b c c c b c c
-    c b c c c b c c c b c c c b c c
-    b b b b b b b b b b b b b b b b
-    c c c b c c c b c c c b c c c b
-`
-let img_pared = img`
+//  Tile de suelo metálico
+let img_suelo_limpio = img`
     b b b b b b b b b b b b b b b b
     b d d d d d d d d d d d d d d b
     b d c c c c c c c c c c c c d b
-    b d c b b b c b b b c b b b c b
-    b d c b b b c b b b c b b b c b
-    b d c c c c c c c c c c c c c b
-    b d c b b b c b b b c b b b c b
-    b d c c c c c c c c c c c c c b
-    b d c c c c c c c c c c c c c b
-    b d c b b b c b b b c b b b c b
-    b d c b b b c b b b c b b b c b
-    b d c c c c c c c c c c c c c b
-    b d c b b b c b b b c b b b c b
-    b d c b b b c b b b c b b b c b
+    b d c 1 c c c c c c c c 1 c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c 1 c c c c c c c c d b
+    b d c c 1 1 1 c c c c c c c d b
+    b d c c c 1 c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c c c c c c c c c c c c d b
+    b d c 1 c c c c c c c c 1 c d b
+    b d c c c c c c c c c c c c d b
     b d d d d d d d d d d d d d d b
     b b b b b b b b b b b b b b b b
 `
 //  --- 4. MAPA Y ENTIDADES ---
 function generar_mundo() {
-    let fila: string;
-    let char: string;
+    let lista_jugador: tiles.Location[];
+    let lista_torre_a: tiles.Location[];
+    let i: number;
     let loc: tiles.Location;
+    let t: Sprite;
+    let lista_torre_b: tiles.Location[];
+    let lista_torre_c: tiles.Location[];
     let caldero: Sprite;
-    scene.setBackgroundColor(13)
-    //  IMPORTANTE: Configurar mapa en el editor a 20x15
-    tiles.setCurrentTilemap(tilemap`level1`)
-    //  N = NPC, S = Start, P = Pocion
-    let nivel = ["WWWWWWWWWWWWWWWWWWWW", "W.S..N.............W", "W.WWWWWWW.WW.WWWWW.W", "W.W.....W.WW.W...W.W", "W.W.1...W.WW.W.2.W.W", "W.WWWWWWW.WW.WWWWW.W", "W.........E........W", "WWWWWWWW.....WWWWWWW", "W......E...........W", "W.WWWWWWW...WWWWWW.W", "W.W.....W...W....W.W", "W.W.3.......W..C.W.W", "W.WWWWWWWW.WWWWWWW.W", "W.........P........W", "WWWWWWWWWWWWWWWWWWWW"]
-    let filas = nivel.length
-    let cols = nivel[0].length
-    for (let r = 0; r < filas; r++) {
-        fila = nivel[r]
-        for (let c = 0; c < cols; c++) {
-            char = fila[c]
-            loc = tiles.getTileLocation(c, r)
-            //  1. Suelo
-            tiles.setTileAt(loc, img_suelo)
-            //  2. Elementos
-            if (char == "W") {
-                tiles.setTileAt(loc, img_pared)
-                tiles.setWallAt(loc, true)
-            } else if (char == "C") {
-                caldero = sprites.create(img_caldero, KIND_META)
-                tiles.placeOnTile(caldero, loc)
-                caldero.startEffect(effects.fountain, 50000)
-            } else if (char == "S") {
-                tiles.placeOnTile(jugador, loc)
-            } else if (char == "N") {
-                crear_rey(loc)
-            } else if (char == "E") {
-                crear_enemigo(loc)
-            } else if (char == "P") {
-                crear_item("Pocion Salud", img_salud, loc, "curacion")
-            } else if (char == "1") {
-                crear_item("Gema Magica", img_gema, loc, "mision")
-            } else if (char == "2") {
-                crear_item("Hierba Santa", img_planta, loc, "mision")
-            } else if (char == "3") {
-                crear_item("Libro Antiguo", img_libro, loc, "mision")
-            }
-            
-        }
-    }
-}
-
-function crear_rey(loc: tiles.Location) {
     
-    rey_npc = sprites.create(img_rey, KIND_NPC)
-    tiles.placeOnTile(rey_npc, loc)
-    rey_npc.startEffect(effects.smiles, 50000)
+    //  Limpieza
+    items = []
+    sprites.destroyAllSpritesOfKind(KIND_ENEMIGO)
+    sprites.destroyAllSpritesOfKind(KIND_META)
+    sprites.destroyAllSpritesOfKind(KIND_ITEM)
+    sprites.destroyAllSpritesOfKind(KIND_TORRE)
+    scene.setBackgroundColor(13)
+    //  --- CASO 0: MAPA GENERAL ---
+    if (nivel_actual == 0) {
+        tiles.setCurrentTilemap(tilemap`mapa_general`)
+        game.splash("MAPA DE ESPAÑA", "Busca la Torre A")
+        //  Colocar Jugador
+        lista_jugador = tiles.getTilesByType(assets.tile`marcador_jugador`)
+        if (lista_jugador.length > 0) {
+            tiles.placeOnTile(jugador, lista_jugador[0])
+            tiles.setTileAt(lista_jugador[0], img_suelo_limpio)
+        }
+        
+        //  COLOCAR TORRES
+        //  Torre A
+        lista_torre_a = tiles.getTilesByType(assets.tile`marcador_torre_a`)
+        for (i = 0; i < lista_torre_a.length; i++) {
+            loc = lista_torre_a[i]
+            t = sprites.create(img_torre_a, KIND_TORRE)
+            tiles.placeOnTile(t, loc)
+            tiles.setTileAt(loc, img_suelo_limpio)
+        }
+        //  Torre B
+        lista_torre_b = tiles.getTilesByType(assets.tile`marcador_torre_b`)
+        for (i = 0; i < lista_torre_b.length; i++) {
+            loc = lista_torre_b[i]
+            t = sprites.create(img_torre_b, KIND_TORRE)
+            tiles.placeOnTile(t, loc)
+            tiles.setTileAt(loc, img_suelo_limpio)
+        }
+        //  Torre C
+        lista_torre_c = tiles.getTilesByType(assets.tile`marcador_torre_c`)
+        for (i = 0; i < lista_torre_c.length; i++) {
+            loc = lista_torre_c[i]
+            t = sprites.create(img_torre_c, KIND_TORRE)
+            tiles.placeOnTile(t, loc)
+            tiles.setTileAt(loc, img_suelo_limpio)
+        }
+        return
+    }
+    
+    //  --- CASO NIVELES (1, 2, 3) ---
+    if (nivel_actual == 1) {
+        tiles.setCurrentTilemap(tilemap`level01`)
+        game.splash("TORRE A", "Objetivo: 1 Panel")
+    } else if (nivel_actual == 2) {
+        tiles.setCurrentTilemap(tilemap`level0`)
+        game.splash("TORRE B", "Objetivo: 2 Paneles")
+    } else if (nivel_actual == 3) {
+        tiles.setCurrentTilemap(tilemap`nivel0`)
+        game.splash("TORRE C", "Objetivo: 3 Paneles")
+    }
+    
+    //  Colocar Jugador
+    lista_jugador = tiles.getTilesByType(assets.tile`marcador_jugador`)
+    if (lista_jugador.length > 0) {
+        tiles.placeOnTile(jugador, lista_jugador[0])
+        tiles.setTileAt(lista_jugador[0], img_suelo_limpio)
+    }
+    
+    //  Colocar Enemigos
+    let lista_enemigos = tiles.getTilesByType(assets.tile`marcador_enemigo`)
+    for (i = 0; i < lista_enemigos.length; i++) {
+        loc = lista_enemigos[i]
+        crear_enemigo(loc)
+        tiles.setTileAt(loc, img_suelo_limpio)
+    }
+    //  Colocar Meta (Caldero/Centro Control)
+    let lista_caldero = tiles.getTilesByType(assets.tile`marcador_caldero`)
+    for (i = 0; i < lista_caldero.length; i++) {
+        loc = lista_caldero[i]
+        caldero = sprites.create(img_caldero, KIND_META)
+        tiles.placeOnTile(caldero, loc)
+        caldero.startEffect(effects.fountain, 50000)
+        tiles.setTileAt(loc, img_suelo_limpio)
+    }
+    //  Colocar Items
+    let lista_gema = tiles.getTilesByType(assets.tile`marcador_item1`)
+    for (i = 0; i < lista_gema.length; i++) {
+        loc = lista_gema[i]
+        crear_item("Panel Torre A", img_cablenaranja, loc, "mision")
+        tiles.setTileAt(loc, img_suelo_limpio)
+    }
+    let lista_planta = tiles.getTilesByType(assets.tile`marcador_item2`)
+    for (i = 0; i < lista_planta.length; i++) {
+        loc = lista_planta[i]
+        crear_item("Panel Torre B", img_cableverde, loc, "mision")
+        tiles.setTileAt(loc, img_suelo_limpio)
+    }
+    let lista_libro = tiles.getTilesByType(assets.tile`marcador_item3`)
+    for (i = 0; i < lista_libro.length; i++) {
+        loc = lista_libro[i]
+        crear_item("Panel Torre C", img_cableamarillo, loc, "mision")
+        tiles.setTileAt(loc, img_suelo_limpio)
+    }
 }
 
 function crear_enemigo(loc: tiles.Location) {
     let ene = sprites.create(img_fantasma, KIND_ENEMIGO)
     tiles.placeOnTile(ene, loc)
-    ene.follow(jugador, 25)
+    ene.follow(jugador, 20)
+    ene.setFlag(SpriteFlag.GhostThroughWalls, true)
 }
 
 function crear_item(nombre: string, img_obj: Image, loc: tiles.Location, tipo: string) {
     let spr: Sprite;
     let nuevo_item: ItemJuego;
-    //  Items de curación no se guardan
     if (tipo == "curacion") {
         spr = sprites.create(img_obj, KIND_ITEM)
         tiles.placeOnTile(spr, loc)
@@ -245,21 +326,19 @@ function crear_item(nombre: string, img_obj: Image, loc: tiles.Location, tipo: s
         return
     }
     
-    //  Items de misión
     nuevo_item = new ItemJuego(nombre, img_obj, tipo)
     items.push(nuevo_item)
-    if (settings.readNumber("got_" + nombre) == 1) {
-        nuevo_item.recogido = true
-    } else {
-        spr = sprites.create(img_obj, KIND_ITEM)
-        tiles.placeOnTile(spr, loc)
-        spr.startEffect(effects.halo, 50000)
-        nuevo_item.sprite_fisico = spr
-    }
-    
+    spr = sprites.create(img_obj, KIND_ITEM)
+    tiles.placeOnTile(spr, loc)
+    spr.startEffect(effects.halo, 50000)
+    nuevo_item.sprite_fisico = spr
 }
 
 function setup_hero() {
+    
+    if (jugador) {
+        jugador.destroy()
+    }
     
     jugador = sprites.create(img_hero, SpriteKind.Player)
     controller.moveSprite(jugador, 80, 80)
@@ -276,7 +355,6 @@ game.onUpdate(function bucle_principal() {
     
     let velocidad = 80
     let gasto = 0.05
-    //  SPRINT (Correr)
     if (controller.A.isPressed()) {
         velocidad = 120
         gasto = 0.2
@@ -284,29 +362,42 @@ game.onUpdate(function bucle_principal() {
     }
     
     controller.moveSprite(jugador, velocidad, velocidad)
-    //  Gasto de energía
-    if (controller.left.isPressed() || controller.right.isPressed() || controller.up.isPressed() || controller.down.isPressed()) {
+    //  --- ANIMACIÓN ---
+    let estado_actual = "parado"
+    if (controller.left.isPressed()) {
+        estado_actual = "izquierda"
+        energia -= gasto
+    } else if (controller.right.isPressed()) {
+        estado_actual = "derecha"
+        energia -= gasto
+    } else if (controller.up.isPressed()) {
+        estado_actual = "arriba"
+        energia -= gasto
+    } else if (controller.down.isPressed()) {
+        estado_actual = "abajo"
         energia -= gasto
     }
     
-    //  HUD (Sin cambiar color para evitar errores)
+    if (estado_actual != ultimo_estado_hero) {
+        animation.stopAnimation(animation.AnimationTypes.All, jugador)
+        if (estado_actual == "izquierda") {
+            animation.runImageAnimation(jugador, assets.animation`anim_hero_izquierda`, 100, true)
+        } else if (estado_actual == "derecha") {
+            animation.runImageAnimation(jugador, assets.animation`anim_hero_derecha`, 100, true)
+        } else if (estado_actual == "arriba") {
+            animation.runImageAnimation(jugador, assets.animation`anim_hero_arriba`, 100, true)
+        } else if (estado_actual == "abajo") {
+            animation.runImageAnimation(jugador, assets.animation`anim_hero_abajo`, 100, true)
+        } else if (estado_actual == "parado") {
+            jugador.setImage(img_hero)
+        }
+        
+        ultimo_estado_hero = estado_actual
+    }
+    
     info.setScore(Math.trunc(energia))
     if (energia <= 0) {
         game.over(false, effects.melt)
-    }
-    
-})
-//  INTERACCIÓN NPC
-sprites.onOverlap(SpriteKind.Player, KIND_NPC, function on_npc_overlap(player: Sprite, npc: Sprite) {
-    
-    if (!mision_iniciada) {
-        game.showLongText(`REY: ¡Alquimista!
-Una plaga destruye mi reino.
-Encuentra los 3 objetos sagrados y llevalos al caldero.`, DialogLayout.Bottom)
-        game.showLongText(`REY: Ten cuidado con los fantasmas.
-¡Ve y salvanos!`, DialogLayout.Bottom)
-        mision_iniciada = true
-        player.y += 16
     }
     
 })
@@ -316,22 +407,21 @@ sprites.onOverlap(SpriteKind.Player, KIND_ITEM, function on_item_overlap(player:
     for (let it of items) {
         if (it.sprite_fisico == other) {
             if (it.tipo == "curacion") {
-                energia = Math.min(100, energia + 30)
+                energia = Math.min(999, energia + 30)
                 other.destroy(effects.hearts, 500)
                 music.powerUp.play()
-                player.say("Recuperado!", 500)
-                //  No usamos remove, solo lo marcamos como recogido
+                //  AUMENTADO A 2000ms
+                player.say("Recuperado!", 2000)
                 it.recogido = true
                 break
             }
             
             if (it.tipo == "mision") {
                 it.recogido = true
-                other.destroy(effects.confetti, 500)
+                other.destroy()
                 music.magicWand.play()
-                energia = Math.min(100, energia + 10)
+                energia = Math.min(999, energia + 10)
                 game.showLongText("¡Conseguido!\n" + it.nombre, DialogLayout.Bottom)
-                settings.writeNumber("got_" + it.nombre, 1)
                 break
             }
             
@@ -345,68 +435,259 @@ sprites.onOverlap(SpriteKind.Player, KIND_ENEMIGO, function on_enemy_overlap(pla
     energia -= 5
     scene.cameraShake(4, 200)
     music.zapped.play()
-    if (player.x < enemy.x) {
-        player.x -= 16
-    } else {
-        player.x += 16
-    }
-    
-    player.say("¡Ay!", 500)
+    pause(200)
 })
-//  INTERACCIÓN META
-sprites.onOverlap(SpriteKind.Player, KIND_META, function on_meta_overlap(player: Sprite, meta: Sprite) {
-    let faltan = false
-    for (let i of items) {
-        if (i.tipo == "mision" && !i.recogido) {
-            faltan = true
+//  --- INTERACCIÓN CON LAS TORRES (ENTRADA A NIVELES) ---
+//  --- AQUI ESTA LA MAGIA DEL BLOQUEO ---
+sprites.onOverlap(SpriteKind.Player, KIND_TORRE, function on_torre_overlap(player: Sprite, torre: Sprite) {
+    
+    //  TORRE A
+    if (torre.image == img_torre_a) {
+        if (niveles_desbloqueados == 1) {
+            nivel_actual = 1
+            generar_mundo()
+        } else {
+            //  AUMENTADO A 2000ms
+            player.say("Torre A: COMPLETADA", 2000)
+            player.y += 16
+        }
+        
+    } else if (torre.image == img_torre_b) {
+        //  Empujamos al jugador para que no entre
+        //  TORRE B
+        if (niveles_desbloqueados == 2) {
+            nivel_actual = 2
+            generar_mundo()
+        } else if (niveles_desbloqueados > 2) {
+            //  AUMENTADO A 2000ms
+            player.say("Torre B: COMPLETADA", 2000)
+            player.y += 16
+        } else {
+            //  AUMENTADO A 2000ms
+            player.say("¡Bloqueada! Termina la Torre A", 2000)
+            player.y += 16
+        }
+        
+    } else if (torre.image == img_torre_c) {
+        //  TORRE C
+        if (niveles_desbloqueados == 3) {
+            nivel_actual = 3
+            generar_mundo()
+        } else {
+            //  AUMENTADO A 2000ms
+            player.say("¡Bloqueada! Termina la Torre B", 2000)
+            player.y += 16
         }
         
     }
-    if (!faltan) {
-        music.baDing.play()
-        game.over(true, effects.starField)
-    } else {
-        player.say("Necesito los 3 objetos!", 1000)
-        player.y -= 10
-    }
     
 })
-//  --- 6. MENÚS Y ARRANQUE ---
-function inicio() {
+//  INTERACCIÓN CALDERO (COMPLETAR NIVEL)
+sprites.onOverlap(SpriteKind.Player, KIND_META, function on_meta_overlap(player: Sprite, meta: Sprite) {
+    let tenemos_este: boolean;
+    let texto_falta: string;
     
-    game.splash("THE ALCHEMIST", "Platinum Edition")
-    let opcion = game.askForNumber(`1. Jugar
-2. Borrar Progreso`, 1)
-    if (opcion == 2) {
-        settings.writeNumber("got_Gema Magica", 0)
-        settings.writeNumber("got_Hierba Santa", 0)
-        settings.writeNumber("got_Libro Antiguo", 0)
-        game.splash("Memoria borrada")
+    let objetivos : string[] = []
+    if (nivel_actual == 1) {
+        objetivos = ["Panel Torre A"]
+    } else if (nivel_actual == 2) {
+        objetivos = ["Panel Torre A", "Panel Torre B"]
+    } else if (nivel_actual == 3) {
+        objetivos = ["Panel Torre A", "Panel Torre B", "Panel Torre C"]
     }
     
-    setup_hero()
-    //  Botón B activa inventario
-    controller.B.onEvent(ControllerButtonEvent.Pressed, function mostrar_inventari() {
-        let estado: any;
-        let texto = "MOCHILA:\n"
-        for (let i of items) {
-            if (i.tipo == "mision") {
-                estado = i.recogido ? "[X] " : "[ ] "
-                texto += estado + i.nombre + "\n"
+    let faltan : string[] = []
+    for (let obj_nombre of objetivos) {
+        tenemos_este = false
+        for (let it of items) {
+            if (it.nombre == obj_nombre && it.recogido) {
+                tenemos_este = true
+                break
             }
             
         }
-        game.showLongText(texto, DialogLayout.Full)
-    })
-    generar_mundo()
-    energia = 100.0
-    juego_activo = true
-    game.showLongText(`CONTROLES:
-A = Correr
-B = Inventario
-
-Habla con el REY para empezar.`, DialogLayout.Full)
+        if (!tenemos_este) {
+            faltan.push(obj_nombre)
+        }
+        
+    }
+    if (faltan.length == 0) {
+        music.baDing.play()
+        if (nivel_actual == 1) {
+            game.showLongText(`Torre A reactivada.
+Volviendo al mapa...`, DialogLayout.Bottom)
+            niveles_desbloqueados = 2
+            nivel_actual = 0
+            //  Volver al mapa
+            generar_mundo()
+        } else if (nivel_actual == 2) {
+            game.showLongText(`Torre B reactivada.
+Volviendo al mapa...`, DialogLayout.Bottom)
+            niveles_desbloqueados = 3
+            nivel_actual = 0
+            //  Volver al mapa
+            generar_mundo()
+        } else if (nivel_actual == 3) {
+            game.over(true, effects.starField)
+        }
+        
+    } else {
+        //  FIN DEL JUEGO
+        player.y += 10
+        scene.cameraShake(2, 200)
+        texto_falta = "Faltan:\n"
+        for (let f of faltan) {
+            texto_falta += "- " + f + "\n"
+        }
+        game.showLongText(texto_falta, DialogLayout.Bottom)
+    }
+    
+})
+//  --- 6. HISTORIA Y MENÚS ---
+function introduccion_historia() {
+    scene.setBackgroundColor(15)
+    //  1. CIUDAD
+    scene.setBackgroundImage(assets.image`intro_ciudad`)
+    game.showLongText("ESPAÑA\n02:17 A.M.", DialogLayout.Bottom)
+    music.bigCrash.play()
+    game.showLongText("LA RED...\nSE APAGA.", DialogLayout.Bottom)
+    game.showLongText(`No fue un fallo.
+Ni un ataque.`, DialogLayout.Bottom)
+    //  2. RAYO
+    scene.setBackgroundImage(assets.image`intro_rayo`)
+    game.showLongText(`La electricidad
+simplemente...`, DialogLayout.Bottom)
+    game.showLongText("DESAPARECIO.", DialogLayout.Bottom)
+    game.showLongText(`Las torres entraron
+en contencion.`, DialogLayout.Bottom)
+    game.showLongText(`Los sistemas
+quedaron bajo tierra.`, DialogLayout.Bottom)
+    //  3. MAPA
+    scene.setBackgroundImage(assets.image`intro_mapa`)
+    game.showLongText(`Los tecnicos
+nunca salieron.`, DialogLayout.Bottom)
+    game.showLongText(`Algo de ellos
+sigue abajo.`, DialogLayout.Bottom)
+    game.showLongText("SENSORES ACTIVOS:", DialogLayout.Bottom)
+    game.showLongText(`Detectando
+Radiacion residual...`, DialogLayout.Bottom)
+    game.showLongText(`Detectando
+Energia inestable...`, DialogLayout.Bottom)
+    game.showLongText(`Detectando
+Ecos humanos...`, DialogLayout.Bottom)
+    //  4. HÉROE
+    scene.setBackgroundImage(assets.image`intro_heroe`)
+    music.beamUp.play()
+    game.showLongText(`Eres un
+OPERADOR DE
+CONTINGENCIA.`, DialogLayout.Bottom)
+    game.showLongText(`Tu traje te protege.
+Pero tu energia
+NO es infinita.`, DialogLayout.Bottom)
+    game.showLongText("MISION PRIORITY:", DialogLayout.Bottom)
+    game.showLongText(`Recuperar los
+PANELES DE REINICIO
+de los sotanos.`, DialogLayout.Bottom)
+    //  Volvemos al MAPA
+    scene.setBackgroundImage(assets.image`intro_mapa`)
+    game.showLongText(`ADVERTENCIA:
+El sistema exige
+un orden exacto.`, DialogLayout.Bottom)
+    game.showLongText("FASE 1:\nIr a Torre A", DialogLayout.Bottom)
+    game.showLongText("FASE 2:\nIr a Torre B", DialogLayout.Bottom)
+    game.showLongText("FASE 3:\nIr a Torre C", DialogLayout.Bottom)
+    scene.setBackgroundImage(null)
+    scene.setBackgroundColor(15)
+    game.showLongText(`Si fallas,
+la red caera
+para siempre.`, DialogLayout.Center)
+    game.showLongText(`Si tienes exito...
+España volvera
+a encenderse.`, DialogLayout.Center)
+    game.showLongText("A cualquier precio.", DialogLayout.Center)
 }
 
-//  ¡ARRANCAR MOTOR!
-inicio()
+function menu_principal() {
+    let bg_controles: Image;
+    //  1. LIMPIEZA TOTAL
+    scene.setBackgroundColor(15)
+    //  Fondo negro (15)
+    scene.setBackgroundImage(null)
+    //  Quitar cualquier imagen anterior
+    //  2. FONDO NEGRO FORZADO
+    let bg_negro = image.create(160, 120)
+    bg_negro.fill(15)
+    scene.setBackgroundImage(bg_negro)
+    //  3. PAUSA TÉCNICA
+    pause(100)
+    //  4. AHORA SÍ, LA PREGUNTA
+    let jugar = game.ask("¿INICIAR MISION?", "A: Jugar  B: Controles")
+    if (jugar) {
+        //  Pulsó A -> Jugar
+        comenzar_juego()
+    } else {
+        //  Pulsó B -> Controles (TABS)
+        //  TAB 1: MOVIMIENTO
+        bg_controles = image.create(160, 120)
+        bg_controles.fill(15)
+        bg_controles.printCenter("CONTROLES (1/3)", 5, 1)
+        bg_controles.print("MOVIMIENTO:", 10, 30, 1)
+        bg_controles.print("Usa FLECHAS", 20, 45, 6)
+        bg_controles.print("o teclas WASD", 20, 60, 6)
+        scene.setBackgroundImage(bg_controles)
+        game.showLongText("Siguiente: Pulsa (A)", DialogLayout.Bottom)
+        //  TAB 2: ACCIÓN
+        bg_controles.fill(15)
+        bg_controles.printCenter("CONTROLES (2/3)", 5, 1)
+        bg_controles.print("ACCION:", 10, 30, 1)
+        bg_controles.print("Pulsa ESPACIO", 20, 45, 6)
+        bg_controles.print("o Boton (A)", 20, 60, 6)
+        scene.setBackgroundImage(bg_controles)
+        game.showLongText("Siguiente: Pulsa (A)", DialogLayout.Bottom)
+        //  TAB 3: CORRER
+        bg_controles.fill(15)
+        bg_controles.printCenter("CONTROLES (3/3)", 5, 1)
+        bg_controles.print("CORRER:", 10, 30, 1)
+        bg_controles.print("Manten ESPACIO", 20, 45, 6)
+        bg_controles.print("mientras andas", 20, 60, 6)
+        scene.setBackgroundImage(bg_controles)
+        game.showLongText("Volver al menu: (A)", DialogLayout.Bottom)
+        //  RECURSIVIDAD: Volvemos al inicio de esta función
+        menu_principal()
+    }
+    
+}
+
+function comenzar_juego() {
+    
+    introduccion_historia()
+    setup_hero()
+    controller.B.onEvent(ControllerButtonEvent.Pressed, function mostrar_inventari() {
+        let texto = "EQUIPO:\n"
+        let encontrados = 0
+        for (let i of items) {
+            if (i.tipo == "mision" && i.recogido) {
+                texto += "[ON] " + i.nombre + "\n"
+                encontrados += 1
+            }
+            
+        }
+        if (encontrados == 0) {
+            texto += "(Sin energia)"
+        }
+        
+        game.showLongText(texto, DialogLayout.Full)
+    })
+    items = []
+    //  EMPEZAMOS EN EL MAPA (Nivel 0)
+    nivel_actual = 0
+    energia = 999.0
+    generar_mundo()
+    juego_activo = true
+}
+
+//  --- INICIO DEL PROGRAMA ---
+//  Primero mostramos el título (Splash) una sola vez
+game.splash("BLACKOUT", "España Edition")
+//  Luego entramos al menú principal
+menu_principal()
