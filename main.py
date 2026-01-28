@@ -193,10 +193,10 @@ def generar_mundo():
         tiles.set_current_tilemap(tilemap("""level01"""))
         game.splash("TORRE A", "Objetivo: 1 Panel")
     elif nivel_actual == 2:
-        tiles.set_current_tilemap(tilemap("""level0"""))
+        tiles.set_current_tilemap(tilemap("""level02"""))
         game.splash("TORRE B", "Objetivo: 2 Paneles")
     elif nivel_actual == 3:
-        tiles.set_current_tilemap(tilemap("""nivel0"""))
+        tiles.set_current_tilemap(tilemap("""level03"""))
         game.splash("TORRE C", "Objetivo: 3 Paneles")
 
     # Colocar Jugador en niveles (aquí SÍ usamos el marcador normal)

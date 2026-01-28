@@ -190,10 +190,10 @@ function generar_mundo() {
         tiles.setCurrentTilemap(tilemap`level01`)
         game.splash("TORRE A", "Objetivo: 1 Panel")
     } else if (nivel_actual == 2) {
-        tiles.setCurrentTilemap(tilemap`level0`)
+        tiles.setCurrentTilemap(tilemap`level02`)
         game.splash("TORRE B", "Objetivo: 2 Paneles")
     } else if (nivel_actual == 3) {
-        tiles.setCurrentTilemap(tilemap`nivel0`)
+        tiles.setCurrentTilemap(tilemap`level03`)
         game.splash("TORRE C", "Objetivo: 3 Paneles")
     }
     
