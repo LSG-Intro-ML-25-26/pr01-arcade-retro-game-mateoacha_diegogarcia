@@ -67,7 +67,7 @@ Per reactivar les torres, cal trobar aquests objectes ocults als nivells y ficar
 
 ## Demo Speed-Run
 
-A continuació es mostra una partida ràpida demostrant com completar la Torre A i la mecànica de moviment.
+A continuació es mostra una partida ràpida demostrant com completar el joc i la mecànica de moviment.
 
 https://drive.google.com/file/d/1UXf7uU9NWTHP8kIYG22GHPqxxk7x8VYH/view?usp=sharing 
 
