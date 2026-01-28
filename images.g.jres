@@ -49,6 +49,11 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "img_fantasma"
     },
+    "image11": {
+        "data": "hwQQABAAAABoiIaIaIiIhohoiGiGiGiIiIiGiIiIiIiIaIiIaIhoiIiIiIiGiIiIiIiGiIiIiIaGiIiIiIiIiIhoiIiGiIiIiIiIaIiIaIiIiIaIaIiIhmiIiIiIiIiIiGiGiIaIaIhoiIaIiIiIhohoiGiIiIiIiIiIiGaIaIiIiIiIiIiIhg==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "miImagen0"
+    },
     "anim6": {
         "namespace": "myAnimations",
         "id": "anim6",
