@@ -69,7 +69,6 @@ Per reactivar les torres, cal trobar aquests objectes ocults als nivells y ficar
 
 A continuació es mostra una partida ràpida demostrant com completar la Torre A i la mecànica de moviment.
 
-![GIF o Video del Joc](URL_DEL_TEU_VIDEO_O_GIF_AQUI)
-*(Pots pujar el vídeo a YouTube i posar l'enllaç aquí, o pujar un GIF animat)*
+https://drive.google.com/file/d/1UXf7uU9NWTHP8kIYG22GHPqxxk7x8VYH/view?usp=sharing 
 
 ---
