@@ -2,7 +2,7 @@
 👑 BLACKOUT: ESPAÑA EDITION 👑
 (ACTUALIZADO: Héroe en Posición Fija 50x50 en Mapa General)
 """
-
+#hola
 # --- 1. CLASES ---
 class ItemJuego:
     def __init__(self, nombre: str, imagen: Image, tipo: str):

@@ -3,6 +3,7 @@
 (ACTUALIZADO: Héroe en Posición Fija 50x50 en Mapa General)
 
  */
+// hola
 //  --- 1. CLASES ---
 class ItemJuego {
     nombre: string
